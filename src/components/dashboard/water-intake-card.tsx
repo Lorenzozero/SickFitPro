@@ -12,6 +12,7 @@ import { Droplet, PlusCircle, MinusCircle, RotateCcw, GlassWater, Milk, Bell } f
 import { useLanguage } from '@/context/language-context';
 import { useToast } from '@/hooks/use-toast';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import { Skeleton } from '@/components/ui/skeleton'; // Added import for Skeleton
 
 const DEFAULT_DAILY_WATER_GOAL_ML = 2500;
 const WATER_INCREMENT_ML = 250;
@@ -139,7 +140,7 @@ export default function WaterIntakeCard() {
           <Progress value={progressPercentage} className="w-full h-2" />
         </div>
         <TooltipProvider>
-          <div className="grid grid-cols-3 gap-2">
+          <div className="grid grid-cols-2 gap-2"> {/* Changed from grid-cols-3 to grid-cols-2 */}
             <Tooltip>
               <TooltipTrigger asChild>
                 <Button 
@@ -174,23 +175,7 @@ export default function WaterIntakeCard() {
               </TooltipContent>
             </Tooltip>
 
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Button 
-                  onClick={() => addWater(WATER_INCREMENT_ML * -1)} 
-                  variant="outline" 
-                  disabled={currentWaterIntake < WATER_INCREMENT_ML}
-                  aria-label={t('waterIntakeCard.ariaRemoveGenericAmount', { amount: WATER_INCREMENT_ML })}
-                  className="w-full h-12 sm:h-10 flex flex-col items-center justify-center"
-                >
-                  <MinusCircle className="w-5 h-5 mb-0.5" />
-                   <span className="text-xs">-{WATER_INCREMENT_ML}ml</span>
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent>
-                <p>{t('waterIntakeCard.tooltipRemoveAmount', { amount: WATER_INCREMENT_ML })}</p>
-              </TooltipContent>
-            </Tooltip>
+            {/* Removed the -500ml button */}
           </div>
         </TooltipProvider>
          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between pt-4 mt-4 border-t gap-2">
@@ -213,3 +198,4 @@ export default function WaterIntakeCard() {
     </Card>
   );
 }
+
