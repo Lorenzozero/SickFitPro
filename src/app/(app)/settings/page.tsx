@@ -14,15 +14,15 @@ import {
 } from '@/components/ui/select';
 import { Button } from '@/components/ui/button';
 import { Switch } from '@/components/ui/switch';
-import { Languages, Bell, Save, Moon, Sun } from 'lucide-react'; // Added Moon, Sun
+import { Languages, Bell, Save, Moon, Sun } from 'lucide-react'; 
 import { useToast } from '@/hooks/use-toast';
 import { useLanguage, type Language } from '@/context/language-context';
-import { useTheme } from '@/components/theme-provider'; // Added useTheme
+import { useTheme } from '@/components/theme-provider'; 
 
 
 export default function SettingsPage() {
   const { language, setLanguage, t, isClient: languageContextIsClient } = useLanguage();
-  const { theme, setTheme, resolvedTheme } = useTheme(); // Added theme state
+  const { theme, setTheme, resolvedTheme } = useTheme(); 
   const [enableNotifications, setEnableNotifications] = useState(true); 
   const { toast } = useToast();
   const [isClient, setIsClient] = useState(false);
@@ -96,7 +96,7 @@ export default function SettingsPage() {
           </CardHeader>
           <CardContent>
             <div className="flex items-center justify-between gap-4">
-                <Label htmlFor="theme-preference" className="whitespace-nowrap">{t('userDropdown.theme')}</Label>
+                <Label htmlFor="theme-preference" className="whitespace-nowrap"></Label>
                  <div className="w-auto min-w-[180px]">
                     <Select 
                         value={isClient ? theme : 'system'} 
