@@ -2,15 +2,14 @@
 'use client';
 
 import { useState, type ChangeEvent, useEffect } from 'react';
-// import type { SVGProps } from 'react';
 import { PageHeader } from '@/components/shared/page-header';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import Image from 'next/image';
-import { LineChart as LucideLineChart, UploadCloud, BarChart as LucideBarChart, Users } from 'lucide-react'; // Aliased to avoid conflict
-import { ChartContainer, ChartTooltip, ChartTooltipContent, ChartLegend, ChartLegendContent } from "@/components/ui/chart"
-import { Bar, CartesianGrid, XAxis, YAxis, Tooltip as RechartsTooltip, ResponsiveContainer, Line, Legend as RechartsLegend, BarChart, LineChart } from "recharts"
+import { LineChart as LucideLineChart, UploadCloud, BarChart as LucideBarChart, Users } from 'lucide-react';
+import { ChartContainer, ChartTooltip, ChartTooltipContent, ChartLegend, ChartLegendContent } from "@/components/ui/chart";
+import { Bar, CartesianGrid, XAxis, YAxis, Tooltip as RechartsTooltip, ResponsiveContainer, Line, Legend as RechartsLegend, BarChart, LineChart } from "recharts";
 import type { ChartConfig } from '@/components/ui/chart';
 import { useLanguage } from '@/context/language-context';
 
@@ -21,7 +20,7 @@ const chartData = [
   { month: "April", desktop: 73, mobile: 190 },
   { month: "May", desktop: 209, mobile: 130 },
   { month: "June", desktop: 214, mobile: 140 },
-]; 
+];
 
 export default function ProgressPage() {
   const { t, language } = useLanguage();
@@ -50,7 +49,6 @@ export default function ProgressPage() {
     }
   };
 
-
   const handleImageUpload = (event: ChangeEvent<HTMLInputElement>, setImage: (url: string | null) => void) => {
     const file = event.target.files?.[0];
     if (file) {
@@ -61,9 +59,9 @@ export default function ProgressPage() {
       reader.readAsDataURL(file);
     }
   };
-  
+
   const getMonthAbbreviation = (fullMonthName: string) => {
-    if (!isClient) return fullMonthName.slice(0, 3); // Fallback for SSR or before client hydration
+    if (!isClient) return fullMonthName.slice(0, 3);
 
     if (language === 'it') {
         const monthMap: { [key: string]: string } = {
@@ -77,8 +75,7 @@ export default function ProgressPage() {
   };
 
   if (!isClient) {
-    // Optional: Render a loading state or null during SSR to avoid hydration mismatches with chartConfig
-    return null; 
+    return null;
   }
 
   return (
@@ -193,7 +190,10 @@ export default function ProgressPage() {
                   />
                 </label>
               </div>
-              <Button variant="outline" size="sm" className="w-full mt-2" onClick={() => document.getElementById(`upload-${item.titleKey.toLowerCase().replace(/\s+/g, '-')}`)?.click()}>
+              <Button variant="outline" size="sm" className="w-full mt-2" onClick={() => {
+                const el = document.getElementById(`upload-${item.titleKey.toLowerCase().replace(/\s+/g, '-')}`);
+                el?.click();
+                }}>
                 {t('progressPage.uploadButtonLabel')} {t(item.titleKey)}
               </Button>
             </div>
