@@ -137,6 +137,7 @@ const translations: Record<Language, Translations> = {
         addWorkoutTo: "Add to {dayOfWeek}",
         toastWorkoutScheduledTitle: "Workout Scheduled!",
         toastWorkoutScheduledDescription: "{planName} on {dayOfWeek} at {time}.",
+        toastWorkoutScheduledDescriptionNoTime: "{planName} on {dayOfWeek}.", // New key
         toastWorkoutRemovedTitle: "Workout Removed",
         errorSelectDayAndPlan: "Please select a day and a workout plan.",
         errorPlanNotFound: "Selected plan not found.",
@@ -436,6 +437,7 @@ const translations: Record<Language, Translations> = {
         addWorkoutTo: "Aggiungi a {dayOfWeek}",
         toastWorkoutScheduledTitle: "Allenamento Programmato!",
         toastWorkoutScheduledDescription: "{planName} il {dayOfWeek} alle {time}.",
+        toastWorkoutScheduledDescriptionNoTime: "{planName} il {dayOfWeek}.", // New key
         toastWorkoutRemovedTitle: "Allenamento Rimosso",
         errorSelectDayAndPlan: "Seleziona un giorno e una scheda di allenamento.",
         errorPlanNotFound: "Scheda selezionata non trovata.",
