@@ -37,7 +37,7 @@ export default function SettingsPage() {
     if (!isClient) return;
 
     localStorage.setItem('app-notifications-enabled', JSON.stringify(enableNotifications));
-    // Theme and language are saved by their respective providers/hooks
+    // Language is saved by its respective provider/hook
     console.log({ selectedLanguage: language, notifications: enableNotifications });
     toast({
       title: t('settingsPage.settingsSaved'),
@@ -49,7 +49,6 @@ export default function SettingsPage() {
     <>
       <PageHeader
         title={t('settingsPage.title')}
-        description={t('settingsPage.description')}
       />
       <div className="space-y-8">
         <Card className="shadow-lg">
@@ -62,14 +61,14 @@ export default function SettingsPage() {
           <CardContent>
             <div className="space-y-2">
                 <div className="flex items-center justify-between gap-4">
-                    <Label htmlFor="language" className="whitespace-nowrap"></Label>
-                    <div className="w-auto min-w-[180px]">
+                    <Label htmlFor="language" className="whitespace-nowrap sr-only">{t('settingsPage.language')}</Label>
+                    <div className="w-full">
                         <Select 
                             value={isClient ? language : 'en'} 
                             onValueChange={(value) => setLanguage(value as Language)}
                             disabled={!isClient}
                         >
-                            <SelectTrigger id="language">
+                            <SelectTrigger id="language" aria-label={t('settingsPage.selectLanguage')}>
                                 <SelectValue placeholder={t('settingsPage.selectLanguage')} />
                             </SelectTrigger>
                             <SelectContent>
