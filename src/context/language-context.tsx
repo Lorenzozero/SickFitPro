@@ -1,4 +1,3 @@
-
 // src/context/language-context.tsx
 'use client';
 
@@ -21,7 +20,7 @@ const translations: Record<Language, Translations> = {
       workoutPlans: 'Workout Plans',
       calendar: 'Calendar',
       progress: 'Progress',
-      diet: 'Diet', // Added Diet
+      diet: 'Diet', 
     },
     userDropdown: {
       myAccount: 'My Account',
@@ -42,25 +41,28 @@ const translations: Record<Language, Translations> = {
       workoutsThisWeek: 'Workouts This Week', // e.g., 3/5
       weightLifted: 'Total Weight Lifted', 
       currentWeight: 'Current Weight',
-      quickActions: 'Quick Actions', // Will be removed from UI but key remains for now
-      quickActionsDescription: 'Jump right into your fitness routine.', // Will be removed from UI
       logNewWorkout: 'Start Workout',
       todaysFocus: "Today's Focus",
       todaysFocusDescription: "What's on the agenda for today?",
       checkCalendarForWorkout: "Check your calendar for today's workout!",
       viewCalendarToSeeWorkout: "Your scheduled workout will appear here.",
       viewFullSchedule: 'View Full Schedule',
-      dietAndHydrationTitle: "Diet & Hydration",
-      dietAndHydrationDescription: "Track your nutrition and water intake.",
+      comingSoon: "More Features Coming Soon",
+      dietFeaturesPlaceholder: "Detailed meal planning, recipe suggestions, and advanced nutritional analysis will be available here.",
+      checkBackLater: "Check back later for more updates!",
     },
     waterIntakeCard: {
       title: "Water Intake",
       description: "Stay hydrated! Your goal: {goal} L",
       currentIntakeLabel: "Current: {current} / {goal}",
-      addWaterButton: "Add Water",
       resetWaterButton: "Reset Water",
       waterResetTitle: "Water Reset",
       waterResetDescription: "Your water intake for the day has been reset.",
+      ariaAddGlass: "Add glass ({amount}ml)",
+      ariaAddBottle: "Add bottle ({amount}ml)",
+      ariaRemoveGenericAmount: "Remove {amount}ml",
+      tooltipAddAmount: "+{amount}ml",
+      tooltipRemoveAmount: "-{amount}ml",
     },
     macroTrackingCard: {
         title: "Macro Tracking",
@@ -121,8 +123,8 @@ const translations: Record<Language, Translations> = {
         generatingSplitTitle: "Generating your advice...",
         generatingSplitDescription: "Our AI is thinking. This might take a moment.",
         yourSuggestedAdviceTitle: "Your AI Fitness Advice",
-        suggestedKeyPointsLabel: "Key Suggestions:",
-        detailedAnalysisLabel: "Detailed Analysis & Advice:",
+        suggestedKeyPointsLabel: "Key Suggestions:", // English key used by flow.ts
+        detailedAnalysisLabel: "Detailed Analysis & Advice:", // English key used by flow.ts
         toastSuggestionReadyTitle: "Advice Ready!",
         toastSuggestionReadyDescription: "AI has generated training advice for you.",
         toastErrorTitle: "Error",
@@ -145,7 +147,6 @@ const translations: Record<Language, Translations> = {
         samplePlan2: "Upper Body Power",
         samplePlan3: "Leg Day Domination",
         samplePlan4: "Cardio Session",
-        timeLabel: "Time", // Remains for potential future use, though UI hidden
         cancelButton: "Cancel",
         scheduleWorkoutButton: "Schedule Workout",
         loadingCalendar: "Loading calendar...",
@@ -266,7 +267,7 @@ const translations: Record<Language, Translations> = {
         aiCoachCardDescription: "Get personalized advice and training plans. Your training data is automatically used to provide tailored suggestions.",
     },
     workoutPlansPage: {
-        title: "Workout Plans", // Changed to "Workout Plans" for consistency, will be "Schede" in Italian
+        title: "Workout Plans", 
         description: "Create, manage, and share your training schedules.",
         createNewPlanButton: "Create New Plan",
         exercisesLabel: "Exercises",
@@ -284,8 +285,8 @@ const translations: Record<Language, Translations> = {
         addThisExerciseButton: "Add this Exercise",
         addedExercisesLabel: "Added Exercises:",
         noExercisesAddedYet: "No exercises added to this plan yet.",
-        exerciseSelectionPlaceholder: "Add exercises to this plan using the form above.", // Updated placeholder
-        addExerciseButton: "Add Exercise to Plan", // Button to add an exercise from inputs
+        exerciseSelectionPlaceholder: "Add exercises to this plan using the form above.", 
+        addExerciseButton: "Add Exercise to Plan", 
         cancelButton: "Cancel",
         savePlanButton: "Save Plan",
         toastPlanUpdatedTitle: "Plan Updated",
@@ -346,21 +347,20 @@ const translations: Record<Language, Translations> = {
       maxRepsLabel: "Max Reps",
       repsUnitLabel: "reps",
     },
-    dietPage: { // Added Diet Page translations
+    dietPage: { 
         title: "Diet Tracking",
         description: "Manage your daily nutritional intake and hydration.",
-        // ... other diet specific translations can be added here
     },
     toastErrorTitle: "Error",
   },
   it: {
     nav: {
-      dashboard: 'Home', // Changed from "Cruscotto" to "Home"
+      dashboard: 'Home', 
       exercises: 'Esercizi',
-      workoutPlans: 'Schede', // Changed from "Piani di Allenamento"
+      workoutPlans: 'Schede', 
       calendar: 'Calendario',
       progress: 'Progressi',
-      diet: 'Dieta', // Added Diet
+      diet: 'Dieta', 
     },
     userDropdown: {
       myAccount: 'Il Mio Account',
@@ -378,28 +378,31 @@ const translations: Record<Language, Translations> = {
       welcomeTitle: 'Benvenuto in SickFit Pro!',
       welcomeDescription: 'Il tuo viaggio verso la forma fisica ottimale inizia qui. Mettiamoci al lavoro.',
       workoutsPlannedToday: 'Allenamenti Previsti Oggi',
-      workoutsThisWeek: 'Allenamenti Settimanali', // es. 3/5
+      workoutsThisWeek: 'Allenamenti Settimanali', 
       weightLifted: 'Peso Totale Sollevato',
       currentWeight: 'Peso Attuale',
-      quickActions: 'Azioni Rapide', // Will be removed from UI
-      quickActionsDescription: 'Entra subito nella tua routine di fitness.', // Will be removed from UI
-      logNewWorkout: 'Inizia Allenamento', // Changed from "Registra Nuovo Allenamento"
+      logNewWorkout: 'Inizia Allenamento', 
       todaysFocus: "Focus di Oggi",
       todaysFocusDescription: "Cosa c'è in programma per oggi?",
       checkCalendarForWorkout: "Controlla il calendario per l'allenamento di oggi!",
       viewCalendarToSeeWorkout: "Il tuo allenamento programmato apparirà qui.",
       viewFullSchedule: 'Visualizza Programma Completo',
-      dietAndHydrationTitle: "Dieta e Idratazione",
-      dietAndHydrationDescription: "Monitora la tua nutrizione e l'apporto idrico.",
+      comingSoon: "Altre Funzionalità in Arrivo",
+      dietFeaturesPlaceholder: "Pianificazione dettagliata dei pasti, suggerimenti di ricette e analisi nutrizionali avanzate saranno disponibili qui.",
+      checkBackLater: "Torna più tardi per ulteriori aggiornamenti!",
     },
     waterIntakeCard: {
       title: "Apporto Idrico",
       description: "Rimani idratato! Il tuo obiettivo: {goal} L",
       currentIntakeLabel: "Attuale: {current} / {goal}",
-      addWaterButton: "Aggiungi Acqua",
       resetWaterButton: "Resetta Acqua",
       waterResetTitle: "Apporto Idrico Azzerato",
       waterResetDescription: "Il tuo apporto idrico giornaliero è stato azzerato.",
+      ariaAddGlass: "Aggiungi bicchiere ({amount}ml)",
+      ariaAddBottle: "Aggiungi bottiglia ({amount}ml)",
+      ariaRemoveGenericAmount: "Rimuovi {amount}ml",
+      tooltipAddAmount: "+{amount}ml",
+      tooltipRemoveAmount: "-{amount}ml",
     },
     macroTrackingCard: {
         title: "Monitoraggio Macro",
@@ -460,8 +463,8 @@ const translations: Record<Language, Translations> = {
         generatingSplitTitle: "Sto generando i tuoi consigli...",
         generatingSplitDescription: "La nostra AI sta elaborando. Potrebbe volerci un momento.",
         yourSuggestedAdviceTitle: "I Tuoi Consigli dal Coach AI",
-        suggestedKeyPointsLabel: "Suggerimenti Chiave:",
-        detailedAnalysisLabel: "Analisi Dettagliata e Consigli:",
+        suggestedKeyPointsLabel: "Suggerimenti Chiave:", // Italian prompt uses "Suggerimenti Chiave"
+        detailedAnalysisLabel: "Analisi Dettagliata e Consigli:", // Italian prompt uses "Analisi e Consigli Dettagliati"
         toastSuggestionReadyTitle: "Consigli Pronti!",
         toastSuggestionReadyDescription: "L'AI ha generato consigli di allenamento per te.",
         toastErrorTitle: "Errore",
@@ -484,7 +487,6 @@ const translations: Record<Language, Translations> = {
         samplePlan2: "Scheda Parte Superiore",
         samplePlan3: "Scheda Gambe Intensa",
         samplePlan4: "Sessione Cardio",
-        timeLabel: "Ora", // Rimane per uso futuro, UI nascosta
         cancelButton: "Annulla",
         scheduleWorkoutButton: "Programma Allenamento",
         loadingCalendar: "Caricamento calendario...",
@@ -605,7 +607,7 @@ const translations: Record<Language, Translations> = {
         aiCoachCardDescription: "Ottieni consigli personalizzati e piani di allenamento. I tuoi dati di allenamento vengono usati automaticamente per fornire suggerimenti su misura.",
     },
      workoutPlansPage: {
-        title: "Schede Allenamento", // Key "Piani di Allenamento" changed to "Schede"
+        title: "Schede Allenamento", 
         description: "Crea, gestisci e condividi i tuoi programmi di allenamento.",
         createNewPlanButton: "Crea Nuova Scheda",
         exercisesLabel: "Esercizi",
@@ -685,7 +687,7 @@ const translations: Record<Language, Translations> = {
       maxRepsLabel: "Rip. Max",
       repsUnitLabel: "rip.",
     },
-    dietPage: { // Added Diet Page translations
+    dietPage: { 
         title: "Monitoraggio Dieta",
         description: "Gestisci il tuo apporto nutrizionale giornaliero e l'idratazione.",
     },
@@ -725,7 +727,7 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
       setLanguageState(clientInitialLanguage);
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, []); // Runs once on client mount
 
   const setLanguage = useCallback((newLanguage: Language) => {
     if (translations[newLanguage]) {
@@ -744,53 +746,47 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const t = useCallback((key: string, replacements?: Record<string, string | number | undefined>): string => {
-    const currentLang = isClient ? language : DEFAULT_LANGUAGE; // Use state language if client, else default
+    const currentLang = isClient ? language : DEFAULT_LANGUAGE; 
     const keys = key.split('.');
     let result: any = translations[currentLang];
 
     for (const k of keys) {
       result = result?.[k];
       if (result === undefined) {
-        // Fallback to default language if key not found in current language
         if (currentLang !== DEFAULT_LANGUAGE) {
             let fallbackResult: any = translations[DEFAULT_LANGUAGE];
             for (const fk of keys) {
                 fallbackResult = fallbackResult?.[fk];
                 if (fallbackResult === undefined) {
-                  // If still not found in default, return the key itself or a default from replacements
                   return replacements?.default?.toString() || key;
                 }
             }
-            result = fallbackResult; // Use the result from the default language
-            break; // Exit loop as we found a fallback
+            result = fallbackResult; 
+            break; 
         }
-        // If not found in current (which might be default) or any fallback, return key or default
         return replacements?.default?.toString() || key;
       }
     }
 
     if (typeof result === 'string' && replacements) {
-      // Make a copy of replacements to avoid modifying the original object
       const actualReplacements = { ...replacements };
-      // Remove 'default' from replacements if it exists, as it's handled above
       delete actualReplacements.default;
 
       return Object.entries(actualReplacements).reduce((acc, [placeholder, value]) => {
-        // Ensure value is string or number before trying to replace
         const replacementValue = (typeof value === 'string' || typeof value === 'number') ? String(value) : '';
         return acc.replace(new RegExp(`{${placeholder}}`, 'g'), replacementValue);
       }, result);
     }
 
     return typeof result === 'string' ? result : (replacements?.default?.toString() || key) ;
-  }, [language, isClient]); // Depend on isClient
+  }, [language, isClient]); 
 
 
   useEffect(() => {
-    if (isClient) { // Only run on client
+    if (isClient) { 
       document.documentElement.lang = language;
     }
-  }, [language, isClient]); // Depend on isClient
+  }, [language, isClient]); 
 
   return (
     <LanguageContext.Provider value={{ language, setLanguage, t, isClient }}>

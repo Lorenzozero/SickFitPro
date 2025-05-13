@@ -1,12 +1,14 @@
+// src/components/dashboard/water-intake-card.tsx
 'use client';
 
 import { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
-import { Droplet, PlusCircle, MinusCircle, RotateCcw } from 'lucide-react';
+import { Droplet, PlusCircle, MinusCircle, RotateCcw, GlassWater, Milk } from 'lucide-react';
 import { useLanguage } from '@/context/language-context';
 import { useToast } from '@/hooks/use-toast';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 
 const DAILY_WATER_GOAL_ML = 2500; // Default goal, can be made configurable
 const WATER_INCREMENT_ML = 250;
@@ -46,7 +48,12 @@ export default function WaterIntakeCard() {
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="h-10 bg-muted rounded-md animate-pulse"></div>
+          <div className="h-10 bg-muted rounded-md animate-pulse mb-4"></div>
+          <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
+            {[...Array(4)].map((_, i) => (
+              <div key={i} className="h-10 bg-muted rounded-md animate-pulse"></div>
+            ))}
+          </div>
         </CardContent>
       </Card>
     );
@@ -60,9 +67,18 @@ export default function WaterIntakeCard() {
             <Droplet className="w-5 h-5 mr-2 text-blue-500" />
             {t('waterIntakeCard.title')}
           </CardTitle>
-          <Button variant="ghost" size="icon" onClick={resetWater} aria-label={t('waterIntakeCard.resetWaterButton')}>
-            <RotateCcw className="w-4 h-4" />
-          </Button>
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button variant="ghost" size="icon" onClick={resetWater} aria-label={t('waterIntakeCard.resetWaterButton')}>
+                  <RotateCcw className="w-4 h-4" />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>{t('waterIntakeCard.resetWaterButton')}</p>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
         </div>
         <CardDescription>{t('waterIntakeCard.description', { goal: DAILY_WATER_GOAL_ML / 1000 })}</CardDescription>
       </CardHeader>
@@ -76,20 +92,79 @@ export default function WaterIntakeCard() {
           </div>
           <Progress value={progressPercentage} className="w-full h-2" />
         </div>
-        <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
-          <Button onClick={() => addWater(WATER_INCREMENT_ML)} variant="outline">
-            <PlusCircle className="w-4 h-4 mr-2" /> {WATER_INCREMENT_ML}ml
-          </Button>
-          <Button onClick={() => addWater(WATER_INCREMENT_ML * 2)} variant="outline">
-            <PlusCircle className="w-4 h-4 mr-2" /> {WATER_INCREMENT_ML * 2}ml
-          </Button>
-           <Button onClick={() => addWater(WATER_INCREMENT_ML * -1)} variant="outline" disabled={currentWaterIntake < WATER_INCREMENT_ML}>
-            <MinusCircle className="w-4 h-4 mr-2" /> {WATER_INCREMENT_ML}ml
-          </Button>
-           <Button onClick={() => addWater(WATER_INCREMENT_ML * -2)} variant="outline" disabled={currentWaterIntake < WATER_INCREMENT_ML * 2}>
-            <MinusCircle className="w-4 h-4 mr-2" /> {WATER_INCREMENT_ML * 2}ml
-          </Button>
-        </div>
+        <TooltipProvider>
+          <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button 
+                  onClick={() => addWater(WATER_INCREMENT_ML)} 
+                  variant="outline" 
+                  size="icon" 
+                  aria-label={t('waterIntakeCard.ariaAddGlass', { amount: WATER_INCREMENT_ML })}
+                  className="w-full h-12 sm:h-10"
+                >
+                  <GlassWater className="w-5 h-5" />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>{t('waterIntakeCard.tooltipAddAmount', { amount: WATER_INCREMENT_ML })}</p>
+              </TooltipContent>
+            </Tooltip>
+
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button 
+                  onClick={() => addWater(WATER_INCREMENT_ML * 2)} 
+                  variant="outline" 
+                  size="icon" 
+                  aria-label={t('waterIntakeCard.ariaAddBottle', { amount: WATER_INCREMENT_ML * 2 })}
+                  className="w-full h-12 sm:h-10"
+                >
+                  <Milk className="w-5 h-5" />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>{t('waterIntakeCard.tooltipAddAmount', { amount: WATER_INCREMENT_ML * 2 })}</p>
+              </TooltipContent>
+            </Tooltip>
+
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button 
+                  onClick={() => addWater(WATER_INCREMENT_ML * -1)} 
+                  variant="outline" 
+                  size="icon" 
+                  disabled={currentWaterIntake < WATER_INCREMENT_ML}
+                  aria-label={t('waterIntakeCard.ariaRemoveGenericAmount', { amount: WATER_INCREMENT_ML })}
+                  className="w-full h-12 sm:h-10"
+                >
+                  <MinusCircle className="w-5 h-5" />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>{t('waterIntakeCard.tooltipRemoveAmount', { amount: WATER_INCREMENT_ML })}</p>
+              </TooltipContent>
+            </Tooltip>
+
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button 
+                  onClick={() => addWater(WATER_INCREMENT_ML * -2)} 
+                  variant="outline" 
+                  size="icon" 
+                  disabled={currentWaterIntake < WATER_INCREMENT_ML * 2}
+                  aria-label={t('waterIntakeCard.ariaRemoveGenericAmount', { amount: WATER_INCREMENT_ML * 2 })}
+                  className="w-full h-12 sm:h-10"
+                >
+                  <MinusCircle className="w-5 h-5" />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>{t('waterIntakeCard.tooltipRemoveAmount', { amount: WATER_INCREMENT_ML * 2 })}</p>
+              </TooltipContent>
+            </Tooltip>
+          </div>
+        </TooltipProvider>
       </CardContent>
     </Card>
   );
