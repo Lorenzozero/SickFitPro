@@ -27,16 +27,20 @@ export default function SettingsPage() {
 
   useEffect(() => {
     setIsClient(true);
-    const storedNotificationPref = localStorage.getItem('app-notifications-enabled');
-    if (storedNotificationPref !== null) {
-      setEnableNotifications(JSON.parse(storedNotificationPref));
+    if (typeof window !== 'undefined') {
+        const storedNotificationPref = localStorage.getItem('app-notifications-enabled');
+        if (storedNotificationPref !== null) {
+          setEnableNotifications(JSON.parse(storedNotificationPref));
+        }
     }
   }, []);
 
   const handleSaveChanges = () => {
     if (!isClient) return;
 
-    localStorage.setItem('app-notifications-enabled', JSON.stringify(enableNotifications));
+    if (typeof window !== 'undefined') {
+        localStorage.setItem('app-notifications-enabled', JSON.stringify(enableNotifications));
+    }
     // Language is saved by its respective provider/hook
     console.log({ selectedLanguage: language, notifications: enableNotifications });
     toast({
@@ -59,26 +63,30 @@ export default function SettingsPage() {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="space-y-2">
-                <div className="flex items-center justify-between gap-4">
-                    <Label htmlFor="language" className="whitespace-nowrap sr-only">{t('settingsPage.language')}</Label>
-                    <div className="w-full">
-                        <Select 
-                            value={isClient ? language : 'en'} 
-                            onValueChange={(value) => setLanguage(value as Language)}
-                            disabled={!isClient}
-                        >
-                            <SelectTrigger id="language" aria-label={t('settingsPage.selectLanguage')}>
-                                <SelectValue placeholder={t('settingsPage.selectLanguage')} />
-                            </SelectTrigger>
-                            <SelectContent>
-                                <SelectItem value="en">{t('settingsPage.english')}</SelectItem>
-                                <SelectItem value="it">{t('settingsPage.italian')}</SelectItem>
-                                <SelectItem value="es">{t('settingsPage.spanish')}</SelectItem>
-                                <SelectItem value="fr">{t('settingsPage.french')}</SelectItem>
-                            </SelectContent>
-                        </Select>
-                    </div>
+            <div className="flex items-center gap-4">
+                <Label htmlFor="language" className="whitespace-nowrap">
+                  {/* This label was previously sr-only and its text potentially removed. 
+                      Restoring text and visibility based on "rimetttila sulla stessa riga di lingua".
+                      Using the same translation key as the CardTitle for consistency. 
+                  */}
+                  {t('settingsPage.language')}
+                </Label>
+                <div className="w-auto">
+                    <Select 
+                        value={isClient ? language : 'en'} 
+                        onValueChange={(value) => setLanguage(value as Language)}
+                        disabled={!isClient}
+                    >
+                        <SelectTrigger id="language" className="min-w-[200px]" aria-label={t('settingsPage.selectLanguage')}>
+                            <SelectValue placeholder={t('settingsPage.selectLanguage')} />
+                        </SelectTrigger>
+                        <SelectContent>
+                            <SelectItem value="en">{t('settingsPage.english')}</SelectItem>
+                            <SelectItem value="it">{t('settingsPage.italian')}</SelectItem>
+                            <SelectItem value="es">{t('settingsPage.spanish')}</SelectItem>
+                            <SelectItem value="fr">{t('settingsPage.french')}</SelectItem>
+                        </SelectContent>
+                    </Select>
                 </div>
             </div>
           </CardContent>
@@ -113,4 +121,3 @@ export default function SettingsPage() {
     </>
   );
 }
-
