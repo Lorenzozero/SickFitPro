@@ -1,6 +1,8 @@
+
 'use client';
 
 import { useState } from 'react';
+import type { ChangeEvent } from 'react'; // Keep ChangeEvent if used elsewhere, not in current snippet
 import { PageHeader } from '@/components/shared/page-header';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
@@ -12,20 +14,20 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
 import { Switch } from '@/components/ui/switch';
-import { Languages, Bell, Palette, Save } from 'lucide-react';
+import { Languages, Bell, Palette, Save, Moon, Sun } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import { useTheme } from '@/components/theme-provider';
 
 export default function SettingsPage() {
   const [language, setLanguage] = useState('en');
   const [notifications, setNotifications] = useState(true);
-  const [darkMode, setDarkMode] = useState(false); // Placeholder for theme
+  const { theme, setTheme, resolvedTheme } = useTheme();
   const { toast } = useToast();
 
   const handleSaveChanges = () => {
-    // In a real app, save these settings to backend/localStorage
-    console.log({ language, notifications, darkMode });
+    // Theme is saved by ThemeProvider. Language and notifications are local state for now.
+    console.log({ language, notifications, selectedTheme: theme });
     toast({
       title: "Settings Saved",
       description: "Your preferences have been updated.",
@@ -62,7 +64,12 @@ export default function SettingsPage() {
                 </SelectContent>
               </Select>
               <p className="text-xs text-muted-foreground">
-                Selected language: {language === 'en' ? 'English' : language === 'it' ? 'Italiano' : 'Other'}
+                Selected language: {
+                  language === 'en' ? 'English (US)' : 
+                  language === 'it' ? 'Italiano (Italian)' : 
+                  language === 'es' ? 'Español (Spanish)' : 
+                  language === 'fr' ? 'Français (French)' : 'Other'
+                }
               </p>
             </div>
           </CardContent>
@@ -96,22 +103,33 @@ export default function SettingsPage() {
           <CardHeader>
             <CardTitle className="flex items-center">
               <Palette className="w-5 h-5 mr-2 text-primary" />
-              Appearance (Placeholder)
+              Appearance
             </CardTitle>
             <CardDescription>Customize the look and feel of the app.</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
-            <div className="flex items-center justify-between p-3 rounded-md bg-secondary">
-              <Label htmlFor="dark-mode" className="font-normal">Dark Mode</Label>
-              <Switch id="dark-mode" checked={darkMode} onCheckedChange={setDarkMode} disabled /> 
-              {/* Dark mode toggle functionality is complex and typically handled at a higher level */}
-            </div>
-             <p className="text-xs text-muted-foreground">
-                Dark mode toggle is a placeholder. Actual theme switching requires app-wide state management.
+            <div className="w-full max-w-sm space-y-2">
+              <Label htmlFor="theme-preference" className="flex items-center">
+                {resolvedTheme === 'dark' ? <Moon className="w-4 h-4 mr-2" /> : <Sun className="w-4 h-4 mr-2" />}
+                Theme
+              </Label>
+               <Select value={theme} onValueChange={(value) => setTheme(value as 'light' | 'dark' | 'system')}>
+                <SelectTrigger id="theme-preference">
+                  <SelectValue placeholder="Select theme" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="light">Light</SelectItem>
+                  <SelectItem value="dark">Dark</SelectItem>
+                  <SelectItem value="system">System</SelectItem>
+                </SelectContent>
+              </Select>
+               <p className="text-xs text-muted-foreground">
+                Current preference: {theme.charAt(0).toUpperCase() + theme.slice(1)}. 
+                {theme === 'system' && ` (System is currently applying: ${resolvedTheme})`}
               </p>
+            </div>
           </CardContent>
         </Card>
-
 
         <div className="flex justify-end">
           <Button onClick={handleSaveChanges}>

@@ -1,3 +1,6 @@
+
+'use client'; 
+
 import type { ReactNode } from 'react';
 import Link from 'next/link';
 import {
@@ -17,9 +20,25 @@ import { navItems } from '@/config/nav';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Settings, LogOut, Moon, Sun } from 'lucide-react';
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
+import { 
+  DropdownMenu, 
+  DropdownMenuContent, 
+  DropdownMenuItem, 
+  DropdownMenuLabel, 
+  DropdownMenuSeparator, 
+  DropdownMenuTrigger,
+  DropdownMenuSub,
+  DropdownMenuSubTrigger,
+  DropdownMenuPortal,
+  DropdownMenuSubContent,
+  DropdownMenuRadioGroup,
+  DropdownMenuRadioItem
+} from '@/components/ui/dropdown-menu';
+import { useTheme } from '@/components/theme-provider';
 
 export default function AppLayout({ children }: { children: ReactNode }) {
+  const { theme, setTheme, resolvedTheme } = useTheme();
+
   return (
     <SidebarProvider defaultOpen>
       <Sidebar>
@@ -62,15 +81,29 @@ export default function AppLayout({ children }: { children: ReactNode }) {
             <DropdownMenuContent side="top" align="start" className="w-56">
               <DropdownMenuLabel>My Account</DropdownMenuLabel>
               <DropdownMenuSeparator />
-              <DropdownMenuItem>
-                <Settings className="w-4 h-4 mr-2" />
-                <span>Settings</span>
+              <DropdownMenuItem asChild>
+                <Link href="/settings">
+                  <Settings className="w-4 h-4 mr-2" />
+                  <span>Settings</span>
+                </Link>
               </DropdownMenuItem>
-              {/* Placeholder for theme toggle - actual functionality not implemented */}
-              {/* <DropdownMenuItem>
-                <Moon className="w-4 h-4 mr-2" /> 
-                <span>Toggle Theme</span>
-              </DropdownMenuItem> */}
+              
+              <DropdownMenuSub>
+                <DropdownMenuSubTrigger>
+                  {resolvedTheme === 'dark' ? <Moon className="w-4 h-4 mr-2" /> : <Sun className="w-4 h-4 mr-2" />}
+                  <span>Theme</span>
+                </DropdownMenuSubTrigger>
+                <DropdownMenuPortal>
+                  <DropdownMenuSubContent>
+                    <DropdownMenuRadioGroup value={theme} onValueChange={(value) => setTheme(value as 'light' | 'dark' | 'system')}>
+                      <DropdownMenuRadioItem value="light">Light</DropdownMenuRadioItem>
+                      <DropdownMenuRadioItem value="dark">Dark</DropdownMenuRadioItem>
+                      <DropdownMenuRadioItem value="system">System</DropdownMenuRadioItem>
+                    </DropdownMenuRadioGroup>
+                  </DropdownMenuSubContent>
+                </DropdownMenuPortal>
+              </DropdownMenuSub>
+
               <DropdownMenuSeparator />
               <DropdownMenuItem>
                 <LogOut className="w-4 h-4 mr-2" />
@@ -83,12 +116,12 @@ export default function AppLayout({ children }: { children: ReactNode }) {
       <SidebarInset>
         <header className="sticky top-0 z-10 flex items-center justify-between h-16 px-4 bg-background/80 backdrop-blur-sm border-b md:px-6">
           <SidebarTrigger className="md:hidden" />
-          {/* Placeholder for breadcrumbs or page title if needed here */}
           <div className="flex items-center gap-4">
-            {/* <Button variant="ghost" size="icon" aria-label="Toggle theme" className="hidden">
-              <Sun className="transition-all scale-100 rotate-0 dark:-rotate-90 dark:scale-0" />
-              <Moon className="absolute transition-all scale-0 rotate-90 dark:rotate-0 dark:scale-100" />
-            </Button> */}
+            <Button variant="ghost" size="icon" aria-label="Toggle theme" onClick={() => setTheme(resolvedTheme === 'dark' ? 'light' : 'dark')}>
+              <Sun className="h-[1.2rem] w-[1.2rem] rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
+              <Moon className="absolute h-[1.2rem] w-[1.2rem] rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
+              <span className="sr-only">Toggle theme</span>
+            </Button>
           </div>
         </header>
         <main className="flex-1 p-4 md:p-6 lg:p-8">
