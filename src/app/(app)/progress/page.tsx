@@ -9,13 +9,15 @@ import { Input } from '@/components/ui/input';
 import Image from 'next/image';
 import { LineChart as LucideLineChart, UploadCloud, BarChart as LucideBarChart, Users, PlusCircle, Edit2, Trash2, Bell } from 'lucide-react';
 import { ChartContainer, ChartTooltip, ChartTooltipContent, ChartLegend, ChartLegendContent } from "@/components/ui/chart";
-import { Bar, CartesianGrid, XAxis, YAxis, Tooltip as RechartsTooltip, ResponsiveContainer, Line, Legend as RechartsLegend, BarChart, LineChart } from "recharts";
+import { Bar, CartesianGrid, XAxis, YAxis, Tooltip as RechartsTooltip, ResponsiveContainer, Line, Legend as RechartsLegend, BarChart, LineChart as RechartsPrimitiveLineChart, BarChart as RechartsPrimitiveBarChart } from "recharts";
 import type { ChartConfig } from '@/components/ui/chart';
 import { useLanguage } from '@/context/language-context';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Switch } from '@/components/ui/switch';
+import { Label } from '@/components/ui/label';
 import { useToast } from '@/hooks/use-toast';
-import { AddMeasurementDialog } from '@/components/dialogs/add-measurement-dialog'; // New component
+import { AddMeasurementDialog } from '@/components/dialogs/add-measurement-dialog'; 
+import { Skeleton } from '@/components/ui/skeleton'; // Added import for Skeleton
 
 const chartData = [
   { month: "January", desktop: 186, mobile: 80 },
@@ -236,7 +238,7 @@ export default function ProgressPage() {
                             <TableHead>{t('progressPage.tableHeaderDate')}</TableHead>
                             <TableHead>{t('progressPage.tableHeaderMuscle')}</TableHead>
                             <TableHead>{t('progressPage.tableHeaderMeasurement')}</TableHead>
-                            <TableHead>{t('exercisesPage.tableHeaderActions')}</TableHead> 
+                            <TableHead className="text-right">{t('exercisesPage.tableHeaderActions')}</TableHead> 
                         </TableRow>
                     </TableHeader>
                     <TableBody>
@@ -326,6 +328,3 @@ export default function ProgressPage() {
     </>
   );
 }
-
-const RechartsPrimitiveLineChart = LineChart;
-const RechartsPrimitiveBarChart = BarChart;
