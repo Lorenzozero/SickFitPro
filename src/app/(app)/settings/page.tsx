@@ -3,7 +3,7 @@
 
 import { useState, useEffect } from 'react';
 import { PageHeader } from '@/components/shared/page-header';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
 import {
   Select,
@@ -73,7 +73,7 @@ export default function SettingsPage() {
               <Languages className="w-5 h-5 mr-2 text-primary" />
               {t('settingsPage.localization')}
             </CardTitle>
-            <CardDescription>{t('settingsPage.localizationDescription')}</CardDescription>
+            {/* CardDescription removed */}
           </CardHeader>
           <CardContent>
             <div className="w-full max-w-sm space-y-2">
@@ -103,18 +103,23 @@ export default function SettingsPage() {
         </Card>
 
         <Card className="shadow-lg">
-          <CardHeader>
+          <CardHeader className="flex flex-row items-center justify-between">
             <CardTitle className="flex items-center">
               <Bell className="w-5 h-5 mr-2 text-primary" />
               {t('settingsPage.notifications')}
             </CardTitle>
-            <CardDescription>{t('settingsPage.notificationsDescriptionSingle')}</CardDescription>
+            {/* CardDescription removed */}
+            <Switch 
+              id="all-notifications" 
+              aria-label={t('settingsPage.allNotificationsLabel')}
+              checked={enableNotifications} 
+              onCheckedChange={setEnableNotifications} 
+              disabled={!isClient}
+            />
           </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="flex items-center justify-between p-3 rounded-md bg-secondary">
-              <Label htmlFor="all-notifications" className="font-normal">{t('settingsPage.allNotificationsLabel')}</Label>
-              <Switch id="all-notifications" checked={enableNotifications} onCheckedChange={setEnableNotifications} disabled={!isClient} />
-            </div>
+          {/* CardContent for notifications is now empty or can be styled if needed, e.g., with p-0 if truly empty */}
+          <CardContent className="pt-0"> 
+            {/* Content moved to header or removed */}
           </CardContent>
         </Card>
         
@@ -124,7 +129,7 @@ export default function SettingsPage() {
               <Palette className="w-5 h-5 mr-2 text-primary" />
               {t('settingsPage.appearance')}
             </CardTitle>
-            <CardDescription>{t('settingsPage.appearanceDescription')}</CardDescription>
+            {/* CardDescription removed */}
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="w-full max-w-sm space-y-2">
@@ -170,3 +175,4 @@ export default function SettingsPage() {
     </>
   );
 }
+
