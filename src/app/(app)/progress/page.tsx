@@ -7,7 +7,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import Image from 'next/image';
-import { LineChart as LucideLineChart, UploadCloud, BarChart as LucideBarChart, Users, PlusCircle, Edit2, Trash2, Bell } from 'lucide-react';
+import { LineChart as LucideLineChart, UploadCloud, BarChart as LucideBarChart, Users, PlusCircle, Edit2, Trash2, Bell, Wand2 } from 'lucide-react';
 import { ChartContainer, ChartTooltip, ChartTooltipContent, ChartLegend, ChartLegendContent } from "@/components/ui/chart";
 import { Bar, CartesianGrid, XAxis, YAxis, Tooltip as RechartsTooltip, ResponsiveContainer, Line, Legend as RechartsLegend, BarChart, LineChart as RechartsPrimitiveLineChart, BarChart as RechartsPrimitiveBarChart } from "recharts";
 import type { ChartConfig } from '@/components/ui/chart';
@@ -18,15 +18,30 @@ import { Label } from '@/components/ui/label';
 import { useToast } from '@/hooks/use-toast';
 import { AddMeasurementDialog } from '@/components/dialogs/add-measurement-dialog'; 
 import { Skeleton } from '@/components/ui/skeleton';
+import { AiSplitForm } from '@/components/forms/ai-split-form';
 
-const chartData = [
-  { month: "January", desktop: 186, mobile: 80 },
-  { month: "February", desktop: 305, mobile: 200 },
-  { month: "March", desktop: 237, mobile: 120 },
-  { month: "April", desktop: 73, mobile: 190 },
-  { month: "May", desktop: 209, mobile: 130 },
-  { month: "June", desktop: 214, mobile: 140 },
+// Mock data for weekly training volume
+const weeklyVolumeChartData = [
+  { week: "W1", volume: 12000 },
+  { week: "W2", volume: 12500 },
+  { week: "W3", volume: 13000 },
+  { week: "W4", volume: 12800 },
+  { week: "W5", volume: 13500 },
+  { week: "W6", volume: 14000 },
+  { week: "W7", volume: 13800 },
+  { week: "W8", volume: 14200 },
 ];
+
+// Mock data for body composition chart (e.g., weight over months)
+const bodyCompositionChartData = [
+  { month: "January", weight: 70 },
+  { month: "February", weight: 69.5 },
+  { month: "March", weight: 69 },
+  { month: "April", weight: 68.5 },
+  { month: "May", weight: 68 },
+  { month: "June", weight: 67.5 },
+];
+
 
 export interface BodyMeasurement {
   id: string;
@@ -67,19 +82,15 @@ export default function ProgressPage() {
   }, []);
 
   const chartConfig: ChartConfig = {
-    desktop: {
-      label: languageContextIsClient ? t('progressPage.benchPressLabel') : 'Bench Press (kg)',
+    weeklyVolume: {
+      label: languageContextIsClient ? t('progressPage.weeklyTrainingVolumeLabel') : 'Weekly Training Volume (kg)',
       color: "hsl(var(--chart-1))",
       icon: LucideLineChart,
     },
-    mobile: {
-      label: languageContextIsClient ? t('progressPage.squatLabel') : 'Squat (kg)',
-      color: "hsl(var(--chart-2))",
-      icon: LucideBarChart,
-    },
-     weight: {
+    weight: {
       label: languageContextIsClient ? t('progressPage.weightLabel') : 'Weight (kg)',
-      color: 'hsl(var(--chart-3))'
+      color: 'hsl(var(--chart-3))',
+      icon: LucideBarChart,
     }
   };
 
@@ -93,7 +104,7 @@ export default function ProgressPage() {
       reader.readAsDataURL(file);
     }
   };
-
+  
   const getMonthAbbreviation = (fullMonthName: string) => {
     if (!languageContextIsClient) return fullMonthName.slice(0, 3);
 
@@ -107,6 +118,7 @@ export default function ProgressPage() {
     }
     return fullMonthName.slice(0, 3);
   };
+
 
   const handleSaveMeasurement = (measurement: BodyMeasurement) => {
     if (currentMeasurement?.id) {
@@ -141,6 +153,7 @@ export default function ProgressPage() {
             <Skeleton className="h-[400px] w-full" />
             <Skeleton className="h-[400px] w-full" />
             <Skeleton className="h-[300px] w-full" />
+            <Skeleton className="h-[500px] w-full" /> {/* For AI Form */}
         </div>
       </>
     );
@@ -164,33 +177,25 @@ export default function ProgressPage() {
           <CardContent>
             <ChartContainer config={chartConfig} className="h-[300px] w-full">
               <ResponsiveContainer width="100%" height="100%">
-                <RechartsPrimitiveLineChart data={chartData}>
+                <RechartsPrimitiveLineChart data={weeklyVolumeChartData}>
                   <CartesianGrid vertical={false} />
                   <XAxis
-                    dataKey="month"
+                    dataKey="week"
                     tickLine={false}
                     tickMargin={10}
                     axisLine={false}
-                    tickFormatter={(value) => getMonthAbbreviation(value)}
+                    tickFormatter={(value) => value} // Display week as is
                   />
                   <YAxis />
                   <RechartsTooltip content={<ChartTooltipContent hideLabel />} />
                   <RechartsLegend content={<ChartLegendContent />} />
                   <Line
-                    dataKey="desktop"
+                    dataKey="volume"
                     type="monotone"
-                    stroke="var(--color-desktop)"
+                    stroke="var(--color-weeklyVolume)"
                     strokeWidth={2}
                     dot={false}
-                    name={chartConfig.desktop?.label?.toString()}
-                  />
-                  <Line
-                    dataKey="mobile"
-                    type="monotone"
-                    stroke="var(--color-mobile)"
-                    strokeWidth={2}
-                    dot={false}
-                    name={chartConfig.mobile?.label?.toString()}
+                    name={chartConfig.weeklyVolume?.label?.toString()}
                   />
                 </RechartsPrimitiveLineChart>
               </ResponsiveContainer>
@@ -209,7 +214,7 @@ export default function ProgressPage() {
           <CardContent>
              <ChartContainer config={chartConfig} className="h-[300px] w-full">
                 <ResponsiveContainer width="100%" height="100%">
-                    <RechartsPrimitiveBarChart data={chartData.map(d => ({...d, weight: d.desktop / 2 + 50}))}> {/* Mocking weight data */}
+                    <RechartsPrimitiveBarChart data={bodyCompositionChartData}>
                         <CartesianGrid vertical={false} />
                         <XAxis dataKey="month" tickLine={false} tickMargin={10} axisLine={false} tickFormatter={(value) => getMonthAbbreviation(value)} />
                         <YAxis dataKey="weight" />
@@ -332,6 +337,25 @@ export default function ProgressPage() {
         </CardContent>
       </Card>
       
+      {/* AI Split Suggester Form */}
+      <div className="mt-8">
+        <Card className="shadow-lg">
+            <CardHeader>
+                <CardTitle className="flex items-center">
+                    <Wand2 className="w-6 h-6 mr-2 text-primary" />
+                    {t('progressPage.aiCoachCardTitle')}
+                </CardTitle>
+                <CardDescription>
+                    {t('progressPage.aiCoachCardDescription')}
+                </CardDescription>
+            </CardHeader>
+            <CardContent>
+                <AiSplitForm />
+            </CardContent>
+        </Card>
+      </div>
+
+
       <AddMeasurementDialog
         isOpen={isMeasurementDialogOpen}
         onOpenChange={setIsMeasurementDialogOpen}

@@ -1,9 +1,9 @@
 
 import type { LucideIcon } from 'lucide-react';
-import { LayoutDashboard, Dumbbell, CalendarDays, Bot, BarChart3, Users } from 'lucide-react';
+import { LayoutDashboard, Dumbbell, CalendarDays, BarChart3, Users } from 'lucide-react'; // Removed Bot
 
 export interface NavItem {
-  titleKey: string; // Changed from title to titleKey
+  titleKey: string; 
   href: string;
   icon: LucideIcon;
   label?: string;
@@ -32,11 +32,11 @@ export const navItems: NavItem[] = [
     href: '/calendar',
     icon: CalendarDays,
   },
-  {
-    titleKey: 'nav.aiSplitSuggester',
-    href: '/ai-split',
-    icon: Bot,
-  },
+  // {  // Removed AI Split Suggester
+  //   titleKey: 'nav.aiSplitSuggester',
+  //   href: '/ai-split',
+  //   icon: Bot,
+  // },
   {
     titleKey: 'nav.progress',
     href: '/progress',

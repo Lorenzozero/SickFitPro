@@ -20,7 +20,7 @@ const translations: Record<Language, Translations> = {
       exercises: 'Exercises',
       workoutPlans: 'Workout Plans',
       calendar: 'Calendar',
-      aiSplitSuggester: 'AI Split Suggester',
+      // aiSplitSuggester: 'AI Split Suggester', // Removed as per new request
       progress: 'Progress',
     },
     userDropdown: {
@@ -83,13 +83,13 @@ const translations: Record<Language, Translations> = {
       settingsSaved: 'Settings Saved',
       preferencesUpdated: 'Your preferences have been updated.',
     },
-    aiSplitPage: {
+    aiSplitPage: { // This can be removed if the page is deleted, but keeping for AiSplitForm usage
         title: "AI Training Split Suggester",
         description: "Get a personalized training split recommendation from our AI coach.",
     },
     aiSplitForm: {
-        cardTitle: "AI Training Split Suggester",
-        cardDescription: "Let our AI craft a personalized training split based on your history and goals. Provide as much detail as possible for the best results.",
+        cardTitle: "AI Training Split Suggester", // Used by AiSplitForm
+        cardDescription: "Let our AI craft a personalized training split based on your history and goals. Provide as much detail as possible for the best results.", // Used by AiSplitForm
         trainingHistoryLabel: "Training History",
         trainingHistoryPlaceholder: "e.g., Been lifting for 2 years, current split is PPL. Squat 100kg, Bench 80kg, Deadlift 120kg. Usually train 3-4 times a week...",
         trainingHistoryDescription: "Describe your past and current training, including exercises, frequency, weights, etc.",
@@ -189,8 +189,9 @@ const translations: Record<Language, Translations> = {
         description: "Visualize your fitness journey and celebrate your achievements.",
         performanceMetricsCardTitle: "Performance Metrics",
         performanceMetricsCardDescription: "Track your key lifts and measurements over time.",
-        benchPressLabel: "Bench Press (kg)",
-        squatLabel: "Squat (kg)",
+        weeklyTrainingVolumeLabel: "Weekly Training Volume (kg)", // New
+        benchPressLabel: "Bench Press (kg)", // Kept for potential future use or if second chart uses it
+        squatLabel: "Squat (kg)", // Kept for potential future use
         bodyCompositionCardTitle: "Body Composition",
         bodyCompositionCardDescription: "Monitor changes in weight, body fat, etc.",
         weightLabel: "Weight (kg)", 
@@ -241,6 +242,8 @@ const translations: Record<Language, Translations> = {
         measurementDeleted: "Measurement Deleted",
         noMeasurementsYet: "No measurements recorded yet. Add your first one!",
         formValidationAlert: "Please fill in date, measurement type, and value.",
+        aiCoachCardTitle: "AI Fitness Coach", // New
+        aiCoachCardDescription: "Get personalized advice and training splits. Input your current training data below.", // New
     },
     workoutPlansPage: {
         title: "Workout Plans",
@@ -324,7 +327,7 @@ const translations: Record<Language, Translations> = {
       exercises: 'Esercizi',
       workoutPlans: 'Schede', 
       calendar: 'Calendario',
-      aiSplitSuggester: 'Suggeritore Split AI',
+      // aiSplitSuggester: 'Suggeritore Split AI', // Removed
       progress: 'Progressi',
     },
     userDropdown: {
@@ -387,11 +390,11 @@ const translations: Record<Language, Translations> = {
       settingsSaved: 'Impostazioni Salvate',
       preferencesUpdated: 'Le tue preferenze sono state aggiornate.',
     },
-    aiSplitPage: {
+    aiSplitPage: { // Kept for AiSplitForm
         title: "Suggeritore Split Allenamento AI",
         description: "Ottieni una raccomandazione personalizzata per lo split di allenamento dal nostro coach AI.",
     },
-    aiSplitForm: {
+    aiSplitForm: { // Used by AiSplitForm
         cardTitle: "Suggeritore Split Allenamento AI",
         cardDescription: "Lascia che la nostra AI crei uno split di allenamento personalizzato basato sulla tua storia e sui tuoi obiettivi. Fornisci più dettagli possibili per i migliori risultati.",
         trainingHistoryLabel: "Storico Allenamenti",
@@ -493,8 +496,9 @@ const translations: Record<Language, Translations> = {
         description: "Visualizza il tuo percorso di fitness e celebra i tuoi traguardi.",
         performanceMetricsCardTitle: "Metriche di Performance",
         performanceMetricsCardDescription: "Traccia i tuoi sollevamenti chiave e misurazioni nel tempo.",
-        benchPressLabel: "Panca Piana (kg)",
-        squatLabel: "Squat (kg)",
+        weeklyTrainingVolumeLabel: "Volume Allenamento Settimanale (kg)", // New
+        benchPressLabel: "Panca Piana (kg)", // Kept
+        squatLabel: "Squat (kg)", // Kept
         bodyCompositionCardTitle: "Composizione Corporea",
         bodyCompositionCardDescription: "Monitora i cambiamenti di peso, grasso corporeo, ecc.",
         weightLabel: "Peso (kg)",
@@ -545,6 +549,8 @@ const translations: Record<Language, Translations> = {
         measurementDeleted: "Misura Eliminata",
         noMeasurementsYet: "Nessuna misura registrata. Aggiungi la prima!",
         formValidationAlert: "Compila data, tipo misurazione e valore.",
+        aiCoachCardTitle: "Coach Fitness AI", // New
+        aiCoachCardDescription: "Ottieni consigli personalizzati e split di allenamento. Inserisci i tuoi dati di allenamento qui sotto.", // New
     },
      workoutPlansPage: {
         title: "Schede Allenamento",
