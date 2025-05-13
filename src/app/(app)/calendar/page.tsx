@@ -5,7 +5,7 @@ import React, { useState, FormEvent, useEffect } from 'react';
 import { PageHeader } from '@/components/shared/page-header';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { PlusCircle } from 'lucide-react';
+import { PlusCircle, Trash2 } from 'lucide-react'; // Added Trash2 import
 import {
   Dialog,
   DialogContent,
@@ -238,3 +238,4 @@ export default function CalendarPage() {
     </>
   );
 }
+
