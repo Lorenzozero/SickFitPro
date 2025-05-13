@@ -39,7 +39,7 @@ const translations: Record<Language, Translations> = {
       welcomeTitle: 'Welcome to SickFit Pro!',
       welcomeDescription: "Your journey to peak fitness starts here. Let's get to work.",
       workoutsPlannedToday: 'Workouts Planned Today',
-      workoutsThisWeek: 'Workouts This Week', // e.g., 3/5
+      workoutsThisWeek: 'Workouts This Week', 
       weightLifted: 'Total Weight Lifted', 
       currentWeight: 'Current Weight',
       logNewWorkout: 'Start Workout',
@@ -120,8 +120,6 @@ const translations: Record<Language, Translations> = {
     settingsPage: {
       title: 'Settings',
       description: 'Customize your SickFit Pro experience.',
-      localization: 'Localization',
-      localizationDescription: 'Choose your preferred language for the app.',
       language: 'Language',
       selectLanguage: 'Select language',
       english: 'English (US)',
@@ -130,17 +128,7 @@ const translations: Record<Language, Translations> = {
       french: 'Français (French)',
       selectedLanguageIs: 'Selected language',
       notifications: 'Notifications',
-      notificationsDescriptionSingle: 'Manage your notification preferences.',
       allNotificationsLabel: 'Enable All App Notifications',
-      appearance: 'Appearance',
-      appearanceDescription: 'Customize the look and feel of the app.',
-      theme: 'Theme',
-      selectTheme: 'Select theme',
-      lightTheme: 'Light',
-      darkTheme: 'Dark',
-      systemTheme: 'System',
-      currentThemePreference: 'Current preference',
-      systemIsApplying: 'System is currently applying',
       saveChanges: 'Save Changes',
       settingsSaved: 'Settings Saved',
       preferencesUpdated: 'Your preferences have been updated.',
@@ -491,8 +479,6 @@ const translations: Record<Language, Translations> = {
     settingsPage: {
       title: 'Impostazioni',
       description: 'Personalizza la tua esperienza SickFit Pro.',
-      localization: 'Localizzazione',
-      localizationDescription: "Scegli la lingua preferita per l'app.",
       language: 'Lingua',
       selectLanguage: 'Seleziona lingua',
       english: 'English (US)',
@@ -501,17 +487,7 @@ const translations: Record<Language, Translations> = {
       french: 'Français (French)',
       selectedLanguageIs: 'Lingua selezionata',
       notifications: 'Notifiche',
-      notificationsDescriptionSingle: 'Gestisci le tue preferenze di notifica.',
       allNotificationsLabel: 'Abilita Tutte le Notifiche dell\'App',
-      appearance: 'Aspetto',
-      appearanceDescription: "Personalizza l'aspetto dell'app.",
-      theme: 'Tema',
-      selectTheme: 'Seleziona tema',
-      lightTheme: 'Chiaro',
-      darkTheme: 'Scuro',
-      systemTheme: 'Sistema',
-      currentThemePreference: 'Preferenza attuale',
-      systemIsApplying: 'Il sistema sta applicando',
       saveChanges: 'Salva Modifiche',
       settingsSaved: 'Impostazioni Salvate',
       preferencesUpdated: 'Le tue preferenze sono state aggiornate.',
@@ -756,9 +732,7 @@ const translations: Record<Language, Translations> = {
     },
     toastErrorTitle: "Errore",
   },
-  // Spanish and French translations remain as they were, but now also need the new/updated notification keys.
-  // For brevity, I'll only show the EN and IT changes, assuming ES and FR would be updated similarly for notifications.
-  es: { // Placeholder - should be updated for notifications like IT/EN
+  es: { 
     nav: {
       dashboard: 'Inicio',
       exercises: 'Ejercicios',
@@ -782,8 +756,6 @@ const translations: Record<Language, Translations> = {
     settingsPage: {
       title: 'Configuración',
       description: 'Personaliza tu experiencia SickFit Pro.',
-      localization: 'Localización',
-      localizationDescription: 'Elige tu idioma preferido para la aplicación.',
       language: 'Idioma',
       selectLanguage: 'Seleccionar idioma',
       english: 'Inglés (EE. UU.)',
@@ -792,24 +764,13 @@ const translations: Record<Language, Translations> = {
       french: 'Francés',
       selectedLanguageIs: 'Idioma seleccionado',
       notifications: 'Notificaciones',
-      notificationsDescriptionSingle: 'Gestiona tus preferencias de notificación.',
       allNotificationsLabel: 'Habilitar Todas las Notificaciones de la App',
-      appearance: 'Apariencia',
-      appearanceDescription: 'Personaliza el aspecto de la aplicación.',
-      theme: 'Tema',
-      selectTheme: 'Seleccionar tema',
-      lightTheme: 'Claro',
-      darkTheme: 'Oscuro',
-      systemTheme: 'Sistema',
-      currentThemePreference: 'Preferencia actual',
-      systemIsApplying: 'El sistema está aplicando actualmente',
       saveChanges: 'Guardar Cambios',
       settingsSaved: 'Configuración Guardada',
       preferencesUpdated: 'Tus preferencias han sido actualizadas.',
     },
-    // ... other Spanish translations would go here, including new ones for diet, etc.
-    toastErrorTitle: "Error", // Example
-    waterIntakeCard: { // Basic example
+    toastErrorTitle: "Error", 
+    waterIntakeCard: { 
       title: "Consumo de Agua",
       description: "¡Mantente hidratado! Tu meta: {dailyGoal} ml.",
       currentIntakeLabel: "Actual: {current}ml / {dailyGoal}ml",
@@ -1098,7 +1059,7 @@ const translations: Record<Language, Translations> = {
         repsUnitLabel: "reps",
     },
   },
-  fr: { // Placeholder - should be updated for notifications like IT/EN
+  fr: { 
     nav: {
       dashboard: 'Accueil',
       exercises: 'Exercices',
@@ -1122,8 +1083,6 @@ const translations: Record<Language, Translations> = {
     settingsPage: {
       title: 'Paramètres',
       description: 'Personnalisez votre expérience SickFit Pro.',
-      localization: 'Localisation',
-      localizationDescription: 'Choisissez votre langue préférée pour l\'application.',
       language: 'Langue',
       selectLanguage: 'Sélectionner la langue',
       english: 'Anglais (US)',
@@ -1132,24 +1091,13 @@ const translations: Record<Language, Translations> = {
       french: 'Français',
       selectedLanguageIs: 'Langue sélectionnée',
       notifications: 'Notifications',
-      notificationsDescriptionSingle: 'Gérez vos préférences de notification.',
       allNotificationsLabel: 'Activer Toutes les Notifications de l\'App',
-      appearance: 'Apparence',
-      appearanceDescription: 'Personnalisez l\'apparence de l\'application.',
-      theme: 'Thème',
-      selectTheme: 'Sélectionner le thème',
-      lightTheme: 'Clair',
-      darkTheme: 'Sombre',
-      systemTheme: 'Système',
-      currentThemePreference: 'Préférence actuelle',
-      systemIsApplying: 'Le système applique actuellement',
       saveChanges: 'Enregistrer les Modifications',
       settingsSaved: 'Paramètres Enregistrés',
       preferencesUpdated: 'Vos préférences ont été mises à jour.',
     },
-    // ... other French translations
-    toastErrorTitle: "Erreur", // Example
-    waterIntakeCard: { // Basic example
+    toastErrorTitle: "Erreur", 
+    waterIntakeCard: { 
       title: "Apport en Eau",
       description: "Restez hydraté ! Votre objectif : {dailyGoal} ml.",
       currentIntakeLabel: "Actuel: {current}ml / {dailyGoal}ml",
