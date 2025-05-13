@@ -1,12 +1,17 @@
+
+'use client';
+
 import { PageHeader } from '@/components/shared/page-header';
 import { AiSplitForm } from '@/components/forms/ai-split-form';
+import { useLanguage } from '@/context/language-context';
 
 export default function AISplitPage() {
+  const { t } = useLanguage();
   return (
     <>
       <PageHeader
-        title="AI Training Split Suggester"
-        description="Get a personalized training split recommendation from our AI coach."
+        title={t('aiSplitPage.title')}
+        description={t('aiSplitPage.description')}
       />
       <AiSplitForm />
     </>

@@ -1,6 +1,7 @@
+
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useForm, type SubmitHandler } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -11,17 +12,19 @@ import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, For
 import { suggestTrainingSplit, type SuggestTrainingSplitInput, type SuggestTrainingSplitOutput } from '@/ai/flows/suggest-training-split';
 import { Loader2, Wand2 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
-
-const formSchema = z.object({
-  trainingHistory: z.string().min(50, { message: "Please provide detailed training history (at least 50 characters)." }),
-  trainingGoals: z.string().min(10, { message: "Please describe your training goals (at least 10 characters)." }),
-});
+import { useLanguage } from '@/context/language-context';
 
 export function AiSplitForm() {
+  const { t } = useLanguage();
   const [isLoading, setIsLoading] = useState(false);
   const [result, setResult] = useState<SuggestTrainingSplitOutput | null>(null);
   const { toast } = useToast();
 
+  const formSchema = z.object({
+    trainingHistory: z.string().min(50, { message: t('aiSplitForm.trainingHistoryMinError') }),
+    trainingGoals: z.string().min(10, { message: t('aiSplitForm.trainingGoalsMinError') }),
+  });
+  
   const form = useForm<SuggestTrainingSplitInput>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -30,6 +33,13 @@ export function AiSplitForm() {
     },
   });
 
+  // Update resolver if language changes to re-validate with correct messages
+  useEffect(() => {
+    form.trigger(); // Re-trigger validation if language changes and form has errors
+     // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [t, form.trigger]);
+
+
   const onSubmit: SubmitHandler<SuggestTrainingSplitInput> = async (data) => {
     setIsLoading(true);
     setResult(null);
@@ -37,14 +47,14 @@ export function AiSplitForm() {
       const response = await suggestTrainingSplit(data);
       setResult(response);
       toast({
-        title: "Suggestion Ready!",
-        description: "AI has generated a training split for you.",
+        title: t('aiSplitForm.toastSuggestionReadyTitle'),
+        description: t('aiSplitForm.toastSuggestionReadyDescription'),
       });
     } catch (error) {
       console.error("Error fetching AI suggestion:", error);
       toast({
-        title: "Error",
-        description: "Failed to get AI suggestion. Please try again.",
+        title: t('aiSplitForm.toastErrorTitle'),
+        description: t('aiSplitForm.toastErrorDescription'),
         variant: "destructive",
       });
     } finally {
@@ -58,11 +68,10 @@ export function AiSplitForm() {
         <CardHeader>
           <CardTitle className="flex items-center">
             <Wand2 className="w-6 h-6 mr-2 text-primary" />
-            AI Training Split Suggester
+            {t('aiSplitForm.cardTitle')}
           </CardTitle>
           <CardDescription>
-            Let our AI craft a personalized training split based on your history and goals.
-            Provide as much detail as possible for the best results.
+            {t('aiSplitForm.cardDescription')}
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -73,16 +82,16 @@ export function AiSplitForm() {
                 name="trainingHistory"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Training History</FormLabel>
+                    <FormLabel>{t('aiSplitForm.trainingHistoryLabel')}</FormLabel>
                     <FormControl>
                       <Textarea
-                        placeholder="e.g., Been lifting for 2 years, current split is PPL. Squat 100kg, Bench 80kg, Deadlift 120kg. Usually train 3-4 times a week..."
+                        placeholder={t('aiSplitForm.trainingHistoryPlaceholder')}
                         className="min-h-[120px]"
                         {...field}
                       />
                     </FormControl>
                     <FormDescription>
-                      Describe your past and current training, including exercises, frequency, weights, etc.
+                      {t('aiSplitForm.trainingHistoryDescription')}
                     </FormDescription>
                     <FormMessage />
                   </FormItem>
@@ -93,16 +102,16 @@ export function AiSplitForm() {
                 name="trainingGoals"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Training Goals</FormLabel>
+                    <FormLabel>{t('aiSplitForm.trainingGoalsLabel')}</FormLabel>
                     <FormControl>
                       <Textarea
-                        placeholder="e.g., Looking to gain muscle mass, improve strength in compound lifts, and increase overall endurance. Specifically want to grow my legs and shoulders."
+                        placeholder={t('aiSplitForm.trainingGoalsPlaceholder')}
                         className="min-h-[80px]"
                         {...field}
                       />
                     </FormControl>
                     <FormDescription>
-                      What do you want to achieve with your training? (e.g., muscle gain, fat loss, strength increase)
+                      {t('aiSplitForm.trainingGoalsDescription')}
                     </FormDescription>
                     <FormMessage />
                   </FormItem>
@@ -114,7 +123,7 @@ export function AiSplitForm() {
                 ) : (
                   <Wand2 className="w-4 h-4 mr-2" />
                 )}
-                Get AI Suggestion
+                {t('aiSplitForm.getAISuggestionButton')}
               </Button>
             </form>
           </Form>
@@ -124,8 +133,8 @@ export function AiSplitForm() {
       {isLoading && (
         <Card className="shadow-md animate-pulse">
           <CardHeader>
-            <CardTitle>Generating your split...</CardTitle>
-            <CardDescription>Our AI is thinking. This might take a moment.</CardDescription>
+            <CardTitle>{t('aiSplitForm.generatingSplitTitle')}</CardTitle>
+            <CardDescription>{t('aiSplitForm.generatingSplitDescription')}</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="w-full h-8 rounded bg-muted"></div>
@@ -138,15 +147,15 @@ export function AiSplitForm() {
       {result && !isLoading && (
         <Card className="shadow-xl bg-gradient-to-br from-primary/5 to-accent/5 border-primary/20">
           <CardHeader>
-            <CardTitle className="text-primary">Your AI-Suggested Training Split</CardTitle>
+            <CardTitle className="text-primary">{t('aiSplitForm.yourSuggestedSplitTitle')}</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
             <div>
-              <h3 className="mb-1 text-lg font-semibold">Suggested Split:</h3>
+              <h3 className="mb-1 text-lg font-semibold">{t('aiSplitForm.suggestedSplitLabel')}</h3>
               <p className="p-3 rounded-md bg-background whitespace-pre-line">{result.suggestedSplit}</p>
             </div>
             <div>
-              <h3 className="mb-1 text-lg font-semibold">Reasoning:</h3>
+              <h3 className="mb-1 text-lg font-semibold">{t('aiSplitForm.reasoningLabel')}</h3>
               <p className="p-3 rounded-md bg-background whitespace-pre-line">{result.reasoning}</p>
             </div>
           </CardContent>

@@ -2,7 +2,7 @@ import type { LucideIcon } from 'lucide-react';
 import { LayoutDashboard, Dumbbell, CalendarDays, Bot, BarChart3, Settings, Users } from 'lucide-react';
 
 export interface NavItem {
-  title: string;
+  titleKey: string; // Changed from title to titleKey
   href: string;
   icon: LucideIcon;
   label?: string;
@@ -12,37 +12,37 @@ export interface NavItem {
 
 export const navItems: NavItem[] = [
   {
-    title: 'Dashboard',
+    titleKey: 'nav.dashboard',
     href: '/',
     icon: LayoutDashboard,
   },
   {
-    title: 'Exercises',
+    titleKey: 'nav.exercises',
     href: '/exercises',
     icon: Dumbbell,
   },
   {
-    title: 'Workout Plans',
+    titleKey: 'nav.workoutPlans',
     href: '/workouts',
-    icon: Users, // Using Users as a proxy for workout plans / groups of exercises
+    icon: Users, 
   },
   {
-    title: 'Calendar',
+    titleKey: 'nav.calendar',
     href: '/calendar',
     icon: CalendarDays,
   },
   {
-    title: 'AI Split Suggester',
+    titleKey: 'nav.aiSplitSuggester',
     href: '/ai-split',
     icon: Bot,
   },
   {
-    title: 'Progress',
+    titleKey: 'nav.progress',
     href: '/progress',
     icon: BarChart3,
   },
   {
-    title: 'Settings',
+    titleKey: 'nav.settings',
     href: '/settings',
     icon: Settings,
   },

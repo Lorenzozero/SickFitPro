@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState } from 'react';
@@ -24,6 +25,7 @@ import {
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { PlusCircle, Edit2, Trash2 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { useLanguage } from '@/context/language-context';
 
 // Mock data - replace with actual data fetching and state management
 const initialExercises = [
@@ -37,6 +39,7 @@ const initialExercises = [
 type Exercise = typeof initialExercises[0] & { description?: string };
 
 export default function ExercisesPage() {
+  const { t } = useLanguage();
   const [exercises, setExercises] = useState<Exercise[]>(initialExercises);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [currentExercise, setCurrentExercise] = useState<Partial<Exercise> | null>(null);
@@ -73,27 +76,27 @@ export default function ExercisesPage() {
   return (
     <>
       <PageHeader
-        title="Custom Exercises"
-        description="Manage your personalized exercise library."
+        title={t('exercisesPage.title')}
+        description={t('exercisesPage.description')}
         actions={
           <Button onClick={() => openDialog()}>
-            <PlusCircle className="w-4 h-4 mr-2" /> Add New Exercise
+            <PlusCircle className="w-4 h-4 mr-2" /> {t('exercisesPage.addNewExerciseButton')}
           </Button>
         }
       />
 
       <Card className="shadow-lg">
         <CardHeader>
-          <CardTitle>Your Exercises</CardTitle>
+          <CardTitle>{t('exercisesPage.yourExercisesCardTitle')}</CardTitle>
         </CardHeader>
         <CardContent>
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Name</TableHead>
-                <TableHead>Muscle Group</TableHead>
-                <TableHead>Type</TableHead>
-                <TableHead className="text-right">Actions</TableHead>
+                <TableHead>{t('exercisesPage.tableHeaderName')}</TableHead>
+                <TableHead>{t('exercisesPage.tableHeaderMuscleGroup')}</TableHead>
+                <TableHead>{t('exercisesPage.tableHeaderType')}</TableHead>
+                <TableHead className="text-right">{t('exercisesPage.tableHeaderActions')}</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -120,67 +123,67 @@ export default function ExercisesPage() {
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
         <DialogContent className="sm:max-w-[425px]">
           <DialogHeader>
-            <DialogTitle>{currentExercise?.id ? 'Edit Exercise' : 'Add New Exercise'}</DialogTitle>
+            <DialogTitle>{currentExercise?.id ? t('exercisesPage.dialogEditTitle') : t('exercisesPage.dialogAddTitle')}</DialogTitle>
             <DialogDescription>
-              {currentExercise?.id ? 'Update the details of your exercise.' : 'Fill in the details for your new exercise.'}
+              {currentExercise?.id ? t('exercisesPage.dialogEditDescription') : t('exercisesPage.dialogAddDescription')}
             </DialogDescription>
           </DialogHeader>
           <form onSubmit={handleSaveExercise}>
             <div className="grid gap-4 py-4">
               <div className="grid items-center grid-cols-4 gap-4">
                 <Label htmlFor="name" className="text-right">
-                  Name
+                  {t('exercisesPage.formNameLabel')}
                 </Label>
                 <Input id="name" name="name" defaultValue={currentExercise?.name || ''} className="col-span-3" required />
               </div>
               <div className="grid items-center grid-cols-4 gap-4">
                 <Label htmlFor="description" className="text-right">
-                  Description
+                  {t('exercisesPage.formDescriptionLabel')}
                 </Label>
                 <Textarea id="description" name="description" defaultValue={currentExercise?.description || ''} className="col-span-3" />
               </div>
               <div className="grid items-center grid-cols-4 gap-4">
                 <Label htmlFor="muscleGroup" className="text-right">
-                  Muscle Group
+                  {t('exercisesPage.formMuscleGroupLabel')}
                 </Label>
                 <Select name="muscleGroup" defaultValue={currentExercise?.muscleGroup}>
                   <SelectTrigger className="col-span-3">
-                    <SelectValue placeholder="Select muscle group" />
+                    <SelectValue placeholder={t('exercisesPage.selectMuscleGroupPlaceholder')} />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="Chest">Chest</SelectItem>
-                    <SelectItem value="Back">Back</SelectItem>
-                    <SelectItem value="Legs">Legs</SelectItem>
-                    <SelectItem value="Shoulders">Shoulders</SelectItem>
-                    <SelectItem value="Biceps">Biceps</SelectItem>
-                    <SelectItem value="Triceps">Triceps</SelectItem>
-                    <SelectItem value="Abs">Abs</SelectItem>
-                    <SelectItem value="Cardio">Cardio</SelectItem>
-                    <SelectItem value="Other">Other</SelectItem>
+                    <SelectItem value="Chest">{t('exercisesPage.muscleGroupChest')}</SelectItem>
+                    <SelectItem value="Back">{t('exercisesPage.muscleGroupBack')}</SelectItem>
+                    <SelectItem value="Legs">{t('exercisesPage.muscleGroupLegs')}</SelectItem>
+                    <SelectItem value="Shoulders">{t('exercisesPage.muscleGroupShoulders')}</SelectItem>
+                    <SelectItem value="Biceps">{t('exercisesPage.muscleGroupBiceps')}</SelectItem>
+                    <SelectItem value="Triceps">{t('exercisesPage.muscleGroupTriceps')}</SelectItem>
+                    <SelectItem value="Abs">{t('exercisesPage.muscleGroupAbs')}</SelectItem>
+                    <SelectItem value="Cardio">{t('exercisesPage.muscleGroupCardio')}</SelectItem>
+                    <SelectItem value="Other">{t('exercisesPage.muscleGroupOther')}</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
               <div className="grid items-center grid-cols-4 gap-4">
                 <Label htmlFor="type" className="text-right">
-                  Type
+                  {t('exercisesPage.formTypeLabel')}
                 </Label>
                  <Select name="type" defaultValue={currentExercise?.type}>
                   <SelectTrigger className="col-span-3">
-                    <SelectValue placeholder="Select exercise type" />
+                    <SelectValue placeholder={t('exercisesPage.selectExerciseTypePlaceholder')} />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="Strength">Strength</SelectItem>
-                    <SelectItem value="Cardio">Cardio</SelectItem>
-                    <SelectItem value="Flexibility">Flexibility</SelectItem>
-                    <SelectItem value="Plyometrics">Plyometrics</SelectItem>
-                    <SelectItem value="Other">Other</SelectItem>
+                    <SelectItem value="Strength">{t('exercisesPage.typeStrength')}</SelectItem>
+                    <SelectItem value="Cardio">{t('exercisesPage.typeCardio')}</SelectItem>
+                    <SelectItem value="Flexibility">{t('exercisesPage.typeFlexibility')}</SelectItem>
+                    <SelectItem value="Plyometrics">{t('exercisesPage.typePlyometrics')}</SelectItem>
+                    <SelectItem value="Other">{t('exercisesPage.typeOther')}</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
             </div>
             <DialogFooter>
-              <Button type="button" variant="outline" onClick={() => setIsDialogOpen(false)}>Cancel</Button>
-              <Button type="submit">Save Exercise</Button>
+              <Button type="button" variant="outline" onClick={() => setIsDialogOpen(false)}>{t('exercisesPage.cancelButton')}</Button>
+              <Button type="submit">{t('exercisesPage.saveExerciseButton')}</Button>
             </DialogFooter>
           </form>
         </DialogContent>

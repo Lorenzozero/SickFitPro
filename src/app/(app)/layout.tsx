@@ -35,9 +35,11 @@ import {
   DropdownMenuRadioItem
 } from '@/components/ui/dropdown-menu';
 import { useTheme } from '@/components/theme-provider';
+import { useLanguage } from '@/context/language-context';
 
 export default function AppLayout({ children }: { children: ReactNode }) {
   const { theme, setTheme, resolvedTheme } = useTheme();
+  const { t } = useLanguage();
 
   return (
     <SidebarProvider defaultOpen>
@@ -53,11 +55,11 @@ export default function AppLayout({ children }: { children: ReactNode }) {
               <SidebarMenuItem key={item.href}>
                 <SidebarMenuButton
                   asChild
-                  tooltip={{ children: item.title, className: 'group-data-[collapsible=icon]:block hidden' }}
+                  tooltip={{ children: t(item.titleKey), className: 'group-data-[collapsible=icon]:block hidden' }}
                 >
                   <Link href={item.href}>
                     <item.icon />
-                    <span>{item.title}</span>
+                    <span>{t(item.titleKey)}</span>
                   </Link>
                 </SidebarMenuButton>
               </SidebarMenuItem>
@@ -73,32 +75,32 @@ export default function AppLayout({ children }: { children: ReactNode }) {
                   <AvatarFallback>U</AvatarFallback>
                 </Avatar>
                 <div className="group-data-[collapsible=icon]:hidden">
-                  <p className="text-sm font-medium">User Name</p>
+                  <p className="text-sm font-medium">User Name</p> 
                   <p className="text-xs text-sidebar-foreground/70">user@example.com</p>
                 </div>
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent side="top" align="start" className="w-56">
-              <DropdownMenuLabel>My Account</DropdownMenuLabel>
+              <DropdownMenuLabel>{t('userDropdown.myAccount')}</DropdownMenuLabel>
               <DropdownMenuSeparator />
               <DropdownMenuItem asChild>
                 <Link href="/settings">
                   <Settings className="w-4 h-4 mr-2" />
-                  <span>Settings</span>
+                  <span>{t('userDropdown.settings')}</span>
                 </Link>
               </DropdownMenuItem>
               
               <DropdownMenuSub>
                 <DropdownMenuSubTrigger>
                   {resolvedTheme === 'dark' ? <Moon className="w-4 h-4 mr-2" /> : <Sun className="w-4 h-4 mr-2" />}
-                  <span>Theme</span>
+                  <span>{t('userDropdown.theme')}</span>
                 </DropdownMenuSubTrigger>
                 <DropdownMenuPortal>
                   <DropdownMenuSubContent>
                     <DropdownMenuRadioGroup value={theme} onValueChange={(value) => setTheme(value as 'light' | 'dark' | 'system')}>
-                      <DropdownMenuRadioItem value="light">Light</DropdownMenuRadioItem>
-                      <DropdownMenuRadioItem value="dark">Dark</DropdownMenuRadioItem>
-                      <DropdownMenuRadioItem value="system">System</DropdownMenuRadioItem>
+                      <DropdownMenuRadioItem value="light">{t('userDropdown.light')}</DropdownMenuRadioItem>
+                      <DropdownMenuRadioItem value="dark">{t('userDropdown.dark')}</DropdownMenuRadioItem>
+                      <DropdownMenuRadioItem value="system">{t('userDropdown.system')}</DropdownMenuRadioItem>
                     </DropdownMenuRadioGroup>
                   </DropdownMenuSubContent>
                 </DropdownMenuPortal>
@@ -107,7 +109,7 @@ export default function AppLayout({ children }: { children: ReactNode }) {
               <DropdownMenuSeparator />
               <DropdownMenuItem>
                 <LogOut className="w-4 h-4 mr-2" />
-                <span>Log out</span>
+                <span>{t('userDropdown.logout')}</span>
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
@@ -117,10 +119,10 @@ export default function AppLayout({ children }: { children: ReactNode }) {
         <header className="sticky top-0 z-10 flex items-center justify-between h-16 px-4 bg-background/80 backdrop-blur-sm border-b md:px-6">
           <SidebarTrigger className="md:hidden" />
           <div className="flex items-center gap-4">
-            <Button variant="ghost" size="icon" aria-label="Toggle theme" onClick={() => setTheme(resolvedTheme === 'dark' ? 'light' : 'dark')}>
+            <Button variant="ghost" size="icon" aria-label={t('header.toggleTheme')} onClick={() => setTheme(resolvedTheme === 'dark' ? 'light' : 'dark')}>
               <Sun className="h-[1.2rem] w-[1.2rem] rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
               <Moon className="absolute h-[1.2rem] w-[1.2rem] rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
-              <span className="sr-only">Toggle theme</span>
+              <span className="sr-only">{t('header.toggleTheme')}</span>
             </Button>
           </div>
         </header>

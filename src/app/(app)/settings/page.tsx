@@ -2,7 +2,6 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import type { ChangeEvent } from 'react'; 
 import { PageHeader } from '@/components/shared/page-header';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
@@ -18,79 +17,78 @@ import { Switch } from '@/components/ui/switch';
 import { Languages, Bell, Palette, Save, Moon, Sun } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { useTheme } from '@/components/theme-provider';
+import { useLanguage, type Language } from '@/context/language-context';
 
-const LANGUAGE_STORAGE_KEY = 'app-language';
 
 export default function SettingsPage() {
-  const [language, setLanguage] = useState('en');
-  const [notifications, setNotifications] = useState(true);
+  const { language, setLanguage, t } = useLanguage();
+  const [notifications, setNotifications] = useState(true); // This could also be moved to a context or persisted
   const { theme, setTheme, resolvedTheme } = useTheme();
   const { toast } = useToast();
   const [isClient, setIsClient] = useState(false);
 
   useEffect(() => {
-    setIsClient(true); // Mark client as ready
-    
-    const storedLanguage = localStorage.getItem(LANGUAGE_STORAGE_KEY);
-    if (storedLanguage) {
-      setLanguage(storedLanguage);
-    }
-    // Future: Load other persisted settings like notifications
+    setIsClient(true);
   }, []);
 
   const handleSaveChanges = () => {
-    if (!isClient) return; // Prevent action if not on client
+    if (!isClient) return;
 
-    localStorage.setItem(LANGUAGE_STORAGE_KEY, language);
-    // Theme is saved by ThemeProvider. Language and notifications are local state for now.
-    console.log({ language, notifications, selectedTheme: theme });
+    // Language is saved by LanguageProvider via setLanguage
+    // Theme is saved by ThemeProvider
+    console.log({ selectedLanguage: language, notifications, selectedTheme: theme });
     toast({
-      title: "Settings Saved",
-      description: "Your preferences have been updated.",
+      title: t('settingsPage.settingsSaved'),
+      description: t('settingsPage.preferencesUpdated'),
     });
   };
+
+  const getLanguageDisplayName = (langCode: Language): string => {
+    if (!isClient) return t('settingsPage.english'); // Default or loading state
+    switch(langCode) {
+      case 'en': return t('settingsPage.english');
+      case 'it': return t('settingsPage.italian');
+      // Add other cases if more languages are supported
+      default: return langCode;
+    }
+  }
 
   return (
     <>
       <PageHeader
-        title="Settings"
-        description="Customize your SickFit Pro experience."
+        title={t('settingsPage.title')}
+        description={t('settingsPage.description')}
       />
       <div className="space-y-8">
         <Card className="shadow-lg">
           <CardHeader>
             <CardTitle className="flex items-center">
               <Languages className="w-5 h-5 mr-2 text-primary" />
-              Localization
+              {t('settingsPage.localization')}
             </CardTitle>
-            <CardDescription>Choose your preferred language for the app.</CardDescription>
+            <CardDescription>{t('settingsPage.localizationDescription')}</CardDescription>
           </CardHeader>
           <CardContent>
             <div className="w-full max-w-sm space-y-2">
-              <Label htmlFor="language">Language</Label>
+              <Label htmlFor="language">{t('settingsPage.language')}</Label>
               <Select 
                 value={isClient ? language : 'en'} 
-                onValueChange={setLanguage}
+                onValueChange={(value) => setLanguage(value as Language)}
                 disabled={!isClient}
               >
                 <SelectTrigger id="language">
-                  <SelectValue placeholder="Select language" />
+                  <SelectValue placeholder={t('settingsPage.selectLanguage')} />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="en">English (US)</SelectItem>
-                  <SelectItem value="it">Italiano (Italian)</SelectItem>
-                  <SelectItem value="es">Español (Spanish)</SelectItem>
-                  <SelectItem value="fr">Français (French)</SelectItem>
+                  <SelectItem value="en">{t('settingsPage.english')}</SelectItem>
+                  <SelectItem value="it">{t('settingsPage.italian')}</SelectItem>
+                  <SelectItem value="es">{t('settingsPage.spanish')}</SelectItem>
+                  <SelectItem value="fr">{t('settingsPage.french')}</SelectItem>
                 </SelectContent>
               </Select>
               {isClient && (
                 <p className="text-xs text-muted-foreground">
-                  Selected language: {
-                    language === 'en' ? 'English (US)' : 
-                    language === 'it' ? 'Italiano (Italian)' : 
-                    language === 'es' ? 'Español (Spanish)' : 
-                    language === 'fr' ? 'Français (French)' : 'Other'
-                  }
+                  {t('settingsPage.selectedLanguageIs')}: {getLanguageDisplayName(language)}
                 </p>
               )}
             </div>
@@ -101,21 +99,21 @@ export default function SettingsPage() {
           <CardHeader>
             <CardTitle className="flex items-center">
               <Bell className="w-5 h-5 mr-2 text-primary" />
-              Notifications
+              {t('settingsPage.notifications')}
             </CardTitle>
-            <CardDescription>Manage your notification preferences.</CardDescription>
+            <CardDescription>{t('settingsPage.notificationsDescription')}</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="flex items-center justify-between p-3 rounded-md bg-secondary">
-              <Label htmlFor="workout-reminders" className="font-normal">Workout Reminders</Label>
+              <Label htmlFor="workout-reminders" className="font-normal">{t('settingsPage.workoutReminders')}</Label>
               <Switch id="workout-reminders" checked={notifications} onCheckedChange={setNotifications} disabled={!isClient} />
             </div>
             <div className="flex items-center justify-between p-3 rounded-md bg-secondary">
-              <Label htmlFor="progress-updates" className="font-normal">Progress Updates</Label>
+              <Label htmlFor="progress-updates" className="font-normal">{t('settingsPage.progressUpdates')}</Label>
               <Switch id="progress-updates" defaultChecked disabled={!isClient}/>
             </div>
             <div className="flex items-center justify-between p-3 rounded-md bg-secondary">
-              <Label htmlFor="new-features" className="font-normal">New Feature Announcements</Label>
+              <Label htmlFor="new-features" className="font-normal">{t('settingsPage.newFeatureAnnouncements')}</Label>
               <Switch id="new-features" defaultChecked disabled={!isClient}/>
             </div>
           </CardContent>
@@ -125,9 +123,9 @@ export default function SettingsPage() {
           <CardHeader>
             <CardTitle className="flex items-center">
               <Palette className="w-5 h-5 mr-2 text-primary" />
-              Appearance
+              {t('settingsPage.appearance')}
             </CardTitle>
-            <CardDescription>Customize the look and feel of the app.</CardDescription>
+            <CardDescription>{t('settingsPage.appearanceDescription')}</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="w-full max-w-sm space-y-2">
@@ -137,7 +135,7 @@ export default function SettingsPage() {
                 ) : (
                   <Palette className="w-4 h-4 mr-2" /> 
                 )}
-                Theme
+                {t('settingsPage.theme')}
               </Label>
                <Select 
                 value={isClient ? theme : 'system'} 
@@ -145,18 +143,18 @@ export default function SettingsPage() {
                 disabled={!isClient}
                >
                 <SelectTrigger id="theme-preference">
-                  <SelectValue placeholder="Select theme" />
+                  <SelectValue placeholder={t('settingsPage.selectTheme')} />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="light">Light</SelectItem>
-                  <SelectItem value="dark">Dark</SelectItem>
-                  <SelectItem value="system">System</SelectItem>
+                  <SelectItem value="light">{t('settingsPage.lightTheme')}</SelectItem>
+                  <SelectItem value="dark">{t('settingsPage.darkTheme')}</SelectItem>
+                  <SelectItem value="system">{t('settingsPage.systemTheme')}</SelectItem>
                 </SelectContent>
               </Select>
                {isClient && (
                  <p className="text-xs text-muted-foreground">
-                  Current preference: {theme.charAt(0).toUpperCase() + theme.slice(1)}. 
-                  {theme === 'system' && ` (System is currently applying: ${resolvedTheme})`}
+                  {t('settingsPage.currentThemePreference')}: {theme.charAt(0).toUpperCase() + theme.slice(1)}. 
+                  {theme === 'system' && ` (${t('settingsPage.systemIsApplying')}: ${resolvedTheme})`}
                  </p>
                )}
             </div>
@@ -166,7 +164,7 @@ export default function SettingsPage() {
         <div className="flex justify-end">
           <Button onClick={handleSaveChanges} disabled={!isClient}>
             <Save className="w-4 h-4 mr-2" />
-            Save Changes
+            {t('settingsPage.saveChanges')}
           </Button>
         </div>
       </div>
