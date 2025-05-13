@@ -1,17 +1,21 @@
 
 'use client';
 
-import { useState, type ChangeEvent, useEffect } from 'react';
+import { useState, type ChangeEvent, useEffect, FormEvent } from 'react';
 import { PageHeader } from '@/components/shared/page-header';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import Image from 'next/image';
-import { LineChart as LucideLineChart, UploadCloud, BarChart as LucideBarChart, Users } from 'lucide-react';
+import { LineChart as LucideLineChart, UploadCloud, BarChart as LucideBarChart, Users, PlusCircle, Edit2, Trash2, Bell } from 'lucide-react';
 import { ChartContainer, ChartTooltip, ChartTooltipContent, ChartLegend, ChartLegendContent } from "@/components/ui/chart";
 import { Bar, CartesianGrid, XAxis, YAxis, Tooltip as RechartsTooltip, ResponsiveContainer, Line, Legend as RechartsLegend, BarChart, LineChart } from "recharts";
 import type { ChartConfig } from '@/components/ui/chart';
 import { useLanguage } from '@/context/language-context';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { Switch } from '@/components/ui/switch';
+import { useToast } from '@/hooks/use-toast';
+import { AddMeasurementDialog } from '@/components/dialogs/add-measurement-dialog'; // New component
 
 const chartData = [
   { month: "January", desktop: 186, mobile: 80 },
@@ -22,11 +26,35 @@ const chartData = [
   { month: "June", desktop: 214, mobile: 140 },
 ];
 
+export interface MuscleMeasurement {
+  id: string;
+  date: string; // YYYY-MM-DD
+  muscle: string;
+  value: number;
+  unit: 'cm' | 'in';
+  notes?: string;
+}
+
+// Mock initial measurements
+const initialMuscleMeasurements: MuscleMeasurement[] = [
+    { id: 'm1', date: '2023-01-15', muscle: 'Biceps', value: 35, unit: 'cm', notes: 'Right arm, flexed' },
+    { id: 'm2', date: '2023-01-15', muscle: 'Waist', value: 80, unit: 'cm' },
+    { id: 'm3', date: '2023-03-15', muscle: 'Biceps', value: 36, unit: 'cm', notes: 'Right arm, flexed' },
+];
+
+
 export default function ProgressPage() {
-  const { t, language } = useLanguage();
+  const { t, language, isClient: languageContextIsClient } = useLanguage();
+  const { toast } = useToast();
   const [photoBefore, setPhotoBefore] = useState<string | null>(null);
   const [photoAfter, setPhotoAfter] = useState<string | null>(null);
   const [isClient, setIsClient] = useState(false);
+
+  const [muscleMeasurements, setMuscleMeasurements] = useState<MuscleMeasurement[]>(initialMuscleMeasurements);
+  const [isMeasurementDialogOpen, setIsMeasurementDialogOpen] = useState(false);
+  const [currentMeasurement, setCurrentMeasurement] = useState<Partial<MuscleMeasurement> | null>(null);
+  const [measurementReminderEnabled, setMeasurementReminderEnabled] = useState(false);
+
 
   useEffect(() => {
     setIsClient(true);
@@ -34,17 +62,17 @@ export default function ProgressPage() {
 
   const chartConfig: ChartConfig = {
     desktop: {
-      label: isClient ? t('progressPage.benchPressLabel') : 'Bench Press (kg)',
+      label: languageContextIsClient ? t('progressPage.benchPressLabel') : 'Bench Press (kg)',
       color: "hsl(var(--chart-1))",
       icon: LucideLineChart,
     },
     mobile: {
-      label: isClient ? t('progressPage.squatLabel') : 'Squat (kg)',
+      label: languageContextIsClient ? t('progressPage.squatLabel') : 'Squat (kg)',
       color: "hsl(var(--chart-2))",
       icon: LucideBarChart,
     },
      weight: {
-      label: isClient ? t('progressPage.weightLabel') : 'Weight (kg)',
+      label: languageContextIsClient ? t('progressPage.weightLabel') : 'Weight (kg)',
       color: 'hsl(var(--chart-3))'
     }
   };
@@ -61,7 +89,7 @@ export default function ProgressPage() {
   };
 
   const getMonthAbbreviation = (fullMonthName: string) => {
-    if (!isClient) return fullMonthName.slice(0, 3);
+    if (!languageContextIsClient) return fullMonthName.slice(0, 3);
 
     if (language === 'it') {
         const monthMap: { [key: string]: string } = {
@@ -74,8 +102,43 @@ export default function ProgressPage() {
     return fullMonthName.slice(0, 3);
   };
 
+  const handleSaveMeasurement = (measurement: MuscleMeasurement) => {
+    if (currentMeasurement?.id) {
+      setMuscleMeasurements(muscleMeasurements.map(m => m.id === measurement.id ? measurement : m));
+    } else {
+      setMuscleMeasurements([...muscleMeasurements, { ...measurement, id: String(Date.now()) }]);
+    }
+    toast({ title: t('progressPage.measurementSaved') });
+    setIsMeasurementDialogOpen(false);
+    setCurrentMeasurement(null);
+  };
+
+  const openMeasurementDialog = (measurement?: MuscleMeasurement) => {
+    setCurrentMeasurement(measurement || {});
+    setIsMeasurementDialogOpen(true);
+  };
+
+  const handleDeleteMeasurement = (id: string) => {
+    setMuscleMeasurements(muscleMeasurements.filter(m => m.id !== id));
+    toast({ title: t('progressPage.measurementDeleted'), variant: 'destructive' });
+  };
+
+
   if (!isClient) {
-    return null;
+    // Render skeleton or null for SSR to avoid hydration issues with client-side state
+    return (
+      <>
+        <PageHeader
+            title={t('progressPage.title')}
+            description={t('progressPage.description')}
+        />
+        <div className="space-y-6">
+            <Skeleton className="h-[400px] w-full" />
+            <Skeleton className="h-[400px] w-full" />
+            <Skeleton className="h-[300px] w-full" />
+        </div>
+      </>
+    );
   }
 
   return (
@@ -114,7 +177,7 @@ export default function ProgressPage() {
                     stroke="var(--color-desktop)"
                     strokeWidth={2}
                     dot={false}
-                    name={t('progressPage.benchPressLabel')}
+                    name={chartConfig.desktop?.label?.toString()}
                   />
                   <Line
                     dataKey="mobile"
@@ -122,7 +185,7 @@ export default function ProgressPage() {
                     stroke="var(--color-mobile)"
                     strokeWidth={2}
                     dot={false}
-                    name={t('progressPage.squatLabel')}
+                    name={chartConfig.mobile?.label?.toString()}
                   />
                 </RechartsPrimitiveLineChart>
               </ResponsiveContainer>
@@ -141,19 +204,71 @@ export default function ProgressPage() {
           <CardContent>
              <ChartContainer config={chartConfig} className="h-[300px] w-full">
                 <ResponsiveContainer width="100%" height="100%">
-                    <RechartsPrimitiveBarChart data={chartData.map(d => ({...d, weight: d.desktop / 2 + 50}))}>
+                    <RechartsPrimitiveBarChart data={chartData.map(d => ({...d, weight: d.desktop / 2 + 50}))}> {/* Mocking weight data */}
                         <CartesianGrid vertical={false} />
                         <XAxis dataKey="month" tickLine={false} tickMargin={10} axisLine={false} tickFormatter={(value) => getMonthAbbreviation(value)} />
                         <YAxis dataKey="weight" />
                         <RechartsTooltip content={<ChartTooltipContent indicator="dot" />} />
                         <RechartsLegend content={<ChartLegendContent />} />
-                        <Bar dataKey="weight" fill="var(--color-weight)" radius={4} name={t('progressPage.weightLabel')} />
+                        <Bar dataKey="weight" fill="var(--color-weight)" radius={4} name={chartConfig.weight?.label?.toString()} />
                     </RechartsPrimitiveBarChart>
                 </ResponsiveContainer>
             </ChartContainer>
           </CardContent>
         </Card>
       </div>
+
+      <Card className="mt-6 shadow-lg">
+        <CardHeader className="flex flex-row items-center justify-between">
+            <div>
+                <CardTitle>{t('progressPage.muscleMeasurementsCardTitle')}</CardTitle>
+                <CardDescription>{t('progressPage.muscleMeasurementsCardDescription')}</CardDescription>
+            </div>
+            <Button onClick={() => openMeasurementDialog()}>
+                <PlusCircle className="w-4 h-4 mr-2" /> {t('progressPage.addMeasurementButton')}
+            </Button>
+        </CardHeader>
+        <CardContent>
+            {muscleMeasurements.length > 0 ? (
+                <Table>
+                    <TableHeader>
+                        <TableRow>
+                            <TableHead>{t('progressPage.tableHeaderDate')}</TableHead>
+                            <TableHead>{t('progressPage.tableHeaderMuscle')}</TableHead>
+                            <TableHead>{t('progressPage.tableHeaderMeasurement')}</TableHead>
+                            <TableHead>{t('exercisesPage.tableHeaderActions')}</TableHead> 
+                        </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                        {muscleMeasurements.sort((a,b) => new Date(b.date).getTime() - new Date(a.date).getTime()).map(m => (
+                            <TableRow key={m.id}>
+                                <TableCell>{new Date(m.date + 'T00:00:00').toLocaleDateString(language === 'it' ? 'it-IT' : 'en-US', { year: 'numeric', month: 'short', day: 'numeric' })}</TableCell>
+                                <TableCell>{m.muscle}</TableCell>
+                                <TableCell>{m.value} {m.unit}{m.notes ? ` (${m.notes})` : ''}</TableCell>
+                                <TableCell className="text-right space-x-2">
+                                    <Button variant="ghost" size="icon" onClick={() => openMeasurementDialog(m)}>
+                                        <Edit2 className="w-4 h-4" />
+                                    </Button>
+                                    <Button variant="ghost" size="icon" onClick={() => handleDeleteMeasurement(m.id)}>
+                                        <Trash2 className="w-4 h-4 text-destructive" />
+                                    </Button>
+                                </TableCell>
+                            </TableRow>
+                        ))}
+                    </TableBody>
+                </Table>
+            ) : (
+                <p className="text-sm text-center text-muted-foreground py-4">{t('progressPage.noMeasurementsYet')}</p>
+            )}
+             <div className="flex items-center justify-between p-4 mt-6 border-t">
+                <Label htmlFor="measurement-reminders" className="flex items-center font-normal">
+                    <Bell className="w-4 h-4 mr-2" />
+                    {t('progressPage.enableMeasurementReminders')}
+                </Label>
+                <Switch id="measurement-reminders" checked={measurementReminderEnabled} onCheckedChange={setMeasurementReminderEnabled} />
+            </div>
+        </CardContent>
+      </Card>
 
       <Card className="mt-6 shadow-lg">
         <CardHeader>
@@ -200,10 +315,17 @@ export default function ProgressPage() {
           ))}
         </CardContent>
       </Card>
+      
+      <AddMeasurementDialog
+        isOpen={isMeasurementDialogOpen}
+        onOpenChange={setIsMeasurementDialogOpen}
+        onSave={handleSaveMeasurement}
+        measurement={currentMeasurement}
+        t={t}
+      />
     </>
   );
 }
 
 const RechartsPrimitiveLineChart = LineChart;
 const RechartsPrimitiveBarChart = BarChart;
-

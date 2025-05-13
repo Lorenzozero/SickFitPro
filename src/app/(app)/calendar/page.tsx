@@ -1,7 +1,8 @@
 
 'use client';
 
-import { useState, useEffect, FormEvent } from 'react';
+import React, { useState, useEffect, FormEvent, useMemo } from 'react';
+import type { Locale } from 'date-fns';
 import { PageHeader } from '@/components/shared/page-header';
 import { Calendar } from '@/components/ui/calendar';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -26,6 +27,7 @@ import {
 } from '@/components/ui/select';
 import { useLanguage } from '@/context/language-context';
 import { useToast } from '@/hooks/use-toast';
+import { Skeleton } from '@/components/ui/skeleton';
 
 
 interface ScheduledWorkout {
@@ -41,7 +43,6 @@ interface WorkoutPlanOption {
   defaultName: string; // Default English name
 }
 
-// Simplified list of plans for the dialog, matching structure from initialWorkoutPlans elsewhere for IDs
 const availableWorkoutPlans: WorkoutPlanOption[] = [
   { id: '1', nameKey: 'calendarPage.samplePlan1', defaultName: 'Full Body Blast' },
   { id: '2', nameKey: 'calendarPage.samplePlan2', defaultName: 'Upper Body Power' },
@@ -56,13 +57,26 @@ export default function CalendarPage() {
   const [date, setDate] = useState<Date | undefined>(new Date());
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [scheduledWorkoutsByDate, setScheduledWorkoutsByDate] = useState<Record<string, ScheduledWorkout[]>>({});
-  const [currentLocale, setCurrentLocale] = useState<string>('en-US');
-  const [selectedWorkoutPlanId, setSelectedWorkoutPlanId] = useState<string | undefined>(availableWorkoutPlans[0]?.id);
-
+  
+  const [dateFnsLocale, setDateFnsLocale] = useState<Locale | undefined>();
+  const [isLocaleLoading, setIsLocaleLoading] = useState(true);
 
   useEffect(() => {
-    setCurrentLocale(language === 'it' ? 'it-IT' : 'en-US');
+    const loadDateFnsLocale = async () => {
+      setIsLocaleLoading(true);
+      if (language === 'it') {
+        const localeModule = await import('date-fns/locale/it');
+        setDateFnsLocale(localeModule.default);
+      } else {
+        const localeModule = await import('date-fns/locale/en-US');
+        setDateFnsLocale(localeModule.default);
+      }
+      setIsLocaleLoading(false);
+    };
+    loadDateFnsLocale();
   }, [language]);
+
+  const currentDisplayLocale = useMemo(() => (language === 'it' ? 'it-IT' : 'en-US'), [language]);
 
   const getWorkoutsForSelectedDate = (): ScheduledWorkout[] => {
     if (!date) return [];
@@ -100,9 +114,20 @@ export default function CalendarPage() {
       return { ...prev, [dateString]: updatedWorkoutsForDate };
     });
     
-    toast({ title: "Workout Scheduled!", description: `${newWorkout.planName} scheduled for ${date.toLocaleDateString(currentLocale)} at ${newWorkout.time}.` });
+    toast({ title: "Workout Scheduled!", description: `${newWorkout.planName} scheduled for ${date.toLocaleDateString(currentDisplayLocale)} at ${newWorkout.time}.` });
     setIsDialogOpen(false);
   };
+
+  const [selectedWorkoutPlanId, setSelectedWorkoutPlanId] = useState<string | undefined>(availableWorkoutPlans[0]?.id);
+
+  const datesWithWorkouts = useMemo(() => {
+    return Object.keys(scheduledWorkoutsByDate)
+        .map(dateString => {
+            const [year, month, day] = dateString.split('-').map(Number);
+            return new Date(year, month - 1, day); 
+        })
+        .filter(d => !isNaN(d.getTime()));
+  }, [scheduledWorkoutsByDate]);
 
   return (
     <>
@@ -113,24 +138,32 @@ export default function CalendarPage() {
       <div className="grid gap-6 md:grid-cols-3">
         <Card className="md:col-span-2 shadow-lg">
           <CardContent className="p-0">
-            <Calendar
-              mode="single"
-              selected={date}
-              onSelect={setDate}
-              className="rounded-md"
-              classNames={{
-                day_selected: "bg-primary text-primary-foreground hover:bg-primary/90 focus:bg-primary/90",
-                day_today: "bg-accent text-accent-foreground"
-              }}
-              locale={currentLocale === 'it-IT' ? (await import('date-fns/locale/it')).default : (await import('date-fns/locale/en-US')).default}
-            />
+            {isLocaleLoading || !dateFnsLocale ? (
+                <div className="flex items-center justify-center p-3 h-[355px]"> {/* Approx height of calendar */}
+                    <Skeleton className="w-full h-full rounded-md" />
+                </div>
+            ) : (
+                <Calendar
+                  mode="single"
+                  selected={date}
+                  onSelect={setDate}
+                  className="rounded-md"
+                  locale={dateFnsLocale}
+                  modifiers={{ scheduled: datesWithWorkouts }}
+                  modifiersClassNames={{ scheduled: 'day-scheduled' }}
+                  classNames={{
+                    day_selected: "bg-primary text-primary-foreground hover:bg-primary/90 focus:bg-primary/90",
+                    day_today: "bg-accent text-accent-foreground",
+                  }}
+                />
+            )}
           </CardContent>
         </Card>
 
         <Card className="shadow-lg">
           <CardHeader>
             <CardTitle>
-              {date ? date.toLocaleDateString(currentLocale, { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }) : t('calendarPage.selectADate')}
+              {date ? date.toLocaleDateString(currentDisplayLocale, { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }) : t('calendarPage.selectADate')}
             </CardTitle>
             <CardDescription>{t('calendarPage.workoutsScheduledForThisDay')}</CardDescription>
           </CardHeader>
@@ -161,7 +194,7 @@ export default function CalendarPage() {
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>{t('calendarPage.dialogAddWorkoutTitle')} {date?.toLocaleDateString(currentLocale)}</DialogTitle>
+            <DialogTitle>{t('calendarPage.dialogAddWorkoutTitle')} {date?.toLocaleDateString(currentDisplayLocale)}</DialogTitle>
             <DialogDescription>{t('calendarPage.dialogAddWorkoutDescription')}</DialogDescription>
           </DialogHeader>
           <form onSubmit={handleAddWorkout}>

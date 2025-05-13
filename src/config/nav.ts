@@ -1,3 +1,4 @@
+
 import type { LucideIcon } from 'lucide-react';
 import { LayoutDashboard, Dumbbell, CalendarDays, Bot, BarChart3, Users } from 'lucide-react';
 
@@ -41,9 +42,4 @@ export const navItems: NavItem[] = [
     href: '/progress',
     icon: BarChart3,
   },
-  // { // Settings removed from sidebar
-  //   titleKey: 'nav.settings',
-  //   href: '/settings',
-  //   icon: Settings,
-  // },
 ];

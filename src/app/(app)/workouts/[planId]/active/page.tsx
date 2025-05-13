@@ -83,7 +83,7 @@ export default function ActiveWorkoutPage() {
 
   if (plan === undefined) {
     return (
-      <PageHeader title="Loading Workout..." description="Please wait while we fetch the plan details." />
+      <PageHeader title={t('activeWorkoutPage.loadingWorkout')} description={t('activeWorkoutPage.loadingDescription')} />
     );
   }
 

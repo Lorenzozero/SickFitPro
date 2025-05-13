@@ -1,3 +1,4 @@
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -103,5 +104,33 @@
   }
   body {
     @apply bg-background text-foreground;
+  }
+}
+
+@layer components {
+  /* Calendar day scheduled indicator */
+  .day-scheduled {
+    position: relative;
+  }
+  .day-scheduled::after {
+    content: '';
+    position: absolute;
+    bottom: 4px; /* Adjust as needed */
+    left: 50%;
+    transform: translateX(-50%);
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background-color: hsl(var(--primary));
+  }
+  /* Adjust for selected scheduled day */
+  .rdp-day_selected.day-scheduled::after,
+  .rdp-day_selected.day-scheduled:hover::after,
+  .rdp-day_selected.day-scheduled:focus::after {
+     background-color: hsl(var(--primary-foreground));
+  }
+   /* Adjust for today scheduled day */
+  .rdp-day_today.day-scheduled::after {
+    background-color: hsl(var(--accent-foreground)); /* Or another contrasting color */
   }
 }

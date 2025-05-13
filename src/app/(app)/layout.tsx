@@ -39,7 +39,7 @@ import { useLanguage } from '@/context/language-context';
 
 export default function AppLayout({ children }: { children: ReactNode }) {
   const { theme, setTheme, resolvedTheme } = useTheme();
-  const { t } = useLanguage();
+  const { t, isClient } = useLanguage(); // Use isClient
 
   return (
     <SidebarProvider defaultOpen>
@@ -55,11 +55,12 @@ export default function AppLayout({ children }: { children: ReactNode }) {
               <SidebarMenuItem key={item.href}>
                 <SidebarMenuButton
                   asChild
-                  tooltip={{ children: t(item.titleKey), className: 'group-data-[collapsible=icon]:block hidden' }}
+                  tooltip={{ children: isClient ? t(item.titleKey) : item.titleKey, className: 'group-data-[collapsible=icon]:block hidden' }}
                 >
                   <Link href={item.href}>
                     <item.icon />
-                    <span>{t(item.titleKey)}</span>
+                    {/* Render translation only on client to avoid hydration mismatch */}
+                    <span>{isClient ? t(item.titleKey) : item.titleKey.split('.').pop()}</span>
                   </Link>
                 </SidebarMenuButton>
               </SidebarMenuItem>
@@ -75,32 +76,33 @@ export default function AppLayout({ children }: { children: ReactNode }) {
                   <AvatarFallback>U</AvatarFallback>
                 </Avatar>
                 <div className="group-data-[collapsible=icon]:hidden">
-                  <p className="text-sm font-medium">User Name</p> 
-                  <p className="text-xs text-sidebar-foreground/70">user@example.com</p>
+                  {/* Placeholder text to avoid hydration mismatch for user name/email if dynamic */}
+                  <p className="text-sm font-medium">{isClient ? t('userDropdown.myAccount') : 'My Account'}</p> 
+                  <p className="text-xs text-sidebar-foreground/70">{isClient ? 'user@example.com' : 'user@example.com'}</p>
                 </div>
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent side="top" align="start" className="w-56">
-              <DropdownMenuLabel>{t('userDropdown.myAccount')}</DropdownMenuLabel>
+              <DropdownMenuLabel>{isClient ? t('userDropdown.myAccount') : 'My Account'}</DropdownMenuLabel>
               <DropdownMenuSeparator />
               <DropdownMenuItem asChild>
                 <Link href="/settings">
                   <Settings className="w-4 h-4 mr-2" />
-                  <span>{t('userDropdown.settings')}</span>
+                  <span>{isClient ? t('userDropdown.settings') : 'Settings'}</span>
                 </Link>
               </DropdownMenuItem>
               
               <DropdownMenuSub>
                 <DropdownMenuSubTrigger>
                   {resolvedTheme === 'dark' ? <Moon className="w-4 h-4 mr-2" /> : <Sun className="w-4 h-4 mr-2" />}
-                  <span>{t('userDropdown.theme')}</span>
+                  <span>{isClient ? t('userDropdown.theme') : 'Theme'}</span>
                 </DropdownMenuSubTrigger>
                 <DropdownMenuPortal>
                   <DropdownMenuSubContent>
                     <DropdownMenuRadioGroup value={theme} onValueChange={(value) => setTheme(value as 'light' | 'dark' | 'system')}>
-                      <DropdownMenuRadioItem value="light">{t('userDropdown.light')}</DropdownMenuRadioItem>
-                      <DropdownMenuRadioItem value="dark">{t('userDropdown.dark')}</DropdownMenuRadioItem>
-                      <DropdownMenuRadioItem value="system">{t('userDropdown.system')}</DropdownMenuRadioItem>
+                      <DropdownMenuRadioItem value="light">{isClient ? t('userDropdown.light') : 'Light'}</DropdownMenuRadioItem>
+                      <DropdownMenuRadioItem value="dark">{isClient ? t('userDropdown.dark') : 'Dark'}</DropdownMenuRadioItem>
+                      <DropdownMenuRadioItem value="system">{isClient ? t('userDropdown.system') : 'System'}</DropdownMenuRadioItem>
                     </DropdownMenuRadioGroup>
                   </DropdownMenuSubContent>
                 </DropdownMenuPortal>
@@ -109,7 +111,7 @@ export default function AppLayout({ children }: { children: ReactNode }) {
               <DropdownMenuSeparator />
               <DropdownMenuItem>
                 <LogOut className="w-4 h-4 mr-2" />
-                <span>{t('userDropdown.logout')}</span>
+                <span>{isClient ? t('userDropdown.logout') : 'Log out'}</span>
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
@@ -119,10 +121,10 @@ export default function AppLayout({ children }: { children: ReactNode }) {
         <header className="sticky top-0 z-10 flex items-center justify-between h-16 px-4 bg-background/80 backdrop-blur-sm border-b md:px-6">
           <SidebarTrigger className="md:hidden" />
           <div className="flex items-center gap-4">
-            <Button variant="ghost" size="icon" aria-label={t('header.toggleTheme')} onClick={() => setTheme(resolvedTheme === 'dark' ? 'light' : 'dark')}>
+            <Button variant="ghost" size="icon" aria-label={isClient ? t('header.toggleTheme') : 'Toggle theme'} onClick={() => setTheme(resolvedTheme === 'dark' ? 'light' : 'dark')}>
               <Sun className="h-[1.2rem] w-[1.2rem] rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
               <Moon className="absolute h-[1.2rem] w-[1.2rem] rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
-              <span className="sr-only">{t('header.toggleTheme')}</span>
+              <span className="sr-only">{isClient ? t('header.toggleTheme') : 'Toggle theme'}</span>
             </Button>
           </div>
         </header>

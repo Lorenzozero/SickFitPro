@@ -1,3 +1,4 @@
+
 // src/context/language-context.tsx
 'use client';
 
@@ -15,13 +16,13 @@ interface Translations {
 const translations: Record<Language, Translations> = {
   en: {
     nav: {
-      dashboard: 'Dashboard',
+      dashboard: 'Home', // Changed from Dashboard
       exercises: 'Exercises',
       workoutPlans: 'Workout Plans',
       calendar: 'Calendar',
       aiSplitSuggester: 'AI Split Suggester',
       progress: 'Progress',
-      settings: 'Settings',
+      // settings: 'Settings', // Settings removed from sidebar
     },
     userDropdown: {
       myAccount: 'My Account',
@@ -44,7 +45,7 @@ const translations: Record<Language, Translations> = {
       streak: 'Streak',
       quickActions: 'Quick Actions',
       quickActionsDescription: 'Jump right into your fitness routine.',
-      logNewWorkout: 'Start New Workout',
+      logNewWorkout: 'Log Workout', // Changed from Start New Workout
       manageExercises: 'Manage Exercises',
       getAISplitSuggestion: 'Get AI Split Suggestion',
       todaysFocus: "Today's Focus",
@@ -128,6 +129,7 @@ const translations: Record<Language, Translations> = {
         timeLabel: "Time",
         cancelButton: "Cancel",
         scheduleWorkoutButton: "Schedule Workout",
+        loadingCalendar: "Loading calendar...",
     },
     exercisesPage: {
         title: "Custom Exercises",
@@ -182,6 +184,37 @@ const translations: Record<Language, Translations> = {
         noPhotoUploaded: "No photo uploaded",
         clickToUpload: "Click to upload",
         uploadButtonLabel: "Upload", // Will be combined with Before/After Photo
+        muscleMeasurementsCardTitle: "Muscle Measurements",
+        muscleMeasurementsCardDescription: "Track your body measurements over time.",
+        addMeasurementButton: "Add Measurement",
+        measurementDialogAddTitle: "Add New Measurement",
+        measurementDialogEditTitle: "Edit Measurement",
+        measurementDialogDescription: "Enter the details for your measurement.",
+        formDateLabel: "Date",
+        formMuscleLabel: "Muscle/Area",
+        selectMusclePlaceholder: "Select muscle/area",
+        muscleBiceps: "Biceps",
+        muscleChest: "Chest",
+        muscleWaist: "Waist",
+        muscleHips: "Hips",
+        muscleThigh: "Thigh",
+        muscleCalf: "Calf",
+        // muscleOther defined in exercisesPage, reuse if same, otherwise define specifically
+        formMeasurementLabel: "Measurement",
+        formUnitLabel: "Unit",
+        unitCm: "cm",
+        unitIn: "inches",
+        formNotesLabel: "Notes (Optional)",
+        saveMeasurementButton: "Save Measurement",
+        // cancelButton defined elsewhere, reuse if same
+        tableHeaderDate: "Date",
+        tableHeaderMuscle: "Muscle/Area",
+        tableHeaderMeasurement: "Measurement",
+        // tableHeaderActions defined in exercisesPage, reuse if same
+        enableMeasurementReminders: "Enable Measurement Reminders",
+        measurementSaved: "Measurement Saved",
+        measurementDeleted: "Measurement Deleted",
+        noMeasurementsYet: "No measurements recorded yet. Add your first one!",
     },
     workoutPlansPage: {
         title: "Workout Plans",
@@ -227,17 +260,19 @@ const translations: Record<Language, Translations> = {
       weightLabel: "Weight (kg)",
       logSetButton: "Log Set",
       planNotFound: "Workout plan not found.",
+      loadingWorkout: "Loading Workout...",
+      loadingDescription: "Please wait while we fetch the plan details.",
     }
   },
   it: {
     nav: {
-      dashboard: 'Home',
+      dashboard: 'Home', // Changed from Cruscotto
       exercises: 'Esercizi',
-      workoutPlans: 'Schede Allenamento',
+      workoutPlans: 'Schede Allenamento', // Changed from Piani di Allenamento
       calendar: 'Calendario',
       aiSplitSuggester: 'Suggeritore Split AI',
       progress: 'Progressi',
-      settings: 'Impostazioni',
+      // settings: 'Impostazioni', // Settings removed from sidebar
     },
     userDropdown: {
       myAccount: 'Il Mio Account',
@@ -260,7 +295,7 @@ const translations: Record<Language, Translations> = {
       streak: 'Serie Positiva',
       quickActions: 'Azioni Rapide',
       quickActionsDescription: 'Entra subito nella tua routine di fitness.',
-      logNewWorkout: 'Inizia Allenamento',
+      logNewWorkout: 'Registra Allenamento', // Changed
       manageExercises: 'Gestisci Esercizi',
       getAISplitSuggestion: 'Ottieni Suggerimento Split AI',
       todaysFocus: "Focus di Oggi",
@@ -330,7 +365,7 @@ const translations: Record<Language, Translations> = {
         description: "Pianifica e monitora il tuo programma di allenamento.",
         selectADate: "Seleziona una Data",
         workoutsScheduledForThisDay: "Allenamenti programmati per questo giorno.",
-        addWorkoutToDay: "Aggiungi Allenamento al Giorno",
+        addWorkoutToDay: "Aggiungi Allenamento",
         noWorkoutsScheduled: "Nessun allenamento programmato. Goditi il riposo o aggiungine uno!",
         selectDateToSeeWorkouts: "Seleziona una data per vedere gli allenamenti programmati.",
         dialogAddWorkoutTitle: "Aggiungi Allenamento al", // Date will be appended
@@ -344,6 +379,7 @@ const translations: Record<Language, Translations> = {
         timeLabel: "Ora",
         cancelButton: "Annulla",
         scheduleWorkoutButton: "Programma Allenamento",
+        loadingCalendar: "Caricamento calendario...",
     },
     exercisesPage: {
         title: "Esercizi Personalizzati",
@@ -398,9 +434,37 @@ const translations: Record<Language, Translations> = {
         noPhotoUploaded: "Nessuna foto caricata",
         clickToUpload: "Clicca per caricare",
         uploadButtonLabel: "Carica",
+        muscleMeasurementsCardTitle: "Misure Muscolari",
+        muscleMeasurementsCardDescription: "Traccia le tue misurazioni corporee nel tempo.",
+        addMeasurementButton: "Aggiungi Misura",
+        measurementDialogAddTitle: "Aggiungi Nuova Misura",
+        measurementDialogEditTitle: "Modifica Misura",
+        measurementDialogDescription: "Inserisci i dettagli per la tua misurazione.",
+        formDateLabel: "Data",
+        formMuscleLabel: "Muscolo/Zona",
+        selectMusclePlaceholder: "Seleziona muscolo/zona",
+        muscleBiceps: "Bicipiti",
+        muscleChest: "Petto",
+        muscleWaist: "Vita",
+        muscleHips: "Fianchi",
+        muscleThigh: "Coscia",
+        muscleCalf: "Polpaccio",
+        formMeasurementLabel: "Misura",
+        formUnitLabel: "Unità",
+        unitCm: "cm",
+        unitIn: "pollici",
+        formNotesLabel: "Note (Opzionale)",
+        saveMeasurementButton: "Salva Misura",
+        tableHeaderDate: "Data",
+        tableHeaderMuscle: "Muscolo/Zona",
+        tableHeaderMeasurement: "Misura",
+        enableMeasurementReminders: "Abilita Promemoria Misure",
+        measurementSaved: "Misura Salvata",
+        measurementDeleted: "Misura Eliminata",
+        noMeasurementsYet: "Nessuna misura registrata. Aggiungi la prima!",
     },
      workoutPlansPage: {
-        title: "Schede di Allenamento",
+        title: "Schede Allenamento",
         description: "Crea, gestisci e condividi i tuoi programmi di allenamento.",
         createNewPlanButton: "Crea Nuova Scheda",
         exercisesLabel: "Esercizi",
@@ -443,6 +507,8 @@ const translations: Record<Language, Translations> = {
       weightLabel: "Peso (kg)",
       logSetButton: "Registra Serie",
       planNotFound: "Scheda di allenamento non trovata.",
+      loadingWorkout: "Caricamento Allenamento...",
+      loadingDescription: "Attendere prego, stiamo caricando i dettagli della scheda.",
     }
   },
 };
@@ -452,6 +518,7 @@ interface LanguageContextType {
   language: Language;
   setLanguage: (language: Language) => void;
   t: (key: string, replacements?: Record<string, string | number>) => string;
+  isClient: boolean; // Expose isClient for components that need to know
 }
 
 const LanguageContext = createContext<LanguageContextType | undefined>(undefined);
@@ -468,17 +535,20 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
       if (storedLanguage && translations[storedLanguage]) {
         clientInitialLanguage = storedLanguage;
       } else {
+        // If no language is stored, or stored language is invalid, set the default one.
         localStorage.setItem(LANGUAGE_STORAGE_KEY, DEFAULT_LANGUAGE);
       }
     } catch (e) {
       console.warn('LanguageProvider: Failed to access localStorage. Using default language.', e);
     }
     
-    if (clientInitialLanguage !== language) { // `language` here is defaultLanguage from useState
+    // Update state only if the determined language is different from the initial state
+    // This ensures `language` state is correctly initialized from localStorage on client
+    if (clientInitialLanguage !== language) { 
       setLanguageState(clientInitialLanguage);
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []); 
+  }, []); // Empty dependency array: runs once on mount on the client.
 
   const setLanguage = useCallback((newLanguage: Language) => {
     if (translations[newLanguage]) {
@@ -494,36 +564,24 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const t = useCallback((key: string, replacements?: Record<string, string | number>): string => {
-    if (!isClient) { // Don't translate on server or before hydration
-        // Attempt to get the key from default language for SSR consistency if needed, or just return key
-        const keys = key.split('.');
-        let defaultResult: any = translations[DEFAULT_LANGUAGE];
-        for (const k of keys) {
-            defaultResult = defaultResult?.[k];
-            if (defaultResult === undefined) return key;
-        }
-        if (typeof defaultResult === 'string' && replacements) {
-          return Object.entries(replacements).reduce((acc, [placeholder, value]) => {
-            return acc.replace(new RegExp(`{${placeholder}}`, 'g'), String(value));
-          }, defaultResult);
-        }
-        return typeof defaultResult === 'string' ? defaultResult : key;
-    }
-
+    const currentLang = isClient ? language : DEFAULT_LANGUAGE;
     const keys = key.split('.');
-    let result: any = translations[language];
+    let result: any = translations[currentLang];
+    
     for (const k of keys) {
       result = result?.[k];
       if (result === undefined) {
-        let fallbackResult: any = translations[DEFAULT_LANGUAGE];
-        for (const fk of keys) {
-            fallbackResult = fallbackResult?.[fk];
-            if (fallbackResult === undefined) {
-                return key; 
+        // Fallback to default language if key not found in current language (and current is not default)
+        if (currentLang !== DEFAULT_LANGUAGE) {
+            let fallbackResult: any = translations[DEFAULT_LANGUAGE];
+            for (const fk of keys) {
+                fallbackResult = fallbackResult?.[fk];
+                if (fallbackResult === undefined) return key; // Key not found in default either
             }
+            result = fallbackResult;
+            break;
         }
-        result = fallbackResult;
-        break; 
+        return key; // Key not found
       }
     }
     
@@ -537,7 +595,7 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
   }, [language, isClient]);
 
   return (
-    <LanguageContext.Provider value={{ language, setLanguage, t }}>
+    <LanguageContext.Provider value={{ language, setLanguage, t, isClient }}>
       {children}
     </LanguageContext.Provider>
   );
