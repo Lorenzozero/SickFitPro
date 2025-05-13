@@ -1,4 +1,3 @@
-
 // src/context/language-context.tsx
 'use client';
 
@@ -18,7 +17,7 @@ const translations: Record<Language, Translations> = {
     nav: {
       dashboard: 'Home', 
       exercises: 'Exercises',
-      workoutPlans: 'Workout Plans', // Maintained as Workout Plans for nav consistency
+      workoutPlans: 'Workout Plans', 
       calendar: 'Calendar',
       progress: 'Progress',
     },
@@ -37,20 +36,46 @@ const translations: Record<Language, Translations> = {
     dashboard: {
       welcomeTitle: 'Welcome to SickFit Pro!',
       welcomeDescription: "Your journey to peak fitness starts here. Let's get to work.",
-      activeWorkouts: 'Active Workouts',
-      workoutsThisWeek: 'Workouts This Week',
-      weightLifted: 'Weight Lifted (kg)',
-      streak: 'Streak',
+      workoutsPlannedToday: 'Workouts Planned Today',
+      workoutsThisWeek: 'Workouts This Week', // e.g., 3/5
+      weightLifted: 'Total Weight Lifted', // Changed to be more generic
+      currentWeight: 'Current Weight',
       quickActions: 'Quick Actions',
       quickActionsDescription: 'Jump right into your fitness routine.',
       logNewWorkout: 'Start Workout', 
-      manageExercises: 'Manage Exercises',
-      getAISplitSuggestion: 'Get AI Fitness Advice', // Changed
       todaysFocus: "Today's Focus",
       todaysFocusDescription: "What's on the agenda for today?",
-      sampleWorkout: 'Leg Day',
-      sampleWorkoutDetails: '5 exercises, 1 hour',
+      checkCalendarForWorkout: "Check your calendar for today's workout!",
+      viewCalendarToSeeWorkout: "Your scheduled workout will appear here.",
       viewFullSchedule: 'View Full Schedule',
+      dietAndHydrationTitle: "Diet & Hydration",
+      dietAndHydrationDescription: "Track your nutrition and water intake.",
+    },
+    waterIntakeCard: {
+      title: "Water Intake",
+      description: "Stay hydrated! Your goal: {goal} L",
+      currentIntakeLabel: "Current: {current} / {goal}",
+      addWaterButton: "Add Water",
+      resetWaterButton: "Reset Water",
+      waterResetTitle: "Water Reset",
+      waterResetDescription: "Your water intake for the day has been reset.",
+    },
+    macroTrackingCard: {
+        title: "Macro Tracking",
+        description: "Monitor your daily protein, carbs, and fat intake.",
+        proteinLabel: "Protein",
+        carbsLabel: "Carbs",
+        fatLabel: "Fat",
+        goalLabel: "Goal (g)",
+        currentLabel: "Current (g)",
+        setYourDailyGoals: "Set Your Daily Goals",
+        logYourDailyIntake: "Log Your Daily Intake",
+        saveGoalsButton: "Save Goals",
+        saveIntakeButton: "Save Intake",
+        goalsSavedTitle: "Macro Goals Saved",
+        goalsSavedDescription: "Your daily macronutrient goals have been updated.",
+        intakeSavedTitle: "Macro Intake Saved",
+        intakeSavedDescription: "Your daily macronutrient intake has been recorded.",
     },
     settingsPage: {
       title: 'Settings',
@@ -93,9 +118,9 @@ const translations: Record<Language, Translations> = {
         getAISuggestionButton: "Get AI Advice",
         generatingSplitTitle: "Generating your advice...",
         generatingSplitDescription: "Our AI is thinking. This might take a moment.",
-        yourSuggestedAdviceTitle: "Your AI Fitness Advice", // Changed
-        suggestedKeyPointsLabel: "Key Suggestions:", // Changed
-        detailedAnalysisLabel: "Detailed Analysis & Advice:", // Changed
+        yourSuggestedAdviceTitle: "Your AI Fitness Advice", 
+        suggestedKeyPointsLabel: "Key Suggestions:", 
+        detailedAnalysisLabel: "Detailed Analysis & Advice:", 
         toastSuggestionReadyTitle: "Advice Ready!",
         toastSuggestionReadyDescription: "AI has generated training advice for you.",
         toastErrorTitle: "Error",
@@ -136,8 +161,7 @@ const translations: Record<Language, Translations> = {
         noWorkoutsForDayOfWeek: "No workouts scheduled for {dayOfWeek}.",
         addWorkoutTo: "Add to {dayOfWeek}",
         toastWorkoutScheduledTitle: "Workout Scheduled!",
-        toastWorkoutScheduledDescription: "{planName} on {dayOfWeek} at {time}.",
-        toastWorkoutScheduledDescriptionNoTime: "{planName} on {dayOfWeek}.", // New key
+        toastWorkoutScheduledDescriptionNoTime: "{planName} on {dayOfWeek}.", 
         toastWorkoutRemovedTitle: "Workout Removed",
         errorSelectDayAndPlan: "Please select a day and a workout plan.",
         errorPlanNotFound: "Selected plan not found.",
@@ -167,6 +191,7 @@ const translations: Record<Language, Translations> = {
         muscleGroupTriceps: "Triceps",
         muscleGroupAbs: "Abs",
         muscleGroupCardio: "Cardio",
+        muscleGroupOther: "Other",
         formTypeLabel: "Type",
         selectExerciseTypePlaceholder: "Select exercise type",
         typeStrength: "Strength",
@@ -239,7 +264,7 @@ const translations: Record<Language, Translations> = {
         aiCoachCardDescription: "Get personalized advice and training plans. Your training data is automatically used to provide tailored suggestions.",
     },
     workoutPlansPage: {
-        title: "Workout Plans", // "Schede Allenamento" in Italian
+        title: "Workout Plans", 
         description: "Create, manage, and share your training schedules.",
         createNewPlanButton: "Create New Plan",
         exercisesLabel: "Exercises",
@@ -312,7 +337,8 @@ const translations: Record<Language, Translations> = {
       maxWeightLabel: "Max Weight",
       maxRepsLabel: "Max Reps",
       repsUnitLabel: "reps",
-    }
+    },
+    toastErrorTitle: "Error", // General error title for toasts
   },
   it: {
     nav: {
@@ -337,20 +363,46 @@ const translations: Record<Language, Translations> = {
     dashboard: {
       welcomeTitle: 'Benvenuto in SickFit Pro!',
       welcomeDescription: 'Il tuo viaggio verso la forma fisica ottimale inizia qui. Mettiamoci al lavoro.',
-      activeWorkouts: 'Allenamenti Attivi',
-      workoutsThisWeek: 'Allenamenti Settimanali',
-      weightLifted: 'Peso Sollevato (kg)',
-      streak: 'Serie Positiva',
+      workoutsPlannedToday: 'Allenamenti Previsti Oggi',
+      workoutsThisWeek: 'Allenamenti Settimanali', // es. 3/5
+      weightLifted: 'Peso Totale Sollevato',
+      currentWeight: 'Peso Attuale',
       quickActions: 'Azioni Rapide',
       quickActionsDescription: 'Entra subito nella tua routine di fitness.',
       logNewWorkout: 'Inizia Allenamento', 
-      manageExercises: 'Gestisci Esercizi',
-      getAISplitSuggestion: 'Consigli Fitness AI', // Changed
       todaysFocus: "Focus di Oggi",
       todaysFocusDescription: "Cosa c'è in programma per oggi?",
-      sampleWorkout: 'Giorno Gambe',
-      sampleWorkoutDetails: '5 esercizi, 1 ora',
+      checkCalendarForWorkout: "Controlla il calendario per l'allenamento di oggi!",
+      viewCalendarToSeeWorkout: "Il tuo allenamento programmato apparirà qui.",
       viewFullSchedule: 'Visualizza Programma Completo',
+      dietAndHydrationTitle: "Dieta e Idratazione",
+      dietAndHydrationDescription: "Monitora la tua nutrizione e l'apporto idrico.",
+    },
+    waterIntakeCard: {
+      title: "Apporto Idrico",
+      description: "Rimani idratato! Il tuo obiettivo: {goal} L",
+      currentIntakeLabel: "Attuale: {current} / {goal}",
+      addWaterButton: "Aggiungi Acqua",
+      resetWaterButton: "Resetta Acqua",
+      waterResetTitle: "Apporto Idrico Azzerato",
+      waterResetDescription: "Il tuo apporto idrico giornaliero è stato azzerato.",
+    },
+    macroTrackingCard: {
+        title: "Monitoraggio Macro",
+        description: "Monitora il tuo apporto giornaliero di proteine, carboidrati e grassi.",
+        proteinLabel: "Proteine",
+        carbsLabel: "Carboidrati",
+        fatLabel: "Grassi",
+        goalLabel: "Obiettivo (g)",
+        currentLabel: "Attuale (g)",
+        setYourDailyGoals: "Imposta i Tuoi Obiettivi Giornalieri",
+        logYourDailyIntake: "Registra il Tuo Apporto Giornaliero",
+        saveGoalsButton: "Salva Obiettivi",
+        saveIntakeButton: "Salva Apporto",
+        goalsSavedTitle: "Obiettivi Macro Salvati",
+        goalsSavedDescription: "I tuoi obiettivi giornalieri di macronutrienti sono stati aggiornati.",
+        intakeSavedTitle: "Apporto Macro Salvato",
+        intakeSavedDescription: "Il tuo apporto giornaliero di macronutrienti è stato registrato.",
     },
     settingsPage: {
       title: 'Impostazioni',
@@ -393,9 +445,9 @@ const translations: Record<Language, Translations> = {
         getAISuggestionButton: "Ottieni Consigli AI",
         generatingSplitTitle: "Sto generando i tuoi consigli...",
         generatingSplitDescription: "La nostra AI sta elaborando. Potrebbe volerci un momento.",
-        yourSuggestedAdviceTitle: "I Tuoi Consigli dal Coach AI", // Changed
-        suggestedKeyPointsLabel: "Suggerimenti Chiave:", // Changed
-        detailedAnalysisLabel: "Analisi Dettagliata e Consigli:", // Changed
+        yourSuggestedAdviceTitle: "I Tuoi Consigli dal Coach AI", 
+        suggestedKeyPointsLabel: "Suggerimenti Chiave:", 
+        detailedAnalysisLabel: "Analisi Dettagliata e Consigli:", 
         toastSuggestionReadyTitle: "Consigli Pronti!",
         toastSuggestionReadyDescription: "L'AI ha generato consigli di allenamento per te.",
         toastErrorTitle: "Errore",
@@ -436,8 +488,7 @@ const translations: Record<Language, Translations> = {
         noWorkoutsForDayOfWeek: "Nessun allenamento programmato per {dayOfWeek}.",
         addWorkoutTo: "Aggiungi a {dayOfWeek}",
         toastWorkoutScheduledTitle: "Allenamento Programmato!",
-        toastWorkoutScheduledDescription: "{planName} il {dayOfWeek} alle {time}.",
-        toastWorkoutScheduledDescriptionNoTime: "{planName} il {dayOfWeek}.", // New key
+        toastWorkoutScheduledDescriptionNoTime: "{planName} il {dayOfWeek}.", 
         toastWorkoutRemovedTitle: "Allenamento Rimosso",
         errorSelectDayAndPlan: "Seleziona un giorno e una scheda di allenamento.",
         errorPlanNotFound: "Scheda selezionata non trovata.",
@@ -467,6 +518,7 @@ const translations: Record<Language, Translations> = {
         muscleGroupTriceps: "Tricipiti",
         muscleGroupAbs: "Addominali",
         muscleGroupCardio: "Cardio",
+        muscleGroupOther: "Altro",
         formTypeLabel: "Tipo",
         selectExerciseTypePlaceholder: "Seleziona tipo di esercizio",
         typeStrength: "Forza",
@@ -612,7 +664,8 @@ const translations: Record<Language, Translations> = {
       maxWeightLabel: "Peso Max",
       maxRepsLabel: "Rip. Max",
       repsUnitLabel: "rip.",
-    }
+    },
+    toastErrorTitle: "Errore", // Titolo errore generico per toast
   },
 };
 
@@ -638,20 +691,17 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
       if (storedLanguage && translations[storedLanguage]) {
         clientInitialLanguage = storedLanguage;
       } else {
-        // If no language is stored, or stored language is invalid, set the default and store it.
         localStorage.setItem(LANGUAGE_STORAGE_KEY, DEFAULT_LANGUAGE);
       }
     } catch (e) {
       console.warn('LanguageProvider: Failed to access localStorage. Using default language.', e);
     }
     
-    // Only update state if the determined client language is different from the initial state
-    // This helps prevent unnecessary re-renders if the state is already correct.
     if (clientInitialLanguage !== language) { 
       setLanguageState(clientInitialLanguage);
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []); // Empty dependency array ensures this runs once on client mount.
+  }, []); 
 
   const setLanguage = useCallback((newLanguage: Language) => {
     if (translations[newLanguage]) {
@@ -661,7 +711,6 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
          console.warn('LanguageProvider: Failed to save language to localStorage.', e);
       }
       setLanguageState(newLanguage);
-      // Force document language update for accessibility and SEO, if running in browser
       if (typeof document !== 'undefined') {
         document.documentElement.lang = newLanguage;
       }
@@ -671,8 +720,6 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const t = useCallback((key: string, replacements?: Record<string, string | number | undefined>): string => {
-    // On the server, or before client-side hydration is complete, always use default language.
-    // On the client, once mounted, use the determined (potentially from localStorage) language.
     const currentLang = isClient ? language : DEFAULT_LANGUAGE;
     const keys = key.split('.');
     let result: any = translations[currentLang];
@@ -680,7 +727,6 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
     for (const k of keys) {
       result = result?.[k];
       if (result === undefined) {
-        // Fallback to default language if key not found in current language
         if (currentLang !== DEFAULT_LANGUAGE) {
             let fallbackResult: any = translations[DEFAULT_LANGUAGE];
             for (const fk of keys) {
@@ -710,7 +756,6 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
   }, [language, isClient]);
 
 
-  // Effect to update HTML lang attribute when language changes on client
   useEffect(() => {
     if (isClient) {
       document.documentElement.lang = language;
