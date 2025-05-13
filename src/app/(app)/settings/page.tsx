@@ -14,13 +14,15 @@ import {
 } from '@/components/ui/select';
 import { Button } from '@/components/ui/button';
 import { Switch } from '@/components/ui/switch';
-import { Languages, Bell, Save } from 'lucide-react';
+import { Languages, Bell, Save, Moon, Sun } from 'lucide-react'; // Added Moon, Sun
 import { useToast } from '@/hooks/use-toast';
 import { useLanguage, type Language } from '@/context/language-context';
+import { useTheme } from '@/components/theme-provider'; // Added useTheme
 
 
 export default function SettingsPage() {
   const { language, setLanguage, t, isClient: languageContextIsClient } = useLanguage();
+  const { theme, setTheme, resolvedTheme } = useTheme(); // Added theme state
   const [enableNotifications, setEnableNotifications] = useState(true); 
   const { toast } = useToast();
   const [isClient, setIsClient] = useState(false);
@@ -37,23 +39,13 @@ export default function SettingsPage() {
     if (!isClient) return;
 
     localStorage.setItem('app-notifications-enabled', JSON.stringify(enableNotifications));
-    console.log({ selectedLanguage: language, notifications: enableNotifications });
+    // Theme and language are saved by their respective providers/hooks
+    console.log({ selectedLanguage: language, notifications: enableNotifications, selectedTheme: theme });
     toast({
       title: t('settingsPage.settingsSaved'),
       description: t('settingsPage.preferencesUpdated'),
     });
   };
-
-  const getLanguageDisplayName = (langCode: Language): string => {
-    if (!languageContextIsClient && !isClient) return t('settingsPage.english'); 
-    switch(langCode) {
-      case 'en': return t('settingsPage.english');
-      case 'it': return t('settingsPage.italian');
-      case 'es': return t('settingsPage.spanish');
-      case 'fr': return t('settingsPage.french');
-      default: return langCode;
-    }
-  }
 
   return (
     <>
@@ -91,14 +83,40 @@ export default function SettingsPage() {
                         </Select>
                     </div>
                 </div>
-                {isClient && (
-                    <p className="text-xs text-muted-foreground">
-                    {t('settingsPage.selectedLanguageIs')}: {getLanguageDisplayName(language)}
-                    </p>
-                )}
             </div>
           </CardContent>
         </Card>
+
+        <Card className="shadow-lg">
+          <CardHeader>
+            <CardTitle className="flex items-center">
+                {isClient && resolvedTheme === 'dark' ? <Moon className="w-5 h-5 mr-2 text-primary" /> : <Sun className="w-5 h-5 mr-2 text-primary" />}
+                {t('userDropdown.theme')}
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="flex items-center justify-between gap-4">
+                <Label htmlFor="theme-preference" className="whitespace-nowrap">{t('userDropdown.theme')}</Label>
+                 <div className="w-auto min-w-[180px]">
+                    <Select 
+                        value={isClient ? theme : 'system'} 
+                        onValueChange={(value) => setTheme(value as 'light' | 'dark' | 'system')}
+                        disabled={!isClient}
+                    >
+                    <SelectTrigger id="theme-preference">
+                        <SelectValue placeholder={t('userDropdown.theme')} />
+                    </SelectTrigger>
+                    <SelectContent>
+                        <SelectItem value="light">{t('userDropdown.light')}</SelectItem>
+                        <SelectItem value="dark">{t('userDropdown.dark')}</SelectItem>
+                        <SelectItem value="system">{t('userDropdown.system')}</SelectItem>
+                    </SelectContent>
+                    </Select>
+                </div>
+            </div>
+          </CardContent>
+        </Card>
+
 
         <Card className="shadow-lg">
           <CardHeader className="flex flex-row items-center justify-between">
@@ -115,6 +133,7 @@ export default function SettingsPage() {
             />
           </CardHeader>
           <CardContent className="pt-0"> 
+            {/* Content removed as per request, description was in header */}
           </CardContent>
         </Card>
         
@@ -128,3 +147,4 @@ export default function SettingsPage() {
     </>
   );
 }
+
