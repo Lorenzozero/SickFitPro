@@ -41,11 +41,11 @@ const measurementNameOptions = [
   { value: 'Thigh', labelKey: 'progressPage.measurementNameThigh', units: ['cm', 'in'] },
   { value: 'Calf', labelKey: 'progressPage.measurementNameCalf', units: ['cm', 'in'] },
   { value: 'Weight', labelKey: 'progressPage.measurementNameWeight', units: ['kg', 'lbs'] },
-  { value: 'Height', labelKey: 'progressPage.measurementNameHeight', units: ['cm', 'in'] }, // Assuming cm/in for height for simplicity
-  { value: 'Other', labelKey: 'exercisesPage.muscleGroupOther', units: ['cm', 'in', 'kg', 'lbs'] }, // Allow all for 'Other'
+  { value: 'Height', labelKey: 'progressPage.measurementNameHeight', units: ['cm', 'in'] },
 ];
 
 type Unit = 'cm' | 'in' | 'kg' | 'lbs';
+const defaultUnits: Unit[] = ['cm', 'in', 'kg', 'lbs'];
 
 export function AddMeasurementDialog({ isOpen, onOpenChange, onSave, measurement, t }: AddMeasurementDialogProps) {
   const [date, setDate] = useState('');
@@ -65,9 +65,9 @@ export function AddMeasurementDialog({ isOpen, onOpenChange, onSave, measurement
     } else {
       // Reset form for new measurement
       setDate(new Date().toISOString().split('T')[0]);
-      setMeasurementName('');
+      setMeasurementName(measurementNameOptions[0]?.value || ''); // Default to first option
       setValue('');
-      setUnit('cm'); // Default unit
+      setUnit(measurementNameOptions[0]?.units[0] as Unit || 'cm');
       setNotes('');
     }
   }, [measurement, isOpen]);
@@ -76,25 +76,26 @@ export function AddMeasurementDialog({ isOpen, onOpenChange, onSave, measurement
     const selectedOption = measurementNameOptions.find(opt => opt.value === measurementName);
     if (selectedOption) {
       setAvailableUnits(selectedOption.units as Unit[]);
-      // If current unit is not in new available units, reset it
       if (!selectedOption.units.includes(unit)) {
         setUnit(selectedOption.units[0] as Unit);
       }
     } else {
-      // Default for unselected or "Other" if not specified with units
-      setAvailableUnits(['cm', 'in', 'kg', 'lbs']);
+      // Fallback if measurementName is somehow empty or not in options
+      setAvailableUnits(defaultUnits);
+      if (!defaultUnits.includes(unit)){
+        setUnit(defaultUnits[0]);
+      }
     }
   }, [measurementName, unit]);
 
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
     if (!date || !measurementName || !value) {
-      // Basic validation, can be enhanced with react-hook-form if needed
       alert(t('progressPage.formValidationAlert'));
       return;
     }
     onSave({
-      id: measurement?.id || String(Date.now()), // Keep existing id or generate new
+      id: measurement?.id || String(Date.now()),
       date,
       measurementName,
       value: parseFloat(value),
@@ -184,7 +185,7 @@ export function AddMeasurementDialog({ isOpen, onOpenChange, onSave, measurement
           <DialogFooter>
             <DialogClose asChild>
               <Button type="button" variant="outline">
-                {t('calendarPage.cancelButton')} {/* Reusing cancel button translation */}
+                {t('calendarPage.cancelButton')}
               </Button>
             </DialogClose>
             <Button type="submit">{t('progressPage.saveMeasurementButton')}</Button>

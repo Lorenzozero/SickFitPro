@@ -112,11 +112,11 @@ const translations: Record<Language, Translations> = {
     calendarPage: {
         title: "Workout Calendar",
         description: "Plan and track your weekly training schedule.",
-        selectADate: "Select a Date", // May become obsolete or repurposed
-        workoutsScheduledForThisDay: "Workouts scheduled for this day.", // May become obsolete
-        addWorkoutToDay: "Add Workout", // Generic add button
-        noWorkoutsScheduled: "No workouts scheduled for this day.", // Or "for this day of the week"
-        selectDateToSeeWorkouts: "Select a date to see scheduled workouts.", // May become obsolete
+        selectADate: "Select a Date", 
+        workoutsScheduledForThisDay: "Workouts scheduled for this day.", 
+        addWorkoutToDay: "Add Workout", 
+        noWorkoutsScheduled: "No workouts scheduled for this day.", 
+        selectDateToSeeWorkouts: "Select a date to see scheduled workouts.", 
         dialogAddWorkoutTitle: "Add Workout to {dayOfWeek}", 
         dialogAddWorkoutDescription: "Select a workout plan to schedule for this day of the week.",
         workoutPlanLabel: "Workout Plan",
@@ -128,7 +128,7 @@ const translations: Record<Language, Translations> = {
         timeLabel: "Time",
         cancelButton: "Cancel",
         scheduleWorkoutButton: "Schedule Workout",
-        loadingCalendar: "Loading calendar...", // May become obsolete
+        loadingCalendar: "Loading calendar...", 
         weeklyScheduleTitle: "Weekly Training Schedule",
         weeklyScheduleDescription: "Set up your typical training week. This schedule will repeat automatically.",
         days: {
@@ -142,6 +142,11 @@ const translations: Record<Language, Translations> = {
         },
         noWorkoutsForDayOfWeek: "No workouts scheduled for {dayOfWeek}.",
         addWorkoutTo: "Add to {dayOfWeek}",
+        toastWorkoutScheduledTitle: "Workout Scheduled!",
+        toastWorkoutScheduledDescription: "{planName} on {dayOfWeek} at {time}.",
+        toastWorkoutRemovedTitle: "Workout Removed",
+        errorSelectDayAndPlan: "Please select a day and a workout plan.",
+        errorPlanNotFound: "Selected plan not found.",
     },
     exercisesPage: {
         title: "Custom Exercises",
@@ -188,7 +193,7 @@ const translations: Record<Language, Translations> = {
         squatLabel: "Squat (kg)",
         bodyCompositionCardTitle: "Body Composition",
         bodyCompositionCardDescription: "Monitor changes in weight, body fat, etc.",
-        weightLabel: "Weight (kg)", // Used in charts
+        weightLabel: "Weight (kg)", 
         photoComparisonCardTitle: "Photo Comparison",
         photoComparisonCardDescription: "Visually track your transformation. Upload 'before' and 'after' photos.",
         beforePhotoLabel: "Before Photo",
@@ -196,14 +201,14 @@ const translations: Record<Language, Translations> = {
         noPhotoUploaded: "No photo uploaded",
         clickToUpload: "Click to upload",
         uploadButtonLabel: "Upload",
-        bodyMeasurementsCardTitle: "Body Measurements", // Changed from Muscle Measurements
+        bodyMeasurementsCardTitle: "Body Measurements", 
         bodyMeasurementsCardDescription: "Track your body measurements like weight, height, and muscle size over time.",
         addMeasurementButton: "Add Measurement",
         measurementDialogAddTitle: "Add New Measurement",
         measurementDialogEditTitle: "Edit Measurement",
         measurementDialogDescription: "Enter the details for your measurement.",
         formDateLabel: "Date",
-        formMeasurementNameLabel: "Measurement Type", // Changed from Muscle/Area
+        formMeasurementNameLabel: "Measurement Type", 
         selectMeasurementNamePlaceholder: "Select measurement type",
         measurementNameBiceps: "Biceps",
         measurementNameChest: "Chest",
@@ -213,19 +218,18 @@ const translations: Record<Language, Translations> = {
         measurementNameCalf: "Calf",
         measurementNameWeight: "Weight",
         measurementNameHeight: "Height",
-        // measurementNameOther corresponds to exercisesPage.muscleGroupOther
-        formValueLabel: "Value", // Changed from Measurement
-        formUnitLabel: "Unit", // Kept same
+        formValueLabel: "Value", 
+        formUnitLabel: "Unit", 
         unitCM: "cm",
         unitIN: "in",
         unitKG: "kg",
         unitLBS: "lbs",
-        formNotesLabel: "Notes", // Changed from Notes (Optional)
+        formNotesLabel: "Notes", 
         formNotesPlaceholder: "Enter any relevant notes...",
         saveMeasurementButton: "Save Measurement",
         tableHeaderDate: "Date",
-        tableHeaderMeasurementName: "Measurement", // Changed from Muscle/Area
-        tableHeaderValue: "Value", // Changed from Measurement to be more specific
+        tableHeaderMeasurementName: "Measurement", 
+        tableHeaderValue: "Value", 
         measurementReminderLabel: "Measurement Reminder",
         selectReminderFrequencyPlaceholder: "Select reminder frequency",
         reminderOff: "Off",
@@ -276,21 +280,43 @@ const translations: Record<Language, Translations> = {
       title: "Active Workout: {planName}",
       description: "Track your sets, reps, and weights for this session.",
       finishWorkoutButton: "Finish Workout",
-      exerciseLabel: "Exercise",
-      setsLabel: "Sets",
-      repsLabel: "Reps",
-      weightLabel: "Weight (kg)",
       logSetButton: "Log Set",
       planNotFound: "Workout plan not found.",
+      planNotFoundDescription: "Please check the URL or go back to select a valid plan.",
       loadingWorkout: "Loading Workout...",
       loadingDescription: "Please wait while we fetch the plan details.",
+      targetSetsLabel: "Target Sets",
+      targetRepsLabel: "Target Reps",
+      repsInputLabel: "Reps",
+      weightInputLabel: "Weight (kg)",
+      setColumnLabel: "Set",
+      repsColumnLabel: "Reps",
+      weightColumnLabel: "Weight (kg)",
+      toastSetLoggedTitle: "Set Logged",
+      toastSetLoggedDescription: "Set for {exerciseName} recorded.",
+      toastSetDeletedTitle: "Set Deleted",
+      toastWorkoutFinishedTitle: "Workout Finished!",
+      toastWorkoutFinishedDescription: "Great job completing your workout in {duration}!",
+      overallProgressLabel: "Overall Workout Progress",
+      setCompletionLabel: "Sets: {completed}/{total}",
+      noGifAvailable: "No GIF available",
+      nextExerciseButton: "Next Exercise",
+      completeWorkoutButton: "Complete Workout",
+      workoutCompleteTitle: "Workout Complete!",
+      workoutCompleteDescription: "You've successfully completed the {planName} workout.",
+      totalTimeLabel: "Total Time",
+      backToDashboardButton: "Back to Home",
+      confirmFinishTitle: "Finish Workout?",
+      confirmFinishDescription: "Are you sure you want to mark this workout as complete?",
+      confirmFinishButton: "Yes, Finish",
+      noSetsLoggedYet: "No sets logged for this exercise yet.",
     }
   },
   it: {
     nav: {
       dashboard: 'Home', 
       exercises: 'Esercizi',
-      workoutPlans: 'Schede Allenamento', 
+      workoutPlans: 'Schede', 
       calendar: 'Calendario',
       aiSplitSuggester: 'Suggeritore Split AI',
       progress: 'Progressi',
@@ -316,7 +342,7 @@ const translations: Record<Language, Translations> = {
       streak: 'Serie Positiva',
       quickActions: 'Azioni Rapide',
       quickActionsDescription: 'Entra subito nella tua routine di fitness.',
-      logNewWorkout: 'Registra Allenamento', 
+      logNewWorkout: 'Inizia Allenamento', 
       manageExercises: 'Gestisci Esercizi',
       getAISplitSuggestion: 'Ottieni Suggerimento Split AI',
       todaysFocus: "Focus di Oggi",
@@ -414,6 +440,11 @@ const translations: Record<Language, Translations> = {
         },
         noWorkoutsForDayOfWeek: "Nessun allenamento programmato per {dayOfWeek}.",
         addWorkoutTo: "Aggiungi a {dayOfWeek}",
+        toastWorkoutScheduledTitle: "Allenamento Programmato!",
+        toastWorkoutScheduledDescription: "{planName} il {dayOfWeek} alle {time}.",
+        toastWorkoutRemovedTitle: "Allenamento Rimosso",
+        errorSelectDayAndPlan: "Seleziona un giorno e una scheda di allenamento.",
+        errorPlanNotFound: "Scheda selezionata non trovata.",
     },
     exercisesPage: {
         title: "Esercizi Personalizzati",
@@ -547,14 +578,36 @@ const translations: Record<Language, Translations> = {
       title: "Allenamento Attivo: {planName}",
       description: "Traccia serie, ripetizioni e pesi per questa sessione.",
       finishWorkoutButton: "Termina Allenamento",
-      exerciseLabel: "Esercizio",
-      setsLabel: "Serie",
-      repsLabel: "Ripetizioni",
-      weightLabel: "Peso (kg)",
       logSetButton: "Registra Serie",
       planNotFound: "Scheda di allenamento non trovata.",
+      planNotFoundDescription: "Controlla l'URL o torna indietro per selezionare una scheda valida.",
       loadingWorkout: "Caricamento Allenamento...",
       loadingDescription: "Attendere prego, stiamo caricando i dettagli della scheda.",
+      targetSetsLabel: "Serie Obiettivo",
+      targetRepsLabel: "Ripetizioni Obiettivo",
+      repsInputLabel: "Ripetizioni",
+      weightInputLabel: "Peso (kg)",
+      setColumnLabel: "Serie",
+      repsColumnLabel: "Ripetizioni",
+      weightColumnLabel: "Peso (kg)",
+      toastSetLoggedTitle: "Serie Registrata",
+      toastSetLoggedDescription: "Serie per {exerciseName} registrata.",
+      toastSetDeletedTitle: "Serie Eliminata",
+      toastWorkoutFinishedTitle: "Allenamento Terminato!",
+      toastWorkoutFinishedDescription: "Ottimo lavoro! Hai completato l'allenamento in {duration}!",
+      overallProgressLabel: "Progresso Allenamento Complessivo",
+      setCompletionLabel: "Serie: {completed}/{total}",
+      noGifAvailable: "Nessun GIF disponibile",
+      nextExerciseButton: "Prossimo Esercizio",
+      completeWorkoutButton: "Completa Allenamento",
+      workoutCompleteTitle: "Allenamento Completato!",
+      workoutCompleteDescription: "Hai completato con successo l'allenamento {planName}.",
+      totalTimeLabel: "Tempo Totale",
+      backToDashboardButton: "Torna alla Home",
+      confirmFinishTitle: "Terminare Allenamento?",
+      confirmFinishDescription: "Sei sicuro di voler contrassegnare questo allenamento come completato?",
+      confirmFinishButton: "Sì, Termina",
+      noSetsLoggedYet: "Nessuna serie registrata per questo esercizio.",
     }
   },
 };
@@ -607,41 +660,44 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const t = useCallback((key: string, replacements?: Record<string, string | number | undefined>): string => {
-    const currentLang = isClient ? language : DEFAULT_LANGUAGE;
+    const currentLang = isClient ? language : DEFAULT_LANGUAGE; // Use state language on client, default on server
     const keys = key.split('.');
     let result: any = translations[currentLang];
     
     for (const k of keys) {
       result = result?.[k];
       if (result === undefined) {
+        // Fallback to default language if key not found in current language (and not already default)
         if (currentLang !== DEFAULT_LANGUAGE) {
             let fallbackResult: any = translations[DEFAULT_LANGUAGE];
             for (const fk of keys) {
                 fallbackResult = fallbackResult?.[fk];
                 if (fallbackResult === undefined) {
-                  // If still not found, try to get the default value from replacements
-                  return replacements?.default?.toString() || key;
+                  return replacements?.default?.toString() || key; // Fallback to default replacement or key itself
                 }
             }
-            result = fallbackResult;
-            break;
+            result = fallbackResult; // Use result from default language
+            break; // Exit loop once fallback is found
         }
-        return replacements?.default?.toString() || key;
+        return replacements?.default?.toString() || key; // Fallback for default language or if no default replacement
       }
     }
     
+    // Perform replacements if the result is a string and replacements are provided
     if (typeof result === 'string' && replacements) {
-      // Filter out the 'default' key from replacements before applying them
       const actualReplacements = { ...replacements };
-      delete actualReplacements.default;
+      delete actualReplacements.default; // Remove 'default' from replacements object
 
       return Object.entries(actualReplacements).reduce((acc, [placeholder, value]) => {
-        return acc.replace(new RegExp(`{${placeholder}}`, 'g'), String(value));
+        // Ensure value is a string or number before replacing
+        const replacementValue = (typeof value === 'string' || typeof value === 'number') ? String(value) : '';
+        return acc.replace(new RegExp(`{${placeholder}}`, 'g'), replacementValue);
       }, result);
     }
 
     return typeof result === 'string' ? result : (replacements?.default?.toString() || key) ;
   }, [language, isClient]);
+
 
   return (
     <LanguageContext.Provider value={{ language, setLanguage, t, isClient }}>
