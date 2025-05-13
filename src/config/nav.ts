@@ -1,5 +1,5 @@
 import type { LucideIcon } from 'lucide-react';
-import { LayoutDashboard, Dumbbell, CalendarDays, Bot, BarChart3, Settings, Users } from 'lucide-react';
+import { LayoutDashboard, Dumbbell, CalendarDays, Bot, BarChart3, Users } from 'lucide-react';
 
 export interface NavItem {
   titleKey: string; // Changed from title to titleKey
@@ -41,9 +41,9 @@ export const navItems: NavItem[] = [
     href: '/progress',
     icon: BarChart3,
   },
-  {
-    titleKey: 'nav.settings',
-    href: '/settings',
-    icon: Settings,
-  },
+  // { // Settings removed from sidebar
+  //   titleKey: 'nav.settings',
+  //   href: '/settings',
+  //   icon: Settings,
+  // },
 ];

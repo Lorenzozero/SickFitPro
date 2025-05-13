@@ -2,6 +2,7 @@
 'use client';
 
 import { useState } from 'react';
+import Link from 'next/link';
 import { PageHeader } from '@/components/shared/page-header';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
@@ -81,7 +82,7 @@ export default function WorkoutPlansPage() {
   }
 
   const handleShare = (planName: string) => {
-    navigator.clipboard.writeText(`Check out my workout plan: ${planName} on SickFit Pro!`); // This text could also be translated if needed
+    navigator.clipboard.writeText(`Check out my workout plan: ${planName} on SickFit Pro!`);
     toast({ 
       title: t('workoutPlansPage.toastLinkCopiedTitle'), 
       description: t('workoutPlansPage.toastLinkCopiedDescription') 
@@ -112,8 +113,10 @@ export default function WorkoutPlansPage() {
               <p className="text-sm text-muted-foreground">{t('workoutPlansPage.estDurationLabel')}: {plan.duration}</p>
             </CardContent>
             <CardFooter className="flex justify-between items-center gap-2 pt-4 border-t">
-              <Button variant="default" size="sm">
-                <PlayCircle className="w-4 h-4 mr-2" /> {t('workoutPlansPage.startButton')}
+              <Button asChild variant="default" size="sm">
+                <Link href={`/workouts/${plan.id}/active`}>
+                  <PlayCircle className="w-4 h-4 mr-2" /> {t('workoutPlansPage.startButton')}
+                </Link>
               </Button>
               <div className="flex gap-1">
                 <Button variant="ghost" size="icon" onClick={() => openDialog(plan)}>

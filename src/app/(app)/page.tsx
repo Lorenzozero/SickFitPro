@@ -48,7 +48,7 @@ export default function DashboardPage() {
           </CardHeader>
           <CardContent className="space-y-4">
             <Button asChild className="w-full">
-              <Link href="/workouts/new">{t('dashboard.logNewWorkout')}</Link>
+              <Link href="/start-workout">{t('dashboard.logNewWorkout')}</Link>
             </Button>
             <Button asChild variant="outline" className="w-full">
               <Link href="/exercises">{t('dashboard.manageExercises')}</Link>

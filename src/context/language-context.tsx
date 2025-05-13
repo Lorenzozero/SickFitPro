@@ -44,7 +44,7 @@ const translations: Record<Language, Translations> = {
       streak: 'Streak',
       quickActions: 'Quick Actions',
       quickActionsDescription: 'Jump right into your fitness routine.',
-      logNewWorkout: 'Log New Workout',
+      logNewWorkout: 'Start New Workout',
       manageExercises: 'Manage Exercises',
       getAISplitSuggestion: 'Get AI Split Suggestion',
       todaysFocus: "Today's Focus",
@@ -209,13 +209,31 @@ const translations: Record<Language, Translations> = {
         toastLinkCopiedTitle: "Link Copied!",
         toastLinkCopiedDescription: "Workout plan link copied to clipboard."
     },
-    // Add other sections as needed
+     startWorkoutPage: {
+      title: "Start New Workout",
+      description: "Choose a plan to start or begin an ad-hoc session.",
+      selectPlanTitle: "Select a Plan",
+      startAdHocButton: "Start Ad-hoc Workout",
+      noPlansAvailable: "No workout plans available. Create one first!",
+      startPlanButton: "Start Plan",
+    },
+    activeWorkoutPage: {
+      title: "Active Workout: {planName}",
+      description: "Track your sets, reps, and weights for this session.",
+      finishWorkoutButton: "Finish Workout",
+      exerciseLabel: "Exercise",
+      setsLabel: "Sets",
+      repsLabel: "Reps",
+      weightLabel: "Weight (kg)",
+      logSetButton: "Log Set",
+      planNotFound: "Workout plan not found.",
+    }
   },
   it: {
     nav: {
-      dashboard: 'Cruscotto',
+      dashboard: 'Home',
       exercises: 'Esercizi',
-      workoutPlans: 'Piani di Allenamento',
+      workoutPlans: 'Schede Allenamento',
       calendar: 'Calendario',
       aiSplitSuggester: 'Suggeritore Split AI',
       progress: 'Progressi',
@@ -242,7 +260,7 @@ const translations: Record<Language, Translations> = {
       streak: 'Serie Positiva',
       quickActions: 'Azioni Rapide',
       quickActionsDescription: 'Entra subito nella tua routine di fitness.',
-      logNewWorkout: 'Registra Nuovo Allenamento',
+      logNewWorkout: 'Inizia Allenamento',
       manageExercises: 'Gestisci Esercizi',
       getAISplitSuggestion: 'Ottieni Suggerimento Split AI',
       todaysFocus: "Focus di Oggi",
@@ -313,15 +331,15 @@ const translations: Record<Language, Translations> = {
         selectADate: "Seleziona una Data",
         workoutsScheduledForThisDay: "Allenamenti programmati per questo giorno.",
         addWorkoutToDay: "Aggiungi Allenamento al Giorno",
-        noWorkoutsScheduled: "Nessun allenamento programmato per questo giorno. Goditi il riposo o aggiungine uno!",
+        noWorkoutsScheduled: "Nessun allenamento programmato. Goditi il riposo o aggiungine uno!",
         selectDateToSeeWorkouts: "Seleziona una data per vedere gli allenamenti programmati.",
         dialogAddWorkoutTitle: "Aggiungi Allenamento al", // Date will be appended
-        dialogAddWorkoutDescription: "Seleziona un piano di allenamento da programmare per questo giorno.",
-        workoutPlanLabel: "Piano di Allenamento",
-        selectAPlanPlaceholder: "Seleziona un piano",
-        samplePlan1: "Distruzione Totale Corpo",
-        samplePlan2: "Potenza Parte Superiore",
-        samplePlan3: "Dominio Giorno Gambe",
+        dialogAddWorkoutDescription: "Seleziona una scheda di allenamento da programmare per questo giorno.",
+        workoutPlanLabel: "Scheda Allenamento",
+        selectAPlanPlaceholder: "Seleziona una scheda",
+        samplePlan1: "Scheda Total Body",
+        samplePlan2: "Scheda Parte Superiore",
+        samplePlan3: "Scheda Gambe Intensa",
         samplePlan4: "Sessione Cardio",
         timeLabel: "Ora",
         cancelButton: "Annulla",
@@ -382,31 +400,50 @@ const translations: Record<Language, Translations> = {
         uploadButtonLabel: "Carica",
     },
      workoutPlansPage: {
-        title: "Piani di Allenamento",
+        title: "Schede di Allenamento",
         description: "Crea, gestisci e condividi i tuoi programmi di allenamento.",
-        createNewPlanButton: "Crea Nuovo Piano",
+        createNewPlanButton: "Crea Nuova Scheda",
         exercisesLabel: "Esercizi",
         estDurationLabel: "Durata Stimata",
         startButton: "Inizia",
-        dialogEditTitle: "Modifica Piano di Allenamento",
-        dialogEditDescription: "Aggiorna i dettagli del tuo piano di allenamento.",
-        dialogCreateTitle: "Crea Nuovo Piano di Allenamento",
-        dialogCreateDescription: "Progetta il tuo nuovo piano di allenamento.",
-        planNameLabel: "Nome Piano",
+        dialogEditTitle: "Modifica Scheda Allenamento",
+        dialogEditDescription: "Aggiorna i dettagli della tua scheda di allenamento.",
+        dialogCreateTitle: "Crea Nuova Scheda Allenamento",
+        dialogCreateDescription: "Progetta la tua nuova scheda di allenamento.",
+        planNameLabel: "Nome Scheda",
         descriptionLabel: "Descrizione",
         exerciseSelectionPlaceholder: "La selezione degli esercizi e i dettagli di serie/ripetizioni andrebbero qui.",
         addExerciseButton: "Aggiungi Esercizio",
         cancelButton: "Annulla",
-        savePlanButton: "Salva Piano",
-        toastPlanUpdatedTitle: "Piano Aggiornato",
-        toastPlanUpdatedDescription: "\"{planName}\" è stato aggiornato.",
-        toastPlanCreatedTitle: "Piano Creato",
-        toastPlanCreatedDescription: "\"{planName}\" è stato creato.",
-        toastPlanDeletedTitle: "Piano Eliminato",
-        toastPlanDeletedDescription: "\"{planName}\" è stato eliminato.",
+        savePlanButton: "Salva Scheda",
+        toastPlanUpdatedTitle: "Scheda Aggiornata",
+        toastPlanUpdatedDescription: "La scheda \"{planName}\" è stata aggiornata.",
+        toastPlanCreatedTitle: "Scheda Creata",
+        toastPlanCreatedDescription: "La scheda \"{planName}\" è stata creata.",
+        toastPlanDeletedTitle: "Scheda Eliminata",
+        toastPlanDeletedDescription: "La scheda \"{planName}\" è stata eliminata.",
         toastLinkCopiedTitle: "Link Copiato!",
-        toastLinkCopiedDescription: "Link del piano di allenamento copiato negli appunti."
+        toastLinkCopiedDescription: "Link della scheda di allenamento copiato negli appunti."
     },
+    startWorkoutPage: {
+      title: "Inizia Nuovo Allenamento",
+      description: "Scegli una scheda da iniziare o avvia una sessione libera.",
+      selectPlanTitle: "Seleziona una Scheda",
+      startAdHocButton: "Inizia Allenamento Libero",
+      noPlansAvailable: "Nessuna scheda di allenamento disponibile. Creane una prima!",
+      startPlanButton: "Inizia Scheda",
+    },
+    activeWorkoutPage: {
+      title: "Allenamento Attivo: {planName}",
+      description: "Traccia serie, ripetizioni e pesi per questa sessione.",
+      finishWorkoutButton: "Termina Allenamento",
+      exerciseLabel: "Esercizio",
+      setsLabel: "Serie",
+      repsLabel: "Ripetizioni",
+      weightLabel: "Peso (kg)",
+      logSetButton: "Registra Serie",
+      planNotFound: "Scheda di allenamento non trovata.",
+    }
   },
 };
 
@@ -420,34 +457,28 @@ interface LanguageContextType {
 const LanguageContext = createContext<LanguageContextType | undefined>(undefined);
 
 export function LanguageProvider({ children }: { children: ReactNode }) {
-  // Initialize with default language consistently for server and initial client render
   const [language, setLanguageState] = useState<Language>(DEFAULT_LANGUAGE);
+  const [isClient, setIsClient] = useState(false);
 
-  // Effect to load language from localStorage on client mount
   useEffect(() => {
-    // This code runs only on the client, after the component has mounted
+    setIsClient(true);
     let clientInitialLanguage = DEFAULT_LANGUAGE;
     try {
       const storedLanguage = localStorage.getItem(LANGUAGE_STORAGE_KEY) as Language | null;
       if (storedLanguage && translations[storedLanguage]) {
         clientInitialLanguage = storedLanguage;
       } else {
-        // If no valid language in storage, ensure default is stored.
-        // This also handles cases where localStorage might have an invalid value.
         localStorage.setItem(LANGUAGE_STORAGE_KEY, DEFAULT_LANGUAGE);
       }
     } catch (e) {
       console.warn('LanguageProvider: Failed to access localStorage. Using default language.', e);
-      // clientInitialLanguage remains DEFAULT_LANGUAGE
     }
-
-    // Update the state only if the resolved language is different from the initial (DEFAULT_LANGUAGE)
-    // `language` in this effect's closure is the initial `DEFAULT_LANGUAGE`.
-    if (clientInitialLanguage !== language) {
+    
+    if (clientInitialLanguage !== language) { // `language` here is defaultLanguage from useState
       setLanguageState(clientInitialLanguage);
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []); // Empty dependency array ensures this runs once on mount
+  }, []); 
 
   const setLanguage = useCallback((newLanguage: Language) => {
     if (translations[newLanguage]) {
@@ -463,18 +494,32 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const t = useCallback((key: string, replacements?: Record<string, string | number>): string => {
+    if (!isClient) { // Don't translate on server or before hydration
+        // Attempt to get the key from default language for SSR consistency if needed, or just return key
+        const keys = key.split('.');
+        let defaultResult: any = translations[DEFAULT_LANGUAGE];
+        for (const k of keys) {
+            defaultResult = defaultResult?.[k];
+            if (defaultResult === undefined) return key;
+        }
+        if (typeof defaultResult === 'string' && replacements) {
+          return Object.entries(replacements).reduce((acc, [placeholder, value]) => {
+            return acc.replace(new RegExp(`{${placeholder}}`, 'g'), String(value));
+          }, defaultResult);
+        }
+        return typeof defaultResult === 'string' ? defaultResult : key;
+    }
+
     const keys = key.split('.');
-    let result: any = translations[language]; // Use current language state
+    let result: any = translations[language];
     for (const k of keys) {
       result = result?.[k];
       if (result === undefined) {
-        // Fallback to default language if key not found in current language
         let fallbackResult: any = translations[DEFAULT_LANGUAGE];
         for (const fk of keys) {
             fallbackResult = fallbackResult?.[fk];
             if (fallbackResult === undefined) {
-                // console.warn(`Translation key "${key}" not found in language "${language}" or default "${DEFAULT_LANGUAGE}".`);
-                return key; // Return the key itself as a last resort
+                return key; 
             }
         }
         result = fallbackResult;
@@ -489,7 +534,7 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
     }
 
     return typeof result === 'string' ? result : key;
-  }, [language]); // `t` function depends on `language` state
+  }, [language, isClient]);
 
   return (
     <LanguageContext.Provider value={{ language, setLanguage, t }}>
