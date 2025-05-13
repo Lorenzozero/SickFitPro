@@ -420,35 +420,34 @@ interface LanguageContextType {
 const LanguageContext = createContext<LanguageContextType | undefined>(undefined);
 
 export function LanguageProvider({ children }: { children: ReactNode }) {
-  const [language, setLanguageState] = useState<Language>(() => {
-    if (typeof window === 'undefined') {
-      return DEFAULT_LANGUAGE;
-    }
-    try {
-      const storedLanguage = localStorage.getItem(LANGUAGE_STORAGE_KEY) as Language;
-      return storedLanguage && translations[storedLanguage] ? storedLanguage : DEFAULT_LANGUAGE;
-    } catch (e) {
-      console.warn('LanguageProvider: Failed to access localStorage for language. Using default.', e);
-      return DEFAULT_LANGUAGE;
-    }
-  });
+  // Initialize with default language consistently for server and initial client render
+  const [language, setLanguageState] = useState<Language>(DEFAULT_LANGUAGE);
 
+  // Effect to load language from localStorage on client mount
   useEffect(() => {
-    // This effect ensures that on client-side mount, we re-check localStorage
-    // in case the initial SSR/default state was different.
+    // This code runs only on the client, after the component has mounted
+    let clientInitialLanguage = DEFAULT_LANGUAGE;
     try {
-      const storedLanguage = localStorage.getItem(LANGUAGE_STORAGE_KEY) as Language;
-      if (storedLanguage && translations[storedLanguage] && storedLanguage !== language) {
-        setLanguageState(storedLanguage);
-      } else if (!storedLanguage) {
-        // If nothing is in localStorage, set it to the current (default or initial) state
-        localStorage.setItem(LANGUAGE_STORAGE_KEY, language);
+      const storedLanguage = localStorage.getItem(LANGUAGE_STORAGE_KEY) as Language | null;
+      if (storedLanguage && translations[storedLanguage]) {
+        clientInitialLanguage = storedLanguage;
+      } else {
+        // If no valid language in storage, ensure default is stored.
+        // This also handles cases where localStorage might have an invalid value.
+        localStorage.setItem(LANGUAGE_STORAGE_KEY, DEFAULT_LANGUAGE);
       }
     } catch (e) {
-      console.warn('LanguageProvider: Failed to access localStorage on mount or during update.', e);
+      console.warn('LanguageProvider: Failed to access localStorage. Using default language.', e);
+      // clientInitialLanguage remains DEFAULT_LANGUAGE
     }
-  }, [language]);
 
+    // Update the state only if the resolved language is different from the initial (DEFAULT_LANGUAGE)
+    // `language` in this effect's closure is the initial `DEFAULT_LANGUAGE`.
+    if (clientInitialLanguage !== language) {
+      setLanguageState(clientInitialLanguage);
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []); // Empty dependency array ensures this runs once on mount
 
   const setLanguage = useCallback((newLanguage: Language) => {
     if (translations[newLanguage]) {
@@ -465,7 +464,7 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
 
   const t = useCallback((key: string, replacements?: Record<string, string | number>): string => {
     const keys = key.split('.');
-    let result: any = translations[language];
+    let result: any = translations[language]; // Use current language state
     for (const k of keys) {
       result = result?.[k];
       if (result === undefined) {
@@ -490,7 +489,7 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
     }
 
     return typeof result === 'string' ? result : key;
-  }, [language]);
+  }, [language]); // `t` function depends on `language` state
 
   return (
     <LanguageContext.Provider value={{ language, setLanguage, t }}>

@@ -25,26 +25,19 @@ export function ThemeProvider({
   defaultTheme = 'system',
   storageKey = 'app-theme',
 }: ThemeProviderProps) {
-  const [theme, setThemeState] = useState<Theme>(() => {
-    if (typeof window === 'undefined') {
-      return defaultTheme;
-    }
-    try {
-      const storedTheme = localStorage.getItem(storageKey) as Theme;
-      return storedTheme || defaultTheme;
-    } catch (e) {
-      // In case localStorage is unavailable (e.g. private browsing in some browsers)
-      console.warn('ThemeProvider: Failed to access localStorage for theme. Using default.', e);
-      return defaultTheme;
-    }
-  });
+  // Initialize with defaultTheme consistently for server and initial client render
+  const [theme, setThemeState] = useState<Theme>(defaultTheme);
 
   const [resolvedTheme, setResolvedTheme] = useState<'light' | 'dark'>(() => {
+    // For initial resolvedTheme, if theme is 'system', try to determine from window if available, else default.
+    // This part runs on client before first full render, but after useState for `theme` is set.
     if (theme === 'light' || theme === 'dark') return theme;
     if (typeof window !== 'undefined') {
       return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
     }
-    return 'light'; // Default for SSR if system preference can't be determined
+    // Default for SSR or if window is not available when this runs (should be 'system' theme case)
+    // Assuming a light default if system preference cannot be determined on server for 'system' theme.
+    return 'light'; 
   });
 
   const applyThemePreference = useCallback(() => {
@@ -94,19 +87,25 @@ export function ThemeProvider({
     setThemeState(newTheme);
   };
   
-  // Effect to initialize theme from localStorage on client mount,
-  // ensuring consistency if the initial state (from SSR or defaultProp) differs.
+  // Effect to load theme from localStorage on client mount,
+  // and update if it differs from the initial (defaultTheme).
   useEffect(() => {
     if (typeof window !== 'undefined') {
-      let storedTheme: Theme | null = null;
+      let clientInitialTheme = defaultTheme;
       try {
-        storedTheme = localStorage.getItem(storageKey) as Theme;
+        const storedTheme = localStorage.getItem(storageKey) as Theme | null;
+        if (storedTheme && ['light', 'dark', 'system'].includes(storedTheme)) {
+          clientInitialTheme = storedTheme;
+        } else {
+           localStorage.setItem(storageKey, defaultTheme);
+        }
       } catch (e) {
         console.warn('ThemeProvider: Failed to access localStorage on mount.', e);
       }
-      const effectiveInitialTheme = storedTheme || defaultTheme;
-      if (effectiveInitialTheme !== theme) {
-         setThemeState(effectiveInitialTheme);
+      
+      // `theme` in this closure is `defaultTheme` from the initial useState.
+      if (clientInitialTheme !== theme) {
+         setThemeState(clientInitialTheme);
       }
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
