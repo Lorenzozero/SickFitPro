@@ -62,7 +62,7 @@ export default function SettingsPage() {
           <CardContent>
             <div className="space-y-2">
                 <div className="flex items-center justify-between gap-4">
-                    <Label htmlFor="language" className="whitespace-nowrap">{t('settingsPage.language')}</Label>
+                    <Label htmlFor="language" className="whitespace-nowrap"></Label>
                     <div className="w-auto min-w-[180px]">
                         <Select 
                             value={isClient ? language : 'en'} 
