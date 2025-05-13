@@ -16,13 +16,12 @@ interface Translations {
 const translations: Record<Language, Translations> = {
   en: {
     nav: {
-      dashboard: 'Home', // Changed from Dashboard
+      dashboard: 'Home', 
       exercises: 'Exercises',
       workoutPlans: 'Workout Plans',
       calendar: 'Calendar',
       aiSplitSuggester: 'AI Split Suggester',
       progress: 'Progress',
-      // settings: 'Settings', // Settings removed from sidebar
     },
     userDropdown: {
       myAccount: 'My Account',
@@ -45,7 +44,7 @@ const translations: Record<Language, Translations> = {
       streak: 'Streak',
       quickActions: 'Quick Actions',
       quickActionsDescription: 'Jump right into your fitness routine.',
-      logNewWorkout: 'Log Workout', // Changed from Start New Workout
+      logNewWorkout: 'Log Workout', 
       manageExercises: 'Manage Exercises',
       getAISplitSuggestion: 'Get AI Split Suggestion',
       todaysFocus: "Today's Focus",
@@ -112,14 +111,14 @@ const translations: Record<Language, Translations> = {
     },
     calendarPage: {
         title: "Workout Calendar",
-        description: "Plan and track your training schedule.",
-        selectADate: "Select a Date",
-        workoutsScheduledForThisDay: "Workouts scheduled for this day.",
-        addWorkoutToDay: "Add Workout to Day",
-        noWorkoutsScheduled: "No workouts scheduled for this day. Enjoy your rest or add one!",
-        selectDateToSeeWorkouts: "Select a date to see scheduled workouts.",
-        dialogAddWorkoutTitle: "Add Workout to", // Date will be appended
-        dialogAddWorkoutDescription: "Select a workout plan to schedule for this day.",
+        description: "Plan and track your weekly training schedule.",
+        selectADate: "Select a Date", // May become obsolete or repurposed
+        workoutsScheduledForThisDay: "Workouts scheduled for this day.", // May become obsolete
+        addWorkoutToDay: "Add Workout", // Generic add button
+        noWorkoutsScheduled: "No workouts scheduled for this day.", // Or "for this day of the week"
+        selectDateToSeeWorkouts: "Select a date to see scheduled workouts.", // May become obsolete
+        dialogAddWorkoutTitle: "Add Workout to {dayOfWeek}", 
+        dialogAddWorkoutDescription: "Select a workout plan to schedule for this day of the week.",
         workoutPlanLabel: "Workout Plan",
         selectAPlanPlaceholder: "Select a plan",
         samplePlan1: "Full Body Blast",
@@ -129,7 +128,20 @@ const translations: Record<Language, Translations> = {
         timeLabel: "Time",
         cancelButton: "Cancel",
         scheduleWorkoutButton: "Schedule Workout",
-        loadingCalendar: "Loading calendar...",
+        loadingCalendar: "Loading calendar...", // May become obsolete
+        weeklyScheduleTitle: "Weekly Training Schedule",
+        weeklyScheduleDescription: "Set up your typical training week. This schedule will repeat automatically.",
+        days: {
+          monday: "Monday",
+          tuesday: "Tuesday",
+          wednesday: "Wednesday",
+          thursday: "Thursday",
+          friday: "Friday",
+          saturday: "Saturday",
+          sunday: "Sunday",
+        },
+        noWorkoutsForDayOfWeek: "No workouts scheduled for {dayOfWeek}.",
+        addWorkoutTo: "Add to {dayOfWeek}",
     },
     exercisesPage: {
         title: "Custom Exercises",
@@ -176,45 +188,55 @@ const translations: Record<Language, Translations> = {
         squatLabel: "Squat (kg)",
         bodyCompositionCardTitle: "Body Composition",
         bodyCompositionCardDescription: "Monitor changes in weight, body fat, etc.",
-        weightLabel: "Weight (kg)",
+        weightLabel: "Weight (kg)", // Used in charts
         photoComparisonCardTitle: "Photo Comparison",
         photoComparisonCardDescription: "Visually track your transformation. Upload 'before' and 'after' photos.",
         beforePhotoLabel: "Before Photo",
         afterPhotoLabel: "After Photo",
         noPhotoUploaded: "No photo uploaded",
         clickToUpload: "Click to upload",
-        uploadButtonLabel: "Upload", // Will be combined with Before/After Photo
-        muscleMeasurementsCardTitle: "Muscle Measurements",
-        muscleMeasurementsCardDescription: "Track your body measurements over time.",
+        uploadButtonLabel: "Upload",
+        bodyMeasurementsCardTitle: "Body Measurements", // Changed from Muscle Measurements
+        bodyMeasurementsCardDescription: "Track your body measurements like weight, height, and muscle size over time.",
         addMeasurementButton: "Add Measurement",
         measurementDialogAddTitle: "Add New Measurement",
         measurementDialogEditTitle: "Edit Measurement",
         measurementDialogDescription: "Enter the details for your measurement.",
         formDateLabel: "Date",
-        formMuscleLabel: "Muscle/Area",
-        selectMusclePlaceholder: "Select muscle/area",
-        muscleBiceps: "Biceps",
-        muscleChest: "Chest",
-        muscleWaist: "Waist",
-        muscleHips: "Hips",
-        muscleThigh: "Thigh",
-        muscleCalf: "Calf",
-        // muscleOther defined in exercisesPage, reuse if same, otherwise define specifically
-        formMeasurementLabel: "Measurement",
-        formUnitLabel: "Unit",
-        unitCm: "cm",
-        unitIn: "inches",
-        formNotesLabel: "Notes (Optional)",
+        formMeasurementNameLabel: "Measurement Type", // Changed from Muscle/Area
+        selectMeasurementNamePlaceholder: "Select measurement type",
+        measurementNameBiceps: "Biceps",
+        measurementNameChest: "Chest",
+        measurementNameWaist: "Waist",
+        measurementNameHips: "Hips",
+        measurementNameThigh: "Thigh",
+        measurementNameCalf: "Calf",
+        measurementNameWeight: "Weight",
+        measurementNameHeight: "Height",
+        // measurementNameOther corresponds to exercisesPage.muscleGroupOther
+        formValueLabel: "Value", // Changed from Measurement
+        formUnitLabel: "Unit", // Kept same
+        unitCM: "cm",
+        unitIN: "in",
+        unitKG: "kg",
+        unitLBS: "lbs",
+        formNotesLabel: "Notes", // Changed from Notes (Optional)
+        formNotesPlaceholder: "Enter any relevant notes...",
         saveMeasurementButton: "Save Measurement",
-        // cancelButton defined elsewhere, reuse if same
         tableHeaderDate: "Date",
-        tableHeaderMuscle: "Muscle/Area",
-        tableHeaderMeasurement: "Measurement",
-        // tableHeaderActions defined in exercisesPage, reuse if same
-        enableMeasurementReminders: "Enable Measurement Reminders",
+        tableHeaderMeasurementName: "Measurement", // Changed from Muscle/Area
+        tableHeaderValue: "Value", // Changed from Measurement to be more specific
+        measurementReminderLabel: "Measurement Reminder",
+        selectReminderFrequencyPlaceholder: "Select reminder frequency",
+        reminderOff: "Off",
+        reminderDaily: "Daily",
+        reminderWeekly: "Weekly",
+        reminderBiWeekly: "Bi-Weekly",
+        reminderMonthly: "Monthly",
         measurementSaved: "Measurement Saved",
         measurementDeleted: "Measurement Deleted",
         noMeasurementsYet: "No measurements recorded yet. Add your first one!",
+        formValidationAlert: "Please fill in date, measurement type, and value.",
     },
     workoutPlansPage: {
         title: "Workout Plans",
@@ -234,7 +256,7 @@ const translations: Record<Language, Translations> = {
         cancelButton: "Cancel",
         savePlanButton: "Save Plan",
         toastPlanUpdatedTitle: "Plan Updated",
-        toastPlanUpdatedDescription: "\"{planName}\" has been updated.", // {planName} is a placeholder
+        toastPlanUpdatedDescription: "\"{planName}\" has been updated.", 
         toastPlanCreatedTitle: "Plan Created",
         toastPlanCreatedDescription: "\"{planName}\" has been created.",
         toastPlanDeletedTitle: "Plan Deleted",
@@ -266,13 +288,12 @@ const translations: Record<Language, Translations> = {
   },
   it: {
     nav: {
-      dashboard: 'Home', // Changed from Cruscotto
+      dashboard: 'Home', 
       exercises: 'Esercizi',
-      workoutPlans: 'Schede Allenamento', // Changed from Piani di Allenamento
+      workoutPlans: 'Schede Allenamento', 
       calendar: 'Calendario',
       aiSplitSuggester: 'Suggeritore Split AI',
       progress: 'Progressi',
-      // settings: 'Impostazioni', // Settings removed from sidebar
     },
     userDropdown: {
       myAccount: 'Il Mio Account',
@@ -295,7 +316,7 @@ const translations: Record<Language, Translations> = {
       streak: 'Serie Positiva',
       quickActions: 'Azioni Rapide',
       quickActionsDescription: 'Entra subito nella tua routine di fitness.',
-      logNewWorkout: 'Registra Allenamento', // Changed
+      logNewWorkout: 'Registra Allenamento', 
       manageExercises: 'Gestisci Esercizi',
       getAISplitSuggestion: 'Ottieni Suggerimento Split AI',
       todaysFocus: "Focus di Oggi",
@@ -362,14 +383,14 @@ const translations: Record<Language, Translations> = {
     },
     calendarPage: {
         title: "Calendario Allenamenti",
-        description: "Pianifica e monitora il tuo programma di allenamento.",
+        description: "Pianifica e monitora il tuo programma di allenamento settimanale.",
         selectADate: "Seleziona una Data",
         workoutsScheduledForThisDay: "Allenamenti programmati per questo giorno.",
         addWorkoutToDay: "Aggiungi Allenamento",
-        noWorkoutsScheduled: "Nessun allenamento programmato. Goditi il riposo o aggiungine uno!",
+        noWorkoutsScheduled: "Nessun allenamento programmato per questo giorno.",
         selectDateToSeeWorkouts: "Seleziona una data per vedere gli allenamenti programmati.",
-        dialogAddWorkoutTitle: "Aggiungi Allenamento al", // Date will be appended
-        dialogAddWorkoutDescription: "Seleziona una scheda di allenamento da programmare per questo giorno.",
+        dialogAddWorkoutTitle: "Aggiungi Allenamento a {dayOfWeek}",
+        dialogAddWorkoutDescription: "Seleziona una scheda di allenamento da programmare per questo giorno della settimana.",
         workoutPlanLabel: "Scheda Allenamento",
         selectAPlanPlaceholder: "Seleziona una scheda",
         samplePlan1: "Scheda Total Body",
@@ -380,6 +401,19 @@ const translations: Record<Language, Translations> = {
         cancelButton: "Annulla",
         scheduleWorkoutButton: "Programma Allenamento",
         loadingCalendar: "Caricamento calendario...",
+        weeklyScheduleTitle: "Programma Allenamento Settimanale",
+        weeklyScheduleDescription: "Imposta la tua settimana di allenamento tipo. Questo programma si ripeterà automaticamente.",
+        days: {
+          monday: "Lunedì",
+          tuesday: "Martedì",
+          wednesday: "Mercoledì",
+          thursday: "Giovedì",
+          friday: "Venerdì",
+          saturday: "Sabato",
+          sunday: "Domenica",
+        },
+        noWorkoutsForDayOfWeek: "Nessun allenamento programmato per {dayOfWeek}.",
+        addWorkoutTo: "Aggiungi a {dayOfWeek}",
     },
     exercisesPage: {
         title: "Esercizi Personalizzati",
@@ -434,34 +468,46 @@ const translations: Record<Language, Translations> = {
         noPhotoUploaded: "Nessuna foto caricata",
         clickToUpload: "Clicca per caricare",
         uploadButtonLabel: "Carica",
-        muscleMeasurementsCardTitle: "Misure Muscolari",
-        muscleMeasurementsCardDescription: "Traccia le tue misurazioni corporee nel tempo.",
+        bodyMeasurementsCardTitle: "Misure Corporee",
+        bodyMeasurementsCardDescription: "Traccia le tue misure corporee come peso, altezza e circonferenze muscolari nel tempo.",
         addMeasurementButton: "Aggiungi Misura",
         measurementDialogAddTitle: "Aggiungi Nuova Misura",
         measurementDialogEditTitle: "Modifica Misura",
         measurementDialogDescription: "Inserisci i dettagli per la tua misurazione.",
         formDateLabel: "Data",
-        formMuscleLabel: "Muscolo/Zona",
-        selectMusclePlaceholder: "Seleziona muscolo/zona",
-        muscleBiceps: "Bicipiti",
-        muscleChest: "Petto",
-        muscleWaist: "Vita",
-        muscleHips: "Fianchi",
-        muscleThigh: "Coscia",
-        muscleCalf: "Polpaccio",
-        formMeasurementLabel: "Misura",
+        formMeasurementNameLabel: "Tipo Misurazione",
+        selectMeasurementNamePlaceholder: "Seleziona tipo misurazione",
+        measurementNameBiceps: "Bicipiti",
+        measurementNameChest: "Petto",
+        measurementNameWaist: "Vita",
+        measurementNameHips: "Fianchi",
+        measurementNameThigh: "Coscia",
+        measurementNameCalf: "Polpaccio",
+        measurementNameWeight: "Peso",
+        measurementNameHeight: "Altezza",
+        formValueLabel: "Valore",
         formUnitLabel: "Unità",
-        unitCm: "cm",
-        unitIn: "pollici",
-        formNotesLabel: "Note (Opzionale)",
+        unitCM: "cm",
+        unitIN: "pollici",
+        unitKG: "kg",
+        unitLBS: "libbre",
+        formNotesLabel: "Note",
+        formNotesPlaceholder: "Inserisci eventuali note pertinenti...",
         saveMeasurementButton: "Salva Misura",
         tableHeaderDate: "Data",
-        tableHeaderMuscle: "Muscolo/Zona",
-        tableHeaderMeasurement: "Misura",
-        enableMeasurementReminders: "Abilita Promemoria Misure",
+        tableHeaderMeasurementName: "Misurazione",
+        tableHeaderValue: "Valore",
+        measurementReminderLabel: "Promemoria Misurazioni",
+        selectReminderFrequencyPlaceholder: "Seleziona frequenza promemoria",
+        reminderOff: "Spento",
+        reminderDaily: "Giornaliero",
+        reminderWeekly: "Settimanale",
+        reminderBiWeekly: "Bisettimanale",
+        reminderMonthly: "Mensile",
         measurementSaved: "Misura Salvata",
         measurementDeleted: "Misura Eliminata",
         noMeasurementsYet: "Nessuna misura registrata. Aggiungi la prima!",
+        formValidationAlert: "Compila data, tipo misurazione e valore.",
     },
      workoutPlansPage: {
         title: "Schede Allenamento",
@@ -517,8 +563,8 @@ const translations: Record<Language, Translations> = {
 interface LanguageContextType {
   language: Language;
   setLanguage: (language: Language) => void;
-  t: (key: string, replacements?: Record<string, string | number>) => string;
-  isClient: boolean; // Expose isClient for components that need to know
+  t: (key: string, replacements?: Record<string, string | number | undefined>) => string;
+  isClient: boolean; 
 }
 
 const LanguageContext = createContext<LanguageContextType | undefined>(undefined);
@@ -535,20 +581,17 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
       if (storedLanguage && translations[storedLanguage]) {
         clientInitialLanguage = storedLanguage;
       } else {
-        // If no language is stored, or stored language is invalid, set the default one.
         localStorage.setItem(LANGUAGE_STORAGE_KEY, DEFAULT_LANGUAGE);
       }
     } catch (e) {
       console.warn('LanguageProvider: Failed to access localStorage. Using default language.', e);
     }
     
-    // Update state only if the determined language is different from the initial state
-    // This ensures `language` state is correctly initialized from localStorage on client
     if (clientInitialLanguage !== language) { 
       setLanguageState(clientInitialLanguage);
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []); // Empty dependency array: runs once on mount on the client.
+  }, []); 
 
   const setLanguage = useCallback((newLanguage: Language) => {
     if (translations[newLanguage]) {
@@ -563,7 +606,7 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
     }
   }, []);
 
-  const t = useCallback((key: string, replacements?: Record<string, string | number>): string => {
+  const t = useCallback((key: string, replacements?: Record<string, string | number | undefined>): string => {
     const currentLang = isClient ? language : DEFAULT_LANGUAGE;
     const keys = key.split('.');
     let result: any = translations[currentLang];
@@ -571,27 +614,33 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
     for (const k of keys) {
       result = result?.[k];
       if (result === undefined) {
-        // Fallback to default language if key not found in current language (and current is not default)
         if (currentLang !== DEFAULT_LANGUAGE) {
             let fallbackResult: any = translations[DEFAULT_LANGUAGE];
             for (const fk of keys) {
                 fallbackResult = fallbackResult?.[fk];
-                if (fallbackResult === undefined) return key; // Key not found in default either
+                if (fallbackResult === undefined) {
+                  // If still not found, try to get the default value from replacements
+                  return replacements?.default?.toString() || key;
+                }
             }
             result = fallbackResult;
             break;
         }
-        return key; // Key not found
+        return replacements?.default?.toString() || key;
       }
     }
     
     if (typeof result === 'string' && replacements) {
-      return Object.entries(replacements).reduce((acc, [placeholder, value]) => {
+      // Filter out the 'default' key from replacements before applying them
+      const actualReplacements = { ...replacements };
+      delete actualReplacements.default;
+
+      return Object.entries(actualReplacements).reduce((acc, [placeholder, value]) => {
         return acc.replace(new RegExp(`{${placeholder}}`, 'g'), String(value));
       }, result);
     }
 
-    return typeof result === 'string' ? result : key;
+    return typeof result === 'string' ? result : (replacements?.default?.toString() || key) ;
   }, [language, isClient]);
 
   return (
@@ -608,3 +657,4 @@ export function useLanguage() {
   }
   return context;
 }
+

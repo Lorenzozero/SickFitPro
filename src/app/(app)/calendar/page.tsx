@@ -1,10 +1,8 @@
 
 'use client';
 
-import React, { useState, useEffect, FormEvent, useMemo } from 'react';
-import type { Locale } from 'date-fns';
+import React, { useState, FormEvent, useEffect } from 'react';
 import { PageHeader } from '@/components/shared/page-header';
-import { Calendar } from '@/components/ui/calendar';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { PlusCircle } from 'lucide-react';
@@ -25,10 +23,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { useLanguage } from '@/context/language-context';
 import { useToast } from '@/hooks/use-toast';
-import { Skeleton } from '@/components/ui/skeleton';
-
 
 interface ScheduledWorkout {
   id: string;
@@ -39,8 +36,8 @@ interface ScheduledWorkout {
 
 interface WorkoutPlanOption {
   id: string;
-  nameKey: string; // Key for translation
-  defaultName: string; // Default English name
+  nameKey: string;
+  defaultName: string;
 }
 
 const availableWorkoutPlans: WorkoutPlanOption[] = [
@@ -50,44 +47,35 @@ const availableWorkoutPlans: WorkoutPlanOption[] = [
   { id: '4', nameKey: 'calendarPage.samplePlan4', defaultName: 'Cardio Session' },
 ];
 
+const dayKeys = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'];
 
 export default function CalendarPage() {
-  const { t, language } = useLanguage();
+  const { t } = useLanguage();
   const { toast } = useToast();
-  const [date, setDate] = useState<Date | undefined>(new Date());
   const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const [scheduledWorkoutsByDate, setScheduledWorkoutsByDate] = useState<Record<string, ScheduledWorkout[]>>({});
+  const [selectedDayForDialog, setSelectedDayForDialog] = useState<string | null>(null);
+  const [selectedWorkoutPlanId, setSelectedWorkoutPlanId] = useState<string | undefined>(availableWorkoutPlans[0]?.id);
   
-  const [dateFnsLocale, setDateFnsLocale] = useState<Locale | undefined>();
-  const [isLocaleLoading, setIsLocaleLoading] = useState(true);
+  const [weeklySchedule, setWeeklySchedule] = useState<Record<string, ScheduledWorkout[]>>(
+    dayKeys.reduce((acc, day) => ({ ...acc, [day]: [] }), {})
+  );
+  const [isClient, setIsClient] = useState(false);
 
   useEffect(() => {
-    const loadDateFnsLocale = async () => {
-      setIsLocaleLoading(true);
-      if (language === 'it') {
-        const localeModule = await import('date-fns/locale/it');
-        setDateFnsLocale(localeModule.default);
-      } else {
-        const localeModule = await import('date-fns/locale/en-US');
-        setDateFnsLocale(localeModule.default);
-      }
-      setIsLocaleLoading(false);
-    };
-    loadDateFnsLocale();
-  }, [language]);
+    setIsClient(true);
+  }, []);
 
-  const currentDisplayLocale = useMemo(() => (language === 'it' ? 'it-IT' : 'en-US'), [language]);
 
-  const getWorkoutsForSelectedDate = (): ScheduledWorkout[] => {
-    if (!date) return [];
-    const dateString = date.toISOString().split('T')[0];
-    return scheduledWorkoutsByDate[dateString] || [];
+  const handleOpenDialog = (dayKey: string) => {
+    setSelectedDayForDialog(dayKey);
+    setSelectedWorkoutPlanId(availableWorkoutPlans[0]?.id); // Reset selected plan
+    setIsDialogOpen(true);
   };
   
-  const handleAddWorkout = (e: FormEvent<HTMLFormElement>) => {
+  const handleAddWorkoutToWeek = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if (!date || !selectedWorkoutPlanId) {
-      toast({ title: "Error", description: "Please select a date and a workout plan.", variant: "destructive" });
+    if (!selectedDayForDialog || !selectedWorkoutPlanId) {
+      toast({ title: t('toastErrorTitle', { default: "Error"}), description: t('calendarPage.errorSelectDayAndPlan', { default: "Please select a day and a workout plan."}), variant: "destructive" });
       return;
     }
 
@@ -96,7 +84,7 @@ export default function CalendarPage() {
     
     const plan = availableWorkoutPlans.find(p => p.id === selectedWorkoutPlanId);
     if (!plan) {
-        toast({ title: "Error", description: "Selected plan not found.", variant: "destructive" });
+        toast({ title: t('toastErrorTitle', {default: "Error"}), description: t('calendarPage.errorPlanNotFound', { default: "Selected plan not found."}), variant: "destructive" });
         return;
     }
 
@@ -106,98 +94,114 @@ export default function CalendarPage() {
       planName: t(plan.nameKey) || plan.defaultName,
       time,
     };
-
-    const dateString = date.toISOString().split('T')[0];
     
-    setScheduledWorkoutsByDate(prev => {
-      const updatedWorkoutsForDate = [...(prev[dateString] || []), newWorkout];
-      return { ...prev, [dateString]: updatedWorkoutsForDate };
+    setWeeklySchedule(prev => {
+      const updatedWorkoutsForDay = [...(prev[selectedDayForDialog] || []), newWorkout].sort((a, b) => a.time.localeCompare(b.time));
+      return { ...prev, [selectedDayForDialog]: updatedWorkoutsForDay };
     });
     
-    toast({ title: "Workout Scheduled!", description: `${newWorkout.planName} scheduled for ${date.toLocaleDateString(currentDisplayLocale)} at ${newWorkout.time}.` });
+    toast({ 
+        title: t('calendarPage.toastWorkoutScheduledTitle', {default: "Workout Scheduled!"}), 
+        description: t('calendarPage.toastWorkoutScheduledDescription', {
+            planName: newWorkout.planName, 
+            dayOfWeek: t(`calendarPage.days.${selectedDayForDialog}`), 
+            time: newWorkout.time
+        })
+    });
     setIsDialogOpen(false);
+    setSelectedDayForDialog(null);
   };
 
-  const [selectedWorkoutPlanId, setSelectedWorkoutPlanId] = useState<string | undefined>(availableWorkoutPlans[0]?.id);
+  const handleDeleteWorkoutFromWeek = (dayKey: string, workoutId: string) => {
+    setWeeklySchedule(prev => {
+        const updatedWorkoutsForDay = (prev[dayKey] || []).filter(w => w.id !== workoutId);
+        return {...prev, [dayKey]: updatedWorkoutsForDay};
+    });
+    toast({ title: t('calendarPage.toastWorkoutRemovedTitle', { default: "Workout Removed" }), variant: "destructive"});
+  }
 
-  const datesWithWorkouts = useMemo(() => {
-    return Object.keys(scheduledWorkoutsByDate)
-        .map(dateString => {
-            const [year, month, day] = dateString.split('-').map(Number);
-            return new Date(year, month - 1, day); 
-        })
-        .filter(d => !isNaN(d.getTime()));
-  }, [scheduledWorkoutsByDate]);
+
+  if (!isClient) {
+    // Basic skeleton or loading state for SSR
+    return (
+      <>
+        <PageHeader
+          title={t('calendarPage.weeklyScheduleTitle')}
+          description={t('calendarPage.weeklyScheduleDescription')}
+        />
+        <Card className="shadow-lg">
+          <CardHeader>
+            <CardTitle>{t('calendarPage.weeklyScheduleTitle')}</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p>{t('calendarPage.loadingCalendar')}</p>
+          </CardContent>
+        </Card>
+      </>
+    );
+  }
 
   return (
     <>
       <PageHeader
-        title={t('calendarPage.title')}
-        description={t('calendarPage.description')}
+        title={t('calendarPage.weeklyScheduleTitle')}
+        description={t('calendarPage.weeklyScheduleDescription')}
       />
-      <div className="grid gap-6 md:grid-cols-3">
-        <Card className="md:col-span-2 shadow-lg">
-          <CardContent className="p-0">
-            {isLocaleLoading || !dateFnsLocale ? (
-                <div className="flex items-center justify-center p-3 h-[355px]"> {/* Approx height of calendar */}
-                    <Skeleton className="w-full h-full rounded-md" />
-                </div>
-            ) : (
-                <Calendar
-                  mode="single"
-                  selected={date}
-                  onSelect={setDate}
-                  className="rounded-md"
-                  locale={dateFnsLocale}
-                  modifiers={{ scheduled: datesWithWorkouts }}
-                  modifiersClassNames={{ scheduled: 'day-scheduled' }}
-                  classNames={{
-                    day_selected: "bg-primary text-primary-foreground hover:bg-primary/90 focus:bg-primary/90",
-                    day_today: "bg-accent text-accent-foreground",
-                  }}
-                />
-            )}
-          </CardContent>
-        </Card>
-
-        <Card className="shadow-lg">
-          <CardHeader>
-            <CardTitle>
-              {date ? date.toLocaleDateString(currentDisplayLocale, { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }) : t('calendarPage.selectADate')}
-            </CardTitle>
-            <CardDescription>{t('calendarPage.workoutsScheduledForThisDay')}</CardDescription>
-          </CardHeader>
-          <CardContent>
-            {date && (
-              <Button onClick={() => setIsDialogOpen(true)} className="w-full mb-4">
-                <PlusCircle className="w-4 h-4 mr-2" /> {t('calendarPage.addWorkoutToDay')}
-              </Button>
-            )}
-            {getWorkoutsForSelectedDate().length > 0 ? (
-              <ul className="space-y-3">
-                {getWorkoutsForSelectedDate().map(workout => (
-                  <li key={workout.id} className="p-3 rounded-md bg-secondary">
-                    <p className="font-semibold text-secondary-foreground">{workout.planName}</p>
-                    <p className="text-sm text-muted-foreground">{workout.time}</p>
-                  </li>
+      <Card className="shadow-lg">
+        <CardContent className="p-0">
+          <Table>
+            <TableHeader>
+              <TableRow>
+                {dayKeys.map(dayKey => (
+                  <TableHead key={dayKey} className="text-center capitalize w-[14.28%]">
+                    {t(`calendarPage.days.${dayKey}`)}
+                  </TableHead>
                 ))}
-              </ul>
-            ) : (
-              <p className="text-sm text-center text-muted-foreground">
-                {date ? t('calendarPage.noWorkoutsScheduled') : t('calendarPage.selectDateToSeeWorkouts')}
-              </p>
-            )}
-          </CardContent>
-        </Card>
-      </div>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              <TableRow className="align-top">
+                {dayKeys.map(dayKey => (
+                  <TableCell key={dayKey} className="p-2 h-48 border">
+                    <div className="flex flex-col h-full">
+                      <ul className="space-y-2 flex-grow overflow-y-auto mb-2">
+                        {weeklySchedule[dayKey] && weeklySchedule[dayKey].length > 0 ? (
+                          weeklySchedule[dayKey].map(workout => (
+                            <li key={workout.id} className="p-2 rounded-md bg-secondary text-xs">
+                              <div className="flex justify-between items-center">
+                                <span className="font-semibold text-secondary-foreground">{workout.planName}</span>
+                                <Button variant="ghost" size="icon" className="h-5 w-5 text-destructive" onClick={() => handleDeleteWorkoutFromWeek(dayKey, workout.id)}>
+                                    <Trash2 className="h-3 w-3" />
+                                </Button>
+                              </div>
+                              <p className="text-muted-foreground">{workout.time}</p>
+                            </li>
+                          ))
+                        ) : (
+                          <p className="text-xs text-center text-muted-foreground pt-2">
+                            {t('calendarPage.noWorkoutsForDayOfWeek', { dayOfWeek: t(`calendarPage.days.${dayKey}`)})}
+                          </p>
+                        )}
+                      </ul>
+                      <Button onClick={() => handleOpenDialog(dayKey)} size="sm" variant="outline" className="w-full mt-auto">
+                        <PlusCircle className="w-3 h-3 mr-1" /> {t('calendarPage.addWorkoutToDay')}
+                      </Button>
+                    </div>
+                  </TableCell>
+                ))}
+              </TableRow>
+            </TableBody>
+          </Table>
+        </CardContent>
+      </Card>
 
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>{t('calendarPage.dialogAddWorkoutTitle')} {date?.toLocaleDateString(currentDisplayLocale)}</DialogTitle>
+            <DialogTitle>{t('calendarPage.dialogAddWorkoutTitle', { dayOfWeek: selectedDayForDialog ? t(`calendarPage.days.${selectedDayForDialog}`) : '' })}</DialogTitle>
             <DialogDescription>{t('calendarPage.dialogAddWorkoutDescription')}</DialogDescription>
           </DialogHeader>
-          <form onSubmit={handleAddWorkout}>
+          <form onSubmit={handleAddWorkoutToWeek}>
             <div className="grid gap-4 py-4">
               <div>
                 <Label htmlFor="workoutPlan">{t('calendarPage.workoutPlanLabel')}</Label>

@@ -23,61 +23,80 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
-import type { MuscleMeasurement } from '@/app/(app)/progress/page';
+import type { BodyMeasurement } from '@/app/(app)/progress/page';
 
 interface AddMeasurementDialogProps {
   isOpen: boolean;
   onOpenChange: (isOpen: boolean) => void;
-  onSave: (measurement: MuscleMeasurement) => void;
-  measurement: Partial<MuscleMeasurement> | null;
+  onSave: (measurement: BodyMeasurement) => void;
+  measurement: Partial<BodyMeasurement> | null;
   t: (key: string, replacements?: Record<string, string | number>) => string;
 }
 
-const muscleOptions = [
-  { value: 'Biceps', labelKey: 'progressPage.muscleBiceps' },
-  { value: 'Chest', labelKey: 'progressPage.muscleChest' },
-  { value: 'Waist', labelKey: 'progressPage.muscleWaist' },
-  { value: 'Hips', labelKey: 'progressPage.muscleHips' },
-  { value: 'Thigh', labelKey: 'progressPage.muscleThigh' },
-  { value: 'Calf', labelKey: 'progressPage.muscleCalf' },
-  { value: 'Other', labelKey: 'exercisesPage.muscleGroupOther' }, // Reusing existing translation key
+const measurementNameOptions = [
+  { value: 'Biceps', labelKey: 'progressPage.measurementNameBiceps', units: ['cm', 'in'] },
+  { value: 'Chest', labelKey: 'progressPage.measurementNameChest', units: ['cm', 'in'] },
+  { value: 'Waist', labelKey: 'progressPage.measurementNameWaist', units: ['cm', 'in'] },
+  { value: 'Hips', labelKey: 'progressPage.measurementNameHips', units: ['cm', 'in'] },
+  { value: 'Thigh', labelKey: 'progressPage.measurementNameThigh', units: ['cm', 'in'] },
+  { value: 'Calf', labelKey: 'progressPage.measurementNameCalf', units: ['cm', 'in'] },
+  { value: 'Weight', labelKey: 'progressPage.measurementNameWeight', units: ['kg', 'lbs'] },
+  { value: 'Height', labelKey: 'progressPage.measurementNameHeight', units: ['cm', 'in'] }, // Assuming cm/in for height for simplicity
+  { value: 'Other', labelKey: 'exercisesPage.muscleGroupOther', units: ['cm', 'in', 'kg', 'lbs'] }, // Allow all for 'Other'
 ];
+
+type Unit = 'cm' | 'in' | 'kg' | 'lbs';
 
 export function AddMeasurementDialog({ isOpen, onOpenChange, onSave, measurement, t }: AddMeasurementDialogProps) {
   const [date, setDate] = useState('');
-  const [muscle, setMuscle] = useState('');
+  const [measurementName, setMeasurementName] = useState('');
   const [value, setValue] = useState('');
-  const [unit, setUnit] = useState<'cm' | 'in'>('cm');
+  const [unit, setUnit] = useState<Unit>('cm');
   const [notes, setNotes] = useState('');
+  const [availableUnits, setAvailableUnits] = useState<Unit[]>(['cm', 'in']);
 
   useEffect(() => {
     if (measurement) {
       setDate(measurement.date || new Date().toISOString().split('T')[0]);
-      setMuscle(measurement.muscle || '');
+      setMeasurementName(measurement.measurementName || '');
       setValue(measurement.value?.toString() || '');
       setUnit(measurement.unit || 'cm');
       setNotes(measurement.notes || '');
     } else {
       // Reset form for new measurement
       setDate(new Date().toISOString().split('T')[0]);
-      setMuscle('');
+      setMeasurementName('');
       setValue('');
-      setUnit('cm');
+      setUnit('cm'); // Default unit
       setNotes('');
     }
   }, [measurement, isOpen]);
 
+  useEffect(() => {
+    const selectedOption = measurementNameOptions.find(opt => opt.value === measurementName);
+    if (selectedOption) {
+      setAvailableUnits(selectedOption.units as Unit[]);
+      // If current unit is not in new available units, reset it
+      if (!selectedOption.units.includes(unit)) {
+        setUnit(selectedOption.units[0] as Unit);
+      }
+    } else {
+      // Default for unselected or "Other" if not specified with units
+      setAvailableUnits(['cm', 'in', 'kg', 'lbs']);
+    }
+  }, [measurementName, unit]);
+
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
-    if (!date || !muscle || !value) {
+    if (!date || !measurementName || !value) {
       // Basic validation, can be enhanced with react-hook-form if needed
-      alert('Please fill in date, muscle, and measurement value.');
+      alert(t('progressPage.formValidationAlert'));
       return;
     }
     onSave({
       id: measurement?.id || String(Date.now()), // Keep existing id or generate new
       date,
-      muscle,
+      measurementName,
       value: parseFloat(value),
       unit,
       notes,
@@ -109,15 +128,15 @@ export function AddMeasurementDialog({ isOpen, onOpenChange, onSave, measurement
               />
             </div>
             <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="muscle" className="text-right">
-                {t('progressPage.formMuscleLabel')}
+              <Label htmlFor="measurementName" className="text-right">
+                {t('progressPage.formMeasurementNameLabel')}
               </Label>
-              <Select value={muscle} onValueChange={setMuscle} required>
+              <Select value={measurementName} onValueChange={setMeasurementName} required>
                 <SelectTrigger className="col-span-3">
-                  <SelectValue placeholder={t('progressPage.selectMusclePlaceholder')} />
+                  <SelectValue placeholder={t('progressPage.selectMeasurementNamePlaceholder')} />
                 </SelectTrigger>
                 <SelectContent>
-                  {muscleOptions.map(opt => (
+                  {measurementNameOptions.map(opt => (
                     <SelectItem key={opt.value} value={opt.value}>
                       {t(opt.labelKey)}
                     </SelectItem>
@@ -127,7 +146,7 @@ export function AddMeasurementDialog({ isOpen, onOpenChange, onSave, measurement
             </div>
             <div className="grid grid-cols-4 items-center gap-4">
               <Label htmlFor="value" className="text-right">
-                {t('progressPage.formMeasurementLabel')}
+                {t('progressPage.formValueLabel')}
               </Label>
               <Input
                 id="value"
@@ -138,13 +157,14 @@ export function AddMeasurementDialog({ isOpen, onOpenChange, onSave, measurement
                 className="col-span-2"
                 required
               />
-              <Select value={unit} onValueChange={(val) => setUnit(val as 'cm' | 'in')}>
+              <Select value={unit} onValueChange={(val) => setUnit(val as Unit)}>
                 <SelectTrigger className="col-span-1">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="cm">{t('progressPage.unitCm')}</SelectItem>
-                  <SelectItem value="in">{t('progressPage.unitIn')}</SelectItem>
+                  {availableUnits.map(u => (
+                    <SelectItem key={u} value={u}>{t(`progressPage.unit${u.toUpperCase()}`)}</SelectItem>
+                  ))}
                 </SelectContent>
               </Select>
             </div>
@@ -157,14 +177,14 @@ export function AddMeasurementDialog({ isOpen, onOpenChange, onSave, measurement
                 value={notes}
                 onChange={(e) => setNotes(e.target.value)}
                 className="col-span-3"
-                placeholder={t('progressPage.formNotesLabel')}
+                placeholder={t('progressPage.formNotesPlaceholder')}
               />
             </div>
           </div>
           <DialogFooter>
             <DialogClose asChild>
               <Button type="button" variant="outline">
-                {t('progressPage.cancelButton')}
+                {t('calendarPage.cancelButton')} {/* Reusing cancel button translation */}
               </Button>
             </DialogClose>
             <Button type="submit">{t('progressPage.saveMeasurementButton')}</Button>
@@ -174,3 +194,4 @@ export function AddMeasurementDialog({ isOpen, onOpenChange, onSave, measurement
     </Dialog>
   );
 }
+
