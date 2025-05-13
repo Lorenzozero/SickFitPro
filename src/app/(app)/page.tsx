@@ -1,23 +1,22 @@
+
 'use client';
 
 import { PageHeader } from '@/components/shared/page-header';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Droplet, CalendarCheck, TrendingUp, Weight, PlayCircle, Users, Activity, Utensils } from 'lucide-react'; // Updated icons
+import { CalendarCheck, TrendingUp, Weight, PlayCircle, Users, Activity } from 'lucide-react';
 import Link from 'next/link';
 import { useLanguage } from '@/context/language-context';
-import WaterIntakeCard from '@/components/dashboard/water-intake-card';
-import MacroTrackingCard from '@/components/dashboard/macro-tracking-card';
-
+// WaterIntakeCard and MacroTrackingCard are moved to /diet page
 
 export default function DashboardPage() {
   const { t } = useLanguage();
 
   const stats = [
     { titleKey: 'dashboard.workoutsPlannedToday', value: '1', icon: CalendarCheck, color: 'text-primary' }, // Placeholder
-    { titleKey: 'dashboard.workoutsThisWeek', value: '3/5', icon: Users, color: 'text-accent' }, // Placeholder
-    { titleKey: 'dashboard.weightLifted', value: '1,250 kg', icon: TrendingUp, color: 'text-green-500' }, // Assuming kg
-    { titleKey: 'dashboard.currentWeight', value: '70 kg', icon: Weight, color: 'text-orange-500' }, // Placeholder
+    { titleKey: 'dashboard.workoutsThisWeek', value: '0/0', icon: Users, color: 'text-accent' }, // Placeholder, to be dynamic
+    { titleKey: 'dashboard.weightLifted', value: '0 kg', icon: TrendingUp, color: 'text-green-500' }, // Placeholder, to be dynamic
+    { titleKey: 'dashboard.currentWeight', value: 'N/A', icon: Weight, color: 'text-orange-500' }, // Placeholder
   ];
 
   return (
@@ -42,22 +41,19 @@ export default function DashboardPage() {
         ))}
       </div>
 
-      <div className="mt-8 grid gap-6 md:grid-cols-2 lg:grid-cols-3"> {/* Adjusted grid for 3 columns */}
-        <Card className="shadow-lg lg:col-span-1"> {/* Quick Actions takes 1 span */}
-          <CardHeader>
-            <CardTitle>{t('dashboard.quickActions')}</CardTitle>
-            <CardDescription>{t('dashboard.quickActionsDescription')}</CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4">
+      <div className="mt-8 grid gap-6 md:grid-cols-1 lg:grid-cols-3">
+        {/* Card for Start Workout Button - "Quick Actions" header removed */}
+        <Card className="shadow-lg lg:col-span-1 flex flex-col justify-center">
+          <CardContent className="p-6">
             <Button asChild className="w-full">
-              <Link href="/start-workout"> 
+              <Link href="/start-workout">
                 <PlayCircle className="w-4 h-4 mr-2"/> {t('dashboard.logNewWorkout')}
               </Link>
             </Button>
           </CardContent>
         </Card>
 
-        <Card className="shadow-lg lg:col-span-2"> {/* Todays Focus takes 2 spans */}
+        <Card className="shadow-lg lg:col-span-2">
           <CardHeader>
             <CardTitle>{t('dashboard.todaysFocus')}</CardTitle>
             <CardDescription>{t('dashboard.todaysFocusDescription')}</CardDescription>
@@ -65,7 +61,7 @@ export default function DashboardPage() {
           <CardContent>
             <div className="p-4 text-center border-2 border-dashed rounded-lg border-border" data-ai-hint="workout routine">
               <Activity className="w-12 h-12 mx-auto mb-2 text-muted-foreground" />
-              {/* This should dynamically show today's scheduled workout */}
+              {/* This should dynamically show today's scheduled workout from calendar */}
               <p className="font-semibold">{t('dashboard.checkCalendarForWorkout')}</p>
               <p className="text-sm text-muted-foreground">{t('dashboard.viewCalendarToSeeWorkout')}</p>
               <Button asChild variant="link" className="mt-2">
@@ -76,17 +72,7 @@ export default function DashboardPage() {
         </Card>
       </div>
 
-      {/* New Diet and Hydration Section */}
-      <div className="mt-8">
-        <PageHeader
-          title={t('dashboard.dietAndHydrationTitle')}
-          description={t('dashboard.dietAndHydrationDescription')}
-        />
-        <div className="grid gap-6 md:grid-cols-1 lg:grid-cols-2">
-          <WaterIntakeCard />
-          <MacroTrackingCard />
-        </div>
-      </div>
+      {/* Diet and Hydration Section is now on the /diet page */}
     </>
   );
 }

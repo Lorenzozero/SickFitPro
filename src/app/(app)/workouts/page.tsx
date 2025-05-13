@@ -1,12 +1,12 @@
 
 'use client';
 
-import { useState } from 'react';
+import { useState, type FormEvent } from 'react';
 import Link from 'next/link';
 import { PageHeader } from '@/components/shared/page-header';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { PlusCircle, Edit2, Trash2, Share2, PlayCircle } from 'lucide-react';
+import { PlusCircle, Edit2, Trash2, Share2, PlayCircle, ListChecks } from 'lucide-react';
 import {
   Dialog,
   DialogContent,
@@ -14,65 +14,133 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
+  DialogClose
 } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
 import { useLanguage } from '@/context/language-context';
+import { ScrollArea } from '@/components/ui/scroll-area';
 
-// Mock data
-const initialWorkoutPlans = [
-  { id: '1', name: 'Full Body Blast', description: 'A comprehensive full-body workout for strength and endurance.', exercises: 5, duration: '60 min' },
-  { id: '2', name: 'Upper Body Power', description: 'Focus on building strength in your chest, back, and arms.', exercises: 6, duration: '75 min' },
-  { id: '3', name: 'Leg Day Domination', description: 'Intense leg workout to build lower body strength and size.', exercises: 4, duration: '90 min' },
+interface ExerciseDetail {
+  id: string;
+  name: string;
+  sets: string;
+  reps: string;
+}
+
+interface WorkoutPlan {
+  id: string;
+  name: string;
+  description: string;
+  exercises: number; // This will be the count of exerciseDetails
+  duration: string; // Can be auto-calculated or manually set
+  exerciseDetails: ExerciseDetail[];
+}
+
+const initialWorkoutPlans: WorkoutPlan[] = [
+  { id: '1', name: 'Full Body Blast', description: 'A comprehensive full-body workout for strength and endurance.', exercises: 2, duration: '60 min', exerciseDetails: [
+    { id: 'e1-1', name: 'Squats', sets: '3', reps: '8-12'},
+    { id: 'e1-2', name: 'Bench Press', sets: '3', reps: '8-12'},
+  ]},
+  { id: '2', name: 'Upper Body Power', description: 'Focus on building strength in your chest, back, and arms.', exercises: 1, duration: '75 min', exerciseDetails: [
+    { id: 'e2-1', name: 'Pull-ups', sets: '4', reps: 'AMRAP'},
+  ]},
+  { id: '3', name: 'Leg Day Domination', description: 'Intense leg workout to build lower body strength and size.', exercises: 0, duration: '90 min', exerciseDetails: [] },
 ];
 
-type WorkoutPlan = typeof initialWorkoutPlans[0] & { exerciseDetails?: { name: string; sets: string; reps: string; weight: string }[] };
 
 export default function WorkoutPlansPage() {
   const { t } = useLanguage();
   const [plans, setPlans] = useState<WorkoutPlan[]>(initialWorkoutPlans);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const [currentPlan, setCurrentPlan] = useState<Partial<WorkoutPlan> | null>(null);
+  
+  // State for the plan being edited or created in the dialog
+  const [currentPlan, setCurrentPlan] = useState<Partial<WorkoutPlan> & { exerciseDetails: ExerciseDetail[] }>({ name: '', description: '', exerciseDetails: [] });
+  
+  // State for the individual exercise being added within the dialog
+  const [newExerciseName, setNewExerciseName] = useState('');
+  const [newExerciseSets, setNewExerciseSets] = useState('');
+  const [newExerciseReps, setNewExerciseReps] = useState('');
+
   const { toast } = useToast();
 
-  const handleSavePlan = (e: React.FormEvent<HTMLFormElement>) => {
+  const openDialog = (plan?: WorkoutPlan) => {
+    if (plan) {
+      setCurrentPlan({ ...plan, exerciseDetails: [...(plan.exerciseDetails || [])] });
+    } else {
+      // For new plan
+      setCurrentPlan({ name: '', description: '', exerciseDetails: [], duration: 'N/A' });
+    }
+    setNewExerciseName('');
+    setNewExerciseSets('');
+    setNewExerciseReps('');
+    setIsDialogOpen(true);
+  };
+
+  const handleAddExerciseToCurrentPlan = () => {
+    if (!newExerciseName.trim() || !newExerciseSets.trim() || !newExerciseReps.trim()) {
+      toast({ title: t('toastErrorTitle'), description: "Please fill in exercise name, sets, and reps.", variant: "destructive" });
+      return;
+    }
+    const newExercise: ExerciseDetail = {
+      id: String(Date.now()), // Simple unique ID for client-side
+      name: newExerciseName,
+      sets: newExerciseSets,
+      reps: newExerciseReps,
+    };
+    setCurrentPlan(prev => ({
+      ...prev,
+      exerciseDetails: [...(prev.exerciseDetails || []), newExercise]
+    }));
+    setNewExerciseName('');
+    setNewExerciseSets('');
+    setNewExerciseReps('');
+  };
+
+  const handleRemoveExerciseFromCurrentPlan = (exerciseId: string) => {
+    setCurrentPlan(prev => ({
+        ...prev,
+        exerciseDetails: (prev.exerciseDetails || []).filter(ex => ex.id !== exerciseId)
+    }));
+  };
+  
+  const handleSavePlan = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    const formData = new FormData(e.currentTarget);
-    const planName = formData.get('name') as string;
-    const newPlan: WorkoutPlan = {
-      id: currentPlan?.id || String(Date.now()),
-      name: planName,
-      description: formData.get('description') as string,
-      exercises: currentPlan?.exercises || 0,
-      duration: currentPlan?.duration || 'N/A',
-      exerciseDetails: [], 
+    // Name and description are taken directly from currentPlan state which is bound to inputs
+    if (!currentPlan.name?.trim()) {
+        toast({title: t('toastErrorTitle'), description: "Plan name is required.", variant: "destructive"});
+        return;
+    }
+
+    const planToSave: WorkoutPlan = {
+      id: currentPlan.id || String(Date.now()),
+      name: currentPlan.name,
+      description: currentPlan.description || '',
+      exerciseDetails: currentPlan.exerciseDetails || [],
+      exercises: (currentPlan.exerciseDetails || []).length, // Count of exercises
+      duration: currentPlan.duration || 'N/A', // Or calculate based on exercises
     };
     
-    if (currentPlan?.id) {
-      setPlans(plans.map(p => p.id === newPlan.id ? newPlan : p));
+    if (currentPlan.id) { // Editing existing plan
+      setPlans(plans.map(p => p.id === planToSave.id ? planToSave : p));
       toast({ 
         title: t('workoutPlansPage.toastPlanUpdatedTitle'), 
-        description: t('workoutPlansPage.toastPlanUpdatedDescription', { planName: newPlan.name }) 
+        description: t('workoutPlansPage.toastPlanUpdatedDescription', { planName: planToSave.name }) 
       });
-    } else {
-      setPlans([...plans, newPlan]);
+    } else { // Creating new plan
+      setPlans([...plans, planToSave]);
       toast({ 
         title: t('workoutPlansPage.toastPlanCreatedTitle'), 
-        description: t('workoutPlansPage.toastPlanCreatedDescription', { planName: newPlan.name }) 
+        description: t('workoutPlansPage.toastPlanCreatedDescription', { planName: planToSave.name }) 
       });
     }
     setIsDialogOpen(false);
-    setCurrentPlan(null);
-  };
-
-  const openDialog = (plan?: WorkoutPlan) => {
-    setCurrentPlan(plan || {});
-    setIsDialogOpen(true);
+    setCurrentPlan({ name: '', description: '', exerciseDetails: [] }); // Reset for next time
   };
   
-  const handleDelete = (id: string, name: string) => {
+  const handleDeletePlan = (id: string, name: string) => {
     setPlans(plans.filter(p => p.id !== id));
     toast({ 
       title: t('workoutPlansPage.toastPlanDeletedTitle'), 
@@ -81,8 +149,8 @@ export default function WorkoutPlansPage() {
     });
   }
 
-  const handleShare = (planName: string) => {
-    navigator.clipboard.writeText(`Check out my workout plan: ${planName} on SickFit Pro!`);
+  const handleSharePlan = (planName: string) => {
+    navigator.clipboard.writeText(`Check out my workout plan: ${planName} on SickFit Pro!`); // Placeholder text
     toast({ 
       title: t('workoutPlansPage.toastLinkCopiedTitle'), 
       description: t('workoutPlansPage.toastLinkCopiedDescription') 
@@ -111,6 +179,17 @@ export default function WorkoutPlansPage() {
             <CardContent className="flex-grow">
               <p className="text-sm text-muted-foreground">{t('workoutPlansPage.exercisesLabel')}: {plan.exercises}</p>
               <p className="text-sm text-muted-foreground">{t('workoutPlansPage.estDurationLabel')}: {plan.duration}</p>
+              {plan.exerciseDetails && plan.exerciseDetails.length > 0 && (
+                <div className="mt-2">
+                    <h4 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1">{t('workoutPlansPage.exercisesLabel')}</h4>
+                    <ScrollArea className="h-20">
+                        <ul className="list-disc list-inside text-xs space-y-0.5">
+                            {plan.exerciseDetails.slice(0,3).map(ex => <li key={ex.id} className="truncate">{ex.name} ({ex.sets}x{ex.reps})</li>)}
+                            {plan.exerciseDetails.length > 3 && <li className="text-muted-foreground text-xs">...e altri {plan.exerciseDetails.length - 3}</li>}
+                        </ul>
+                    </ScrollArea>
+                </div>
+              )}
             </CardContent>
             <CardFooter className="flex justify-between items-center gap-2 pt-4 border-t">
               <Button asChild variant="default" size="sm">
@@ -122,10 +201,10 @@ export default function WorkoutPlansPage() {
                 <Button variant="ghost" size="icon" onClick={() => openDialog(plan)}>
                   <Edit2 className="w-4 h-4" />
                 </Button>
-                <Button variant="ghost" size="icon" onClick={() => handleShare(plan.name)}>
+                <Button variant="ghost" size="icon" onClick={() => handleSharePlan(plan.name)}>
                   <Share2 className="w-4 h-4" />
                 </Button>
-                <Button variant="ghost" size="icon" onClick={() => handleDelete(plan.id, plan.name)}>
+                <Button variant="ghost" size="icon" onClick={() => handleDeletePlan(plan.id, plan.name)}>
                   <Trash2 className="w-4 h-4 text-destructive" />
                 </Button>
               </div>
@@ -143,22 +222,93 @@ export default function WorkoutPlansPage() {
             </DialogDescription>
           </DialogHeader>
           <form onSubmit={handleSavePlan}>
-            <div className="grid gap-4 py-4">
-              <div>
-                <Label htmlFor="name">{t('workoutPlansPage.planNameLabel')}</Label>
-                <Input id="name" name="name" defaultValue={currentPlan?.name || ''} required />
+            <ScrollArea className="max-h-[calc(100vh-20rem)]">
+              <div className="grid gap-4 py-4 px-1"> {/* Added px-1 for scrollbar visibility */}
+                <div>
+                  <Label htmlFor="planName">{t('workoutPlansPage.planNameLabel')}</Label>
+                  <Input 
+                    id="planName" 
+                    name="planName" 
+                    value={currentPlan.name || ''}
+                    onChange={(e) => setCurrentPlan(prev => ({ ...prev, name: e.target.value }))}
+                    required 
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="planDescription">{t('workoutPlansPage.descriptionLabel')}</Label>
+                  <Textarea 
+                    id="planDescription" 
+                    name="planDescription" 
+                    value={currentPlan.description || ''}
+                    onChange={(e) => setCurrentPlan(prev => ({ ...prev, description: e.target.value }))}
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="planDuration">{t('workoutPlansPage.estDurationLabel')}</Label>
+                  <Input 
+                    id="planDuration" 
+                    name="planDuration" 
+                    value={currentPlan.duration || 'N/A'}
+                    onChange={(e) => setCurrentPlan(prev => ({ ...prev, duration: e.target.value }))}
+                  />
+                </div>
+
+                {/* Section to add individual exercises */}
+                <Card className="mt-4">
+                  <CardHeader className="pb-2">
+                    <CardTitle className="text-base flex items-center">
+                        <ListChecks className="w-4 h-4 mr-2" />
+                        {t('workoutPlansPage.addExerciseButton')}
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-3">
+                    <div>
+                      <Label htmlFor="newExerciseName">{t('workoutPlansPage.exerciseNameLabel')}</Label>
+                      <Input id="newExerciseName" value={newExerciseName} onChange={(e) => setNewExerciseName(e.target.value)} placeholder="es. Squat" />
+                    </div>
+                    <div className="grid grid-cols-2 gap-3">
+                      <div>
+                        <Label htmlFor="newExerciseSets">{t('workoutPlansPage.setsLabel')}</Label>
+                        <Input id="newExerciseSets" value={newExerciseSets} onChange={(e) => setNewExerciseSets(e.target.value)} placeholder="es. 3" />
+                      </div>
+                      <div>
+                        <Label htmlFor="newExerciseReps">{t('workoutPlansPage.repsLabel')}</Label>
+                        <Input id="newExerciseReps" value={newExerciseReps} onChange={(e) => setNewExerciseReps(e.target.value)} placeholder="es. 8-12" />
+                      </div>
+                    </div>
+                    <Button type="button" variant="outline" size="sm" onClick={handleAddExerciseToCurrentPlan} className="w-full">
+                      <PlusCircle className="w-4 h-4 mr-2" /> {t('workoutPlansPage.addThisExerciseButton')}
+                    </Button>
+                  </CardContent>
+                </Card>
+
+                {/* Display added exercises */}
+                {currentPlan.exerciseDetails && currentPlan.exerciseDetails.length > 0 && (
+                  <div className="mt-4 space-y-2">
+                    <h4 className="text-sm font-medium">{t('workoutPlansPage.addedExercisesLabel')}</h4>
+                    <ScrollArea className="h-32 border rounded-md p-2">
+                      <ul className="space-y-1">
+                        {currentPlan.exerciseDetails.map(ex => (
+                          <li key={ex.id} className="flex justify-between items-center text-sm p-1 bg-secondary rounded-sm">
+                            <span className="truncate">{ex.name} ({ex.sets} x {ex.reps})</span>
+                            <Button type="button" variant="ghost" size="icon" className="h-6 w-6 text-destructive" onClick={() => handleRemoveExerciseFromCurrentPlan(ex.id)}>
+                              <Trash2 className="h-3.5 w-3.5" />
+                            </Button>
+                          </li>
+                        ))}
+                      </ul>
+                    </ScrollArea>
+                  </div>
+                )}
+                {(!currentPlan.exerciseDetails || currentPlan.exerciseDetails.length === 0) && (
+                    <p className="text-sm text-muted-foreground text-center mt-2">{t('workoutPlansPage.noExercisesAddedYet')}</p>
+                )}
               </div>
-              <div>
-                <Label htmlFor="description">{t('workoutPlansPage.descriptionLabel')}</Label>
-                <Textarea id="description" name="description" defaultValue={currentPlan?.description || ''} />
-              </div>
-              <div className="p-4 text-center border-2 border-dashed rounded-lg border-border">
-                <p className="text-sm text-muted-foreground">{t('workoutPlansPage.exerciseSelectionPlaceholder')}</p>
-                <Button type="button" variant="outline" size="sm" className="mt-2">{t('workoutPlansPage.addExerciseButton')}</Button>
-              </div>
-            </div>
-            <DialogFooter>
-              <Button type="button" variant="outline" onClick={() => setIsDialogOpen(false)}>{t('workoutPlansPage.cancelButton')}</Button>
+            </ScrollArea>
+            <DialogFooter className="pt-4 border-t">
+              <DialogClose asChild>
+                <Button type="button" variant="outline">{t('workoutPlansPage.cancelButton')}</Button>
+              </DialogClose>
               <Button type="submit">{t('workoutPlansPage.savePlanButton')}</Button>
             </DialogFooter>
           </form>

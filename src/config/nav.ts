@@ -1,9 +1,9 @@
 
 import type { LucideIcon } from 'lucide-react';
-import { LayoutDashboard, Dumbbell, CalendarDays, BarChart3, Users } from 'lucide-react'; // Removed Bot
+import { LayoutDashboard, Dumbbell, CalendarDays, BarChart3, Users, Utensils } from 'lucide-react'; // Added Utensils for Diet
 
 export interface NavItem {
-  titleKey: string; 
+  titleKey: string;
   href: string;
   icon: LucideIcon;
   label?: string;
@@ -13,7 +13,7 @@ export interface NavItem {
 
 export const navItems: NavItem[] = [
   {
-    titleKey: 'nav.dashboard',
+    titleKey: 'nav.dashboard', // "Home"
     href: '/',
     icon: LayoutDashboard,
   },
@@ -23,23 +23,23 @@ export const navItems: NavItem[] = [
     icon: Dumbbell,
   },
   {
-    titleKey: 'nav.workoutPlans',
+    titleKey: 'nav.workoutPlans', // "Schede"
     href: '/workouts',
-    icon: Users, 
+    icon: Users,
   },
   {
     titleKey: 'nav.calendar',
     href: '/calendar',
     icon: CalendarDays,
   },
-  // {  // Removed AI Split Suggester
-  //   titleKey: 'nav.aiSplitSuggester',
-  //   href: '/ai-split',
-  //   icon: Bot,
-  // },
   {
     titleKey: 'nav.progress',
     href: '/progress',
     icon: BarChart3,
+  },
+  {
+    titleKey: 'nav.diet', // New "Diet" item
+    href: '/diet',
+    icon: Utensils,
   },
 ];
