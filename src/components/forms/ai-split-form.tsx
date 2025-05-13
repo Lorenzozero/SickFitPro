@@ -14,6 +14,7 @@ import { Loader2, Wand2 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { useLanguage } from '@/context/language-context';
 import { Skeleton } from '@/components/ui/skeleton';
+import { Input } from '@/components/ui/input'; // Added import
 
 // Mock functions for fetching and formatting user training data
 // In a real application, these would interact with your backend or state management
