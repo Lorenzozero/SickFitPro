@@ -21,7 +21,7 @@ import { useLanguage, type Language } from '@/context/language-context';
 
 
 export default function SettingsPage() {
-  const { language, setLanguage, t } = useLanguage();
+  const { language, setLanguage, t, isClient: languageContextIsClient } = useLanguage();
   const [notifications, setNotifications] = useState(true); // This could also be moved to a context or persisted
   const { theme, setTheme, resolvedTheme } = useTheme();
   const { toast } = useToast();
@@ -44,7 +44,7 @@ export default function SettingsPage() {
   };
 
   const getLanguageDisplayName = (langCode: Language): string => {
-    if (!isClient) return t('settingsPage.english'); // Default or loading state
+    if (!languageContextIsClient) return t('settingsPage.english'); // Default or loading state
     switch(langCode) {
       case 'en': return t('settingsPage.english');
       case 'it': return t('settingsPage.italian');
@@ -161,7 +161,7 @@ export default function SettingsPage() {
           </CardContent>
         </Card>
 
-        <div className="flex justify-end">
+        <div className="flex justify-center">
           <Button onClick={handleSaveChanges} disabled={!isClient}>
             <Save className="w-4 h-4 mr-2" />
             {t('settingsPage.saveChanges')}

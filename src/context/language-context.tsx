@@ -53,8 +53,12 @@ const translations: Record<Language, Translations> = {
     },
     waterIntakeCard: {
       title: "Water Intake",
-      description: "Stay hydrated! Your goal: {goal} L",
-      currentIntakeLabel: "Current: {current} / {goal}",
+      description: "Stay hydrated! Your goal: {goal} L. Daily goal: {dailyGoal} ml.",
+      currentIntakeLabel: "Current: {current} / {dailyGoal}",
+      setGoalLabel: "Set Daily Goal (ml)",
+      saveGoalButton: "Save Goal",
+      goalSavedTitle: "Goal Saved",
+      goalSavedDescription: "Your daily water intake goal has been updated.",
       resetWaterButton: "Reset Water",
       waterResetTitle: "Water Reset",
       waterResetDescription: "Your water intake for the day has been reset.",
@@ -63,6 +67,11 @@ const translations: Record<Language, Translations> = {
       ariaRemoveGenericAmount: "Remove {amount}ml",
       tooltipAddAmount: "+{amount}ml",
       tooltipRemoveAmount: "-{amount}ml",
+      reminderLabel: "Hydration Reminder",
+      selectReminderFrequencyPlaceholder: "Set reminder frequency",
+      reminderOff: "Off",
+      reminderDaily: "Daily",
+      reminderHourly: "Hourly",
     },
     macroTrackingCard: {
         title: "Macro Tracking",
@@ -80,6 +89,35 @@ const translations: Record<Language, Translations> = {
         goalsSavedDescription: "Your daily macronutrient goals have been updated.",
         intakeSavedTitle: "Macro Intake Saved",
         intakeSavedDescription: "Your daily macronutrient intake has been recorded.",
+        reminderLabel: "Macro Logging Reminder",
+        selectReminderFrequencyPlaceholder: "Set reminder frequency",
+        reminderOff: "Off",
+        reminderDaily: "Daily",
+        reminderMealtime: "Around Mealtimes",
+    },
+    nutritionalAnalysis: {
+        cardTitle: "Nutritional Analysis (AI)",
+        cardDescription: "Describe your meal or upload a photo to get an AI-powered nutritional breakdown and advice.",
+        mealDescriptionLabel: "Meal Description",
+        mealDescriptionPlaceholder: "e.g., Grilled chicken breast with quinoa and steamed broccoli.",
+        mealPhotoLabel: "Meal Photo (Optional)",
+        uploadPhotoButton: "Upload Photo",
+        photoPreviewAlt: "Meal photo preview",
+        removePhoto: "Remove Photo",
+        analyzeMealButton: "Analyze Meal",
+        analyzingTitle: "Analyzing Meal...",
+        analyzingDescription: "Our AI is looking at your meal. This might take a moment.",
+        analysisReadyTitle: "Analysis Ready!",
+        analysisReadyDescription: "Nutritional analysis for your meal is complete.",
+        errorTitle: "Analysis Error",
+        errorDescription: "Could not analyze the meal. Please try again.",
+        resultsTitle: "Nutritional Analysis Results",
+        estimatedCalories: "Estimated Calories",
+        protein: "Protein (g)",
+        carbs: "Carbs (g)",
+        fat: "Fat (g)",
+        generalAdvice: "General Advice",
+        noPhotoSelected: "No photo selected",
     },
     settingsPage: {
       title: 'Settings',
@@ -393,8 +431,12 @@ const translations: Record<Language, Translations> = {
     },
     waterIntakeCard: {
       title: "Apporto Idrico",
-      description: "Rimani idratato! Il tuo obiettivo: {goal} L",
-      currentIntakeLabel: "Attuale: {current} / {goal}",
+      description: "Rimani idratato! Il tuo obiettivo giornaliero: {dailyGoal} ml.",
+      currentIntakeLabel: "Attuale: {current} / {dailyGoal}",
+      setGoalLabel: "Imposta Obiettivo Giornaliero (ml)",
+      saveGoalButton: "Salva Obiettivo",
+      goalSavedTitle: "Obiettivo Salvato",
+      goalSavedDescription: "Il tuo obiettivo di apporto idrico giornaliero è stato aggiornato.",
       resetWaterButton: "Resetta Acqua",
       waterResetTitle: "Apporto Idrico Azzerato",
       waterResetDescription: "Il tuo apporto idrico giornaliero è stato azzerato.",
@@ -403,6 +445,11 @@ const translations: Record<Language, Translations> = {
       ariaRemoveGenericAmount: "Rimuovi {amount}ml",
       tooltipAddAmount: "+{amount}ml",
       tooltipRemoveAmount: "-{amount}ml",
+      reminderLabel: "Promemoria Idratazione",
+      selectReminderFrequencyPlaceholder: "Imposta frequenza promemoria",
+      reminderOff: "Spento",
+      reminderDaily: "Giornaliero",
+      reminderHourly: "Ogni ora",
     },
     macroTrackingCard: {
         title: "Monitoraggio Macro",
@@ -420,6 +467,35 @@ const translations: Record<Language, Translations> = {
         goalsSavedDescription: "I tuoi obiettivi giornalieri di macronutrienti sono stati aggiornati.",
         intakeSavedTitle: "Apporto Macro Salvato",
         intakeSavedDescription: "Il tuo apporto giornaliero di macronutrienti è stato registrato.",
+        reminderLabel: "Promemoria Log Macro",
+        selectReminderFrequencyPlaceholder: "Imposta frequenza promemoria",
+        reminderOff: "Spento",
+        reminderDaily: "Giornaliero",
+        reminderMealtime: "Intorno ai Pasti",
+    },
+    nutritionalAnalysis: {
+        cardTitle: "Analisi Nutrizionale (AI)",
+        cardDescription: "Descrivi il tuo pasto o carica una foto per ottenere un'analisi nutrizionale e consigli basati sull'AI.",
+        mealDescriptionLabel: "Descrizione Pasto",
+        mealDescriptionPlaceholder: "es. Petto di pollo alla griglia con quinoa e broccoli al vapore.",
+        mealPhotoLabel: "Foto Pasto (Opzionale)",
+        uploadPhotoButton: "Carica Foto",
+        photoPreviewAlt: "Anteprima foto pasto",
+        removePhoto: "Rimuovi Foto",
+        analyzeMealButton: "Analizza Pasto",
+        analyzingTitle: "Analisi Pasto in Corso...",
+        analyzingDescription: "La nostra AI sta analizzando il tuo pasto. Potrebbe volerci un momento.",
+        analysisReadyTitle: "Analisi Pronta!",
+        analysisReadyDescription: "L'analisi nutrizionale per il tuo pasto è completa.",
+        errorTitle: "Errore Analisi",
+        errorDescription: "Impossibile analizzare il pasto. Riprova.",
+        resultsTitle: "Risultati Analisi Nutrizionale",
+        estimatedCalories: "Calorie Stimate",
+        protein: "Proteine (g)",
+        carbs: "Carboidrati (g)",
+        fat: "Grassi (g)",
+        generalAdvice: "Consigli Generali",
+        noPhotoSelected: "Nessuna foto selezionata",
     },
     settingsPage: {
       title: 'Impostazioni',
@@ -753,26 +829,25 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
     for (const k of keys) {
       result = result?.[k];
       if (result === undefined) {
-        if (currentLang !== DEFAULT_LANGUAGE) {
-            let fallbackResult: any = translations[DEFAULT_LANGUAGE];
-            for (const fk of keys) {
-                fallbackResult = fallbackResult?.[fk];
-                if (fallbackResult === undefined) {
-                  return replacements?.default?.toString() || key;
-                }
+        // Fallback to default language if key not found in current language
+        let fallbackResult: any = translations[DEFAULT_LANGUAGE];
+        for (const fk of keys) {
+            fallbackResult = fallbackResult?.[fk];
+            if (fallbackResult === undefined) {
+              return replacements?.default?.toString() || key; // Return default from replacements or key itself
             }
-            result = fallbackResult; 
-            break; 
         }
-        return replacements?.default?.toString() || key;
+        result = fallbackResult; 
+        break; 
       }
     }
 
     if (typeof result === 'string' && replacements) {
       const actualReplacements = { ...replacements };
-      delete actualReplacements.default;
+      delete actualReplacements.default; // Remove 'default' from replacements before processing
 
       return Object.entries(actualReplacements).reduce((acc, [placeholder, value]) => {
+        // Ensure value is string or number before converting to string
         const replacementValue = (typeof value === 'string' || typeof value === 'number') ? String(value) : '';
         return acc.replace(new RegExp(`{${placeholder}}`, 'g'), replacementValue);
       }, result);

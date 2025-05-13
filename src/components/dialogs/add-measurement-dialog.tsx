@@ -182,7 +182,7 @@ export function AddMeasurementDialog({ isOpen, onOpenChange, onSave, measurement
               />
             </div>
           </div>
-          <DialogFooter>
+          <DialogFooter className="sm:justify-center">
             <DialogClose asChild>
               <Button type="button" variant="outline">
                 {t('calendarPage.cancelButton')}
@@ -195,4 +195,3 @@ export function AddMeasurementDialog({ isOpen, onOpenChange, onSave, measurement
     </Dialog>
   );
 }
-

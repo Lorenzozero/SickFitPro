@@ -276,9 +276,11 @@ export default function WorkoutPlansPage() {
                         <Input id="newExerciseReps" value={newExerciseReps} onChange={(e) => setNewExerciseReps(e.target.value)} placeholder="es. 8-12" />
                       </div>
                     </div>
-                    <Button type="button" variant="outline" size="sm" onClick={handleAddExerciseToCurrentPlan} className="w-full">
-                      <PlusCircle className="w-4 h-4 mr-2" /> {t('workoutPlansPage.addThisExerciseButton')}
-                    </Button>
+                    <div className="flex justify-center">
+                        <Button type="button" variant="outline" size="sm" onClick={handleAddExerciseToCurrentPlan} className="w-full">
+                        <PlusCircle className="w-4 h-4 mr-2" /> {t('workoutPlansPage.addThisExerciseButton')}
+                        </Button>
+                    </div>
                   </CardContent>
                 </Card>
 
@@ -305,7 +307,7 @@ export default function WorkoutPlansPage() {
                 )}
               </div>
             </ScrollArea>
-            <DialogFooter className="pt-4 border-t">
+            <DialogFooter className="pt-4 border-t sm:justify-center">
               <DialogClose asChild>
                 <Button type="button" variant="outline">{t('workoutPlansPage.cancelButton')}</Button>
               </DialogClose>

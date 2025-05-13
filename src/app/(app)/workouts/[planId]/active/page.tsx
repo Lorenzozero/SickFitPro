@@ -16,6 +16,7 @@ import { useEffect, useState, useRef, useCallback } from 'react';
 import Image from 'next/image';
 import { useToast } from '@/hooks/use-toast';
 import { cn } from '@/lib/utils';
+import { Skeleton } from '@/components/ui/skeleton'; // Added Skeleton for loading state
 
 // Mock data for workout plans
 const mockWorkoutPlans = [
@@ -248,11 +249,13 @@ export default function ActiveWorkoutPage() {
   const [isTimerRunning, setIsTimerRunning] = useState(false);
   const [isFinished, setIsFinished] = useState(false);
   const [visibleExerciseId, setVisibleExerciseId] = useState<string | null>(null);
+  const [isClient, setIsClient] = useState(false); // For client-side rendering control
   
   const exerciseRefs = useRef<(HTMLDivElement | null)[]>([]);
   const planId = typeof params.planId === 'string' ? params.planId : undefined;
 
   useEffect(() => {
+    setIsClient(true); // Component has mounted on client
     if (planId) {
       const foundPlan = mockWorkoutPlans.find(p => p.id === planId);
       setPlan(foundPlan || null);
@@ -276,7 +279,7 @@ export default function ActiveWorkoutPage() {
 
   useEffect(() => {
     let interval: NodeJS.Timeout | undefined;
-    if (isTimerRunning && workoutStartTime) {
+    if (isTimerRunning && workoutStartTime && isClient) { // Ensure timer runs only on client
       interval = setInterval(() => {
         const now = new Date();
         const diff = now.getTime() - workoutStartTime.getTime();
@@ -290,10 +293,10 @@ export default function ActiveWorkoutPage() {
     return () => {
       if (interval) clearInterval(interval);
     };
-  }, [isTimerRunning, workoutStartTime]);
+  }, [isTimerRunning, workoutStartTime, isClient]);
 
   useEffect(() => {
-    if (!activeWorkout || activeWorkout.length === 0) return;
+    if (!activeWorkout || activeWorkout.length === 0 || !isClient) return;
 
     const observer = new IntersectionObserver(
       (entries) => {
@@ -303,7 +306,7 @@ export default function ActiveWorkoutPage() {
           }
         });
       },
-      { threshold: 0.5, rootMargin: "-40% 0px -40% 0px" } // Adjust rootMargin to make it more sensitive to centered items
+      { threshold: 0.5, rootMargin: "-40% 0px -40% 0px" } 
     );
 
     exerciseRefs.current.forEach(ref => {
@@ -316,7 +319,7 @@ export default function ActiveWorkoutPage() {
       });
       observer.disconnect();
     };
-  }, [activeWorkout]);
+  }, [activeWorkout, isClient]);
 
 
   const updateExerciseData = (exerciseId: string, updatedLoggedSets: LoggedSet[]) => {
@@ -371,14 +374,36 @@ export default function ActiveWorkoutPage() {
     });
   };
   
-  const overallProgress = activeWorkout 
+  const overallProgress = activeWorkout && activeWorkout.length > 0
     ? (activeWorkout.reduce((acc, ex) => acc + ex.loggedSets.length, 0) / 
        activeWorkout.reduce((acc, ex) => acc + ex.targetSets, 0)) * 100 
     : 0;
 
 
-  if (plan === undefined) {
-    return <PageHeader title={t('activeWorkoutPage.loadingWorkout')} description={t('activeWorkoutPage.loadingDescription')} />;
+  if (!isClient || plan === undefined) { // Show loading skeleton if not client or plan is loading
+    return (
+        <>
+            <PageHeader title={t('activeWorkoutPage.loadingWorkout')} description={t('activeWorkoutPage.loadingDescription')} />
+            <Skeleton className="h-8 w-full mb-6" /> {/* For progress bar */}
+            <div className="space-y-8">
+                {[1,2,3].map(i => (
+                    <Card key={i} className="shadow-xl overflow-hidden">
+                        <div className="md:grid md:grid-cols-3">
+                            <div className="md:col-span-1 p-4 bg-muted/30 flex items-center justify-center">
+                                <Skeleton className="w-full h-[200px] rounded-md" />
+                            </div>
+                            <div className="md:col-span-2 p-4">
+                                <Skeleton className="h-8 w-3/4 mb-2" />
+                                <Skeleton className="h-4 w-1/2 mb-4" />
+                                <Skeleton className="h-10 w-full mb-4" />
+                                <Skeleton className="h-20 w-full" />
+                            </div>
+                        </div>
+                    </Card>
+                ))}
+            </div>
+        </>
+    );
   }
 
   if (!plan || !activeWorkout) {
@@ -428,7 +453,7 @@ export default function ActiveWorkoutPage() {
                         {t('activeWorkoutPage.confirmFinishDescription')}
                     </AlertDialogDescription>
                     </AlertDialogHeader>
-                    <AlertDialogFooter>
+                    <AlertDialogFooter className="sm:justify-center">
                     <AlertDialogCancel>{t('calendarPage.cancelButton')}</AlertDialogCancel>
                     <AlertDialogAction onClick={handleFinishWorkout}>
                         {t('activeWorkoutPage.confirmFinishButton')}

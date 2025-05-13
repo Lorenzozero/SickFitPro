@@ -12,11 +12,11 @@ export interface NavItem {
 }
 
 export const navItems: NavItem[] = [
-  {
-    titleKey: 'nav.dashboard', // "Home"
-    href: '/',
-    icon: LayoutDashboard,
-  },
+  // {
+  //   titleKey: 'nav.dashboard', // "Home" - Removed as per request
+  //   href: '/',
+  //   icon: LayoutDashboard,
+  // },
   {
     titleKey: 'nav.exercises',
     href: '/exercises',
@@ -43,3 +43,4 @@ export const navItems: NavItem[] = [
     icon: Utensils,
   },
 ];
+

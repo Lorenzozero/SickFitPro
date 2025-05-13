@@ -1,14 +1,16 @@
 'use client';
 
 import { useState, useEffect, type ChangeEvent } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Progress } from '@/components/ui/progress';
-import { Utensils, Zap, Flame, Fish, Wheat, Drumstick } from 'lucide-react'; // Added more icons
+import { Utensils, Zap, Flame, Fish, Wheat, Drumstick, Bell } from 'lucide-react';
 import { useLanguage } from '@/context/language-context';
 import { Button } from '../ui/button';
 import { useToast } from '@/hooks/use-toast';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Skeleton } from '../ui/skeleton';
 
 interface Macro {
   goal: number;
@@ -27,15 +29,18 @@ const initialMacros: Macros = {
   fat: { goal: 70, current: 0 },      // g
 };
 
+type ReminderFrequency = 'off' | 'daily' | 'mealtime';
+
 export default function MacroTrackingCard() {
   const { t } = useLanguage();
   const { toast } = useToast();
   const [macros, setMacros] = useState<Macros>(initialMacros);
+  const [reminderFrequency, setReminderFrequency] = useState<ReminderFrequency>('off');
   const [isClient, setIsClient] = useState(false);
 
   useEffect(() => {
     setIsClient(true);
-    // In a real app, load this from localStorage or backend
+    // In a real app, load macros and reminderFrequency from localStorage or backend
   }, []);
 
   const handleGoalChange = (macroKey: keyof Macros, value: string) => {
@@ -101,7 +106,9 @@ export default function MacroTrackingCard() {
           </CardTitle>
         </CardHeader>
         <CardContent>
-          {[1,2,3].map(i => <div key={i} className="h-10 bg-muted rounded-md animate-pulse mb-4"></div>)}
+          <Skeleton className="h-8 w-3/4 mb-4" />
+          {[1,2,3].map(i => <Skeleton key={i} className="h-10 bg-muted rounded-md animate-pulse mb-4" />)}
+          <Skeleton className="h-10 w-1/3" />
         </CardContent>
       </Card>
     );
@@ -118,11 +125,11 @@ export default function MacroTrackingCard() {
       </CardHeader>
       <CardContent className="space-y-6">
         <div>
-          <h3 className="text-md font-semibold mb-2">{t('macroTrackingCard.setYourDailyGoals')}</h3>
+          <h3 className="text-md font-semibold mb-3">{t('macroTrackingCard.setYourDailyGoals')}</h3>
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-4">
             {macroDetails.map(m => (
               <div key={m.key}>
-                <Label htmlFor={`${m.key}-goal`} className="flex items-center text-sm font-medium text-muted-foreground">
+                <Label htmlFor={`${m.key}-goal`} className="flex items-center text-sm font-medium text-muted-foreground mb-1">
                   <m.icon className="w-4 h-4 mr-1.5" /> {t(m.labelKey)} ({m.unit})
                 </Label>
                 <Input
@@ -131,26 +138,27 @@ export default function MacroTrackingCard() {
                   value={macros[m.key].goal}
                   onChange={(e: ChangeEvent<HTMLInputElement>) => handleGoalChange(m.key, e.target.value)}
                   min="0"
-                  className="mt-1"
                 />
               </div>
             ))}
           </div>
-           <Button onClick={handleSaveGoals} size="sm" className="w-full sm:w-auto">{t('macroTrackingCard.saveGoalsButton')}</Button>
+           <div className="flex justify-center sm:justify-start">
+            <Button onClick={handleSaveGoals} size="sm">{t('macroTrackingCard.saveGoalsButton')}</Button>
+           </div>
         </div>
         
         <hr className="border-border" />
 
         <div>
-            <h3 className="text-md font-semibold mb-2">{t('macroTrackingCard.logYourDailyIntake')}</h3>
+            <h3 className="text-md font-semibold mb-3">{t('macroTrackingCard.logYourDailyIntake')}</h3>
             {macroDetails.map(m => {
             const progress = m.goal > 0 ? (macros[m.key].current / m.goal) * 100 : 0;
-            const Icon = m.icon;
+            const IconComponent = m.icon;
             return (
                 <div key={m.key} className="mb-4">
                 <div className="flex items-center justify-between mb-1">
                     <Label htmlFor={`${m.key}-current`} className="flex items-center text-sm font-medium text-muted-foreground">
-                      <Icon className="w-4 h-4 mr-1.5" /> {t(m.labelKey)}
+                      <IconComponent className="w-4 h-4 mr-1.5" /> {t(m.labelKey)}
                     </Label>
                     <span className="text-xs text-muted-foreground">
                     {macros[m.key].current}{m.unit} / {macros[m.key].goal}{m.unit}
@@ -171,7 +179,25 @@ export default function MacroTrackingCard() {
                 </div>
             );
             })}
-            <Button onClick={handleSaveIntake} size="sm" className="w-full sm:w-auto mt-2">{t('macroTrackingCard.saveIntakeButton')}</Button>
+            <div className="flex justify-center sm:justify-start">
+                <Button onClick={handleSaveIntake} size="sm" className="mt-2">{t('macroTrackingCard.saveIntakeButton')}</Button>
+            </div>
+        </div>
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between pt-4 mt-4 border-t gap-2">
+            <Label htmlFor="macro-reminders" className="flex items-center font-normal whitespace-nowrap">
+                <Bell className="w-4 h-4 mr-2" />
+                {t('macroTrackingCard.reminderLabel')}
+            </Label>
+            <Select value={reminderFrequency} onValueChange={(value) => setReminderFrequency(value as ReminderFrequency)}>
+                <SelectTrigger id="macro-reminders" className="w-full sm:w-auto min-w-[180px]">
+                    <SelectValue placeholder={t('macroTrackingCard.selectReminderFrequencyPlaceholder')} />
+                </SelectTrigger>
+                <SelectContent>
+                    <SelectItem value="off">{t('macroTrackingCard.reminderOff')}</SelectItem>
+                    <SelectItem value="daily">{t('macroTrackingCard.reminderDaily')}</SelectItem>
+                    <SelectItem value="mealtime">{t('macroTrackingCard.reminderMealtime')}</SelectItem>
+                </SelectContent>
+            </Select>
         </div>
       </CardContent>
     </Card>

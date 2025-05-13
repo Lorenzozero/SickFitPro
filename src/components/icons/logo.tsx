@@ -1,4 +1,5 @@
 import type { SVGProps } from 'react';
+import { cn } from '@/lib/utils';
 
 export function Logo(props: SVGProps<SVGSVGElement>) {
   return (
@@ -8,6 +9,7 @@ export function Logo(props: SVGProps<SVGSVGElement>) {
       width="120"
       height="30"
       aria-label="SickFit Pro Logo"
+      className={cn("transition-transform duration-200 ease-in-out hover:scale-105 group-hover:opacity-90", props.className)}
       {...props}
     >
       <defs>
@@ -23,6 +25,7 @@ export function Logo(props: SVGProps<SVGSVGElement>) {
         fontSize="30"
         fontWeight="bold"
         fill="url(#logoGradient)"
+        className="transition-opacity duration-200 ease-in-out group-hover:opacity-100"
       >
         SickFit Pro
       </text>

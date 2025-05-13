@@ -39,13 +39,13 @@ import { useLanguage } from '@/context/language-context';
 
 export default function AppLayout({ children }: { children: ReactNode }) {
   const { theme, setTheme, resolvedTheme } = useTheme();
-  const { t, isClient } = useLanguage(); // Use isClient
+  const { t, isClient } = useLanguage(); 
 
   return (
     <SidebarProvider defaultOpen>
       <Sidebar>
         <SidebarHeader className="p-4">
-          <Link href="/" className="block">
+          <Link href="/" className="block group" aria-label={isClient ? t('nav.dashboard') : 'Home'}>
             <Logo />
           </Link>
         </SidebarHeader>
@@ -55,12 +55,11 @@ export default function AppLayout({ children }: { children: ReactNode }) {
               <SidebarMenuItem key={item.href}>
                 <SidebarMenuButton
                   asChild
-                  tooltip={{ children: isClient ? t(item.titleKey) : item.titleKey, className: 'group-data-[collapsible=icon]:block hidden' }}
+                  tooltip={{ children: isClient ? t(item.titleKey) : item.titleKey.split('.').pop() || item.titleKey, className: 'group-data-[collapsible=icon]:block hidden' }}
                 >
                   <Link href={item.href}>
                     <item.icon />
-                    {/* Render translation only on client to avoid hydration mismatch */}
-                    <span>{isClient ? t(item.titleKey) : item.titleKey.split('.').pop()}</span>
+                    <span>{isClient ? t(item.titleKey) : item.titleKey.split('.').pop() || item.titleKey}</span>
                   </Link>
                 </SidebarMenuButton>
               </SidebarMenuItem>
@@ -76,9 +75,8 @@ export default function AppLayout({ children }: { children: ReactNode }) {
                   <AvatarFallback>U</AvatarFallback>
                 </Avatar>
                 <div className="group-data-[collapsible=icon]:hidden">
-                  {/* Placeholder text to avoid hydration mismatch for user name/email if dynamic */}
                   <p className="text-sm font-medium">{isClient ? t('userDropdown.myAccount') : 'My Account'}</p> 
-                  <p className="text-xs text-sidebar-foreground/70">{isClient ? 'user@example.com' : 'user@example.com'}</p>
+                  <p className="text-xs text-sidebar-foreground/70">{isClient ? t('userDropdown.settings') : 'Settings'}</p>
                 </div>
               </Button>
             </DropdownMenuTrigger>
@@ -94,7 +92,7 @@ export default function AppLayout({ children }: { children: ReactNode }) {
               
               <DropdownMenuSub>
                 <DropdownMenuSubTrigger>
-                  {resolvedTheme === 'dark' ? <Moon className="w-4 h-4 mr-2" /> : <Sun className="w-4 h-4 mr-2" />}
+                  {isClient && resolvedTheme === 'dark' ? <Moon className="w-4 h-4 mr-2" /> : <Sun className="w-4 h-4 mr-2" />}
                   <span>{isClient ? t('userDropdown.theme') : 'Theme'}</span>
                 </DropdownMenuSubTrigger>
                 <DropdownMenuPortal>
