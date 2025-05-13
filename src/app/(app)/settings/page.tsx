@@ -22,13 +22,18 @@ import { useLanguage, type Language } from '@/context/language-context';
 
 export default function SettingsPage() {
   const { language, setLanguage, t, isClient: languageContextIsClient } = useLanguage();
-  const [notifications, setNotifications] = useState(true); // This could also be moved to a context or persisted
+  const [enableNotifications, setEnableNotifications] = useState(true); // Single state for all notifications
   const { theme, setTheme, resolvedTheme } = useTheme();
   const { toast } = useToast();
   const [isClient, setIsClient] = useState(false);
 
   useEffect(() => {
     setIsClient(true);
+    // In a real app, load notification preference from localStorage or backend
+    const storedNotificationPref = localStorage.getItem('app-notifications-enabled');
+    if (storedNotificationPref !== null) {
+      setEnableNotifications(JSON.parse(storedNotificationPref));
+    }
   }, []);
 
   const handleSaveChanges = () => {
@@ -36,7 +41,8 @@ export default function SettingsPage() {
 
     // Language is saved by LanguageProvider via setLanguage
     // Theme is saved by ThemeProvider
-    console.log({ selectedLanguage: language, notifications, selectedTheme: theme });
+    localStorage.setItem('app-notifications-enabled', JSON.stringify(enableNotifications));
+    console.log({ selectedLanguage: language, notifications: enableNotifications, selectedTheme: theme });
     toast({
       title: t('settingsPage.settingsSaved'),
       description: t('settingsPage.preferencesUpdated'),
@@ -44,11 +50,12 @@ export default function SettingsPage() {
   };
 
   const getLanguageDisplayName = (langCode: Language): string => {
-    if (!languageContextIsClient) return t('settingsPage.english'); // Default or loading state
+    if (!languageContextIsClient && !isClient) return t('settingsPage.english'); // Default or loading state
     switch(langCode) {
       case 'en': return t('settingsPage.english');
       case 'it': return t('settingsPage.italian');
-      // Add other cases if more languages are supported
+      case 'es': return t('settingsPage.spanish');
+      case 'fr': return t('settingsPage.french');
       default: return langCode;
     }
   }
@@ -101,20 +108,12 @@ export default function SettingsPage() {
               <Bell className="w-5 h-5 mr-2 text-primary" />
               {t('settingsPage.notifications')}
             </CardTitle>
-            <CardDescription>{t('settingsPage.notificationsDescription')}</CardDescription>
+            <CardDescription>{t('settingsPage.notificationsDescriptionSingle')}</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="flex items-center justify-between p-3 rounded-md bg-secondary">
-              <Label htmlFor="workout-reminders" className="font-normal">{t('settingsPage.workoutReminders')}</Label>
-              <Switch id="workout-reminders" checked={notifications} onCheckedChange={setNotifications} disabled={!isClient} />
-            </div>
-            <div className="flex items-center justify-between p-3 rounded-md bg-secondary">
-              <Label htmlFor="progress-updates" className="font-normal">{t('settingsPage.progressUpdates')}</Label>
-              <Switch id="progress-updates" defaultChecked disabled={!isClient}/>
-            </div>
-            <div className="flex items-center justify-between p-3 rounded-md bg-secondary">
-              <Label htmlFor="new-features" className="font-normal">{t('settingsPage.newFeatureAnnouncements')}</Label>
-              <Switch id="new-features" defaultChecked disabled={!isClient}/>
+              <Label htmlFor="all-notifications" className="font-normal">{t('settingsPage.allNotificationsLabel')}</Label>
+              <Switch id="all-notifications" checked={enableNotifications} onCheckedChange={setEnableNotifications} disabled={!isClient} />
             </div>
           </CardContent>
         </Card>
