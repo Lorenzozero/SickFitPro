@@ -19,6 +19,8 @@ import { Languages, Bell, Palette, Save, Moon, Sun } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { useTheme } from '@/components/theme-provider';
 
+const LANGUAGE_STORAGE_KEY = 'app-language';
+
 export default function SettingsPage() {
   const [language, setLanguage] = useState('en');
   const [notifications, setNotifications] = useState(true);
@@ -27,10 +29,19 @@ export default function SettingsPage() {
   const [isClient, setIsClient] = useState(false);
 
   useEffect(() => {
-    setIsClient(true);
+    setIsClient(true); // Mark client as ready
+    
+    const storedLanguage = localStorage.getItem(LANGUAGE_STORAGE_KEY);
+    if (storedLanguage) {
+      setLanguage(storedLanguage);
+    }
+    // Future: Load other persisted settings like notifications
   }, []);
 
   const handleSaveChanges = () => {
+    if (!isClient) return; // Prevent action if not on client
+
+    localStorage.setItem(LANGUAGE_STORAGE_KEY, language);
     // Theme is saved by ThemeProvider. Language and notifications are local state for now.
     console.log({ language, notifications, selectedTheme: theme });
     toast({
@@ -57,7 +68,11 @@ export default function SettingsPage() {
           <CardContent>
             <div className="w-full max-w-sm space-y-2">
               <Label htmlFor="language">Language</Label>
-              <Select value={language} onValueChange={setLanguage}>
+              <Select 
+                value={isClient ? language : 'en'} 
+                onValueChange={setLanguage}
+                disabled={!isClient}
+              >
                 <SelectTrigger id="language">
                   <SelectValue placeholder="Select language" />
                 </SelectTrigger>
@@ -68,14 +83,16 @@ export default function SettingsPage() {
                   <SelectItem value="fr">Français (French)</SelectItem>
                 </SelectContent>
               </Select>
-              <p className="text-xs text-muted-foreground">
-                Selected language: {
-                  language === 'en' ? 'English (US)' : 
-                  language === 'it' ? 'Italiano (Italian)' : 
-                  language === 'es' ? 'Español (Spanish)' : 
-                  language === 'fr' ? 'Français (French)' : 'Other'
-                }
-              </p>
+              {isClient && (
+                <p className="text-xs text-muted-foreground">
+                  Selected language: {
+                    language === 'en' ? 'English (US)' : 
+                    language === 'it' ? 'Italiano (Italian)' : 
+                    language === 'es' ? 'Español (Spanish)' : 
+                    language === 'fr' ? 'Français (French)' : 'Other'
+                  }
+                </p>
+              )}
             </div>
           </CardContent>
         </Card>
@@ -91,15 +108,15 @@ export default function SettingsPage() {
           <CardContent className="space-y-4">
             <div className="flex items-center justify-between p-3 rounded-md bg-secondary">
               <Label htmlFor="workout-reminders" className="font-normal">Workout Reminders</Label>
-              <Switch id="workout-reminders" checked={notifications} onCheckedChange={setNotifications} />
+              <Switch id="workout-reminders" checked={notifications} onCheckedChange={setNotifications} disabled={!isClient} />
             </div>
             <div className="flex items-center justify-between p-3 rounded-md bg-secondary">
               <Label htmlFor="progress-updates" className="font-normal">Progress Updates</Label>
-              <Switch id="progress-updates" defaultChecked />
+              <Switch id="progress-updates" defaultChecked disabled={!isClient}/>
             </div>
             <div className="flex items-center justify-between p-3 rounded-md bg-secondary">
               <Label htmlFor="new-features" className="font-normal">New Feature Announcements</Label>
-              <Switch id="new-features" defaultChecked />
+              <Switch id="new-features" defaultChecked disabled={!isClient}/>
             </div>
           </CardContent>
         </Card>
@@ -118,11 +135,15 @@ export default function SettingsPage() {
                 {isClient ? (
                   resolvedTheme === 'dark' ? <Moon className="w-4 h-4 mr-2" /> : <Sun className="w-4 h-4 mr-2" />
                 ) : (
-                  <Palette className="w-4 h-4 mr-2" /> // Placeholder icon
+                  <Palette className="w-4 h-4 mr-2" /> 
                 )}
                 Theme
               </Label>
-               <Select value={theme} onValueChange={(value) => setTheme(value as 'light' | 'dark' | 'system')}>
+               <Select 
+                value={isClient ? theme : 'system'} 
+                onValueChange={(value) => setTheme(value as 'light' | 'dark' | 'system')}
+                disabled={!isClient}
+               >
                 <SelectTrigger id="theme-preference">
                   <SelectValue placeholder="Select theme" />
                 </SelectTrigger>
@@ -132,16 +153,18 @@ export default function SettingsPage() {
                   <SelectItem value="system">System</SelectItem>
                 </SelectContent>
               </Select>
-               <p className="text-xs text-muted-foreground">
-                Current preference: {theme.charAt(0).toUpperCase() + theme.slice(1)}. 
-                {isClient && theme === 'system' && ` (System is currently applying: ${resolvedTheme})`}
-              </p>
+               {isClient && (
+                 <p className="text-xs text-muted-foreground">
+                  Current preference: {theme.charAt(0).toUpperCase() + theme.slice(1)}. 
+                  {theme === 'system' && ` (System is currently applying: ${resolvedTheme})`}
+                 </p>
+               )}
             </div>
           </CardContent>
         </Card>
 
         <div className="flex justify-end">
-          <Button onClick={handleSaveChanges}>
+          <Button onClick={handleSaveChanges} disabled={!isClient}>
             <Save className="w-4 h-4 mr-2" />
             Save Changes
           </Button>
