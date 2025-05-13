@@ -18,9 +18,8 @@ const translations: Record<Language, Translations> = {
     nav: {
       dashboard: 'Home', 
       exercises: 'Exercises',
-      workoutPlans: 'Workout Plans',
+      workoutPlans: 'Workout Plans', // Maintained as Workout Plans for nav consistency
       calendar: 'Calendar',
-      // aiSplitSuggester: 'AI Split Suggester', // Removed as per new request
       progress: 'Progress',
     },
     userDropdown: {
@@ -44,9 +43,9 @@ const translations: Record<Language, Translations> = {
       streak: 'Streak',
       quickActions: 'Quick Actions',
       quickActionsDescription: 'Jump right into your fitness routine.',
-      logNewWorkout: 'Log Workout', 
+      logNewWorkout: 'Start Workout', 
       manageExercises: 'Manage Exercises',
-      getAISplitSuggestion: 'Get AI Split Suggestion',
+      getAISplitSuggestion: 'Get AI Fitness Advice', // Changed
       todaysFocus: "Today's Focus",
       todaysFocusDescription: "What's on the agenda for today?",
       sampleWorkout: 'Leg Day',
@@ -83,31 +82,25 @@ const translations: Record<Language, Translations> = {
       settingsSaved: 'Settings Saved',
       preferencesUpdated: 'Your preferences have been updated.',
     },
-    aiSplitPage: { // This can be removed if the page is deleted, but keeping for AiSplitForm usage
-        title: "AI Training Split Suggester",
-        description: "Get a personalized training split recommendation from our AI coach.",
-    },
     aiSplitForm: {
-        cardTitle: "AI Training Split Suggester", // Used by AiSplitForm
-        cardDescription: "Let our AI craft a personalized training split based on your history and goals. Provide as much detail as possible for the best results.", // Used by AiSplitForm
-        trainingHistoryLabel: "Training History",
-        trainingHistoryPlaceholder: "e.g., Been lifting for 2 years, current split is PPL. Squat 100kg, Bench 80kg, Deadlift 120kg. Usually train 3-4 times a week...",
-        trainingHistoryDescription: "Describe your past and current training, including exercises, frequency, weights, etc.",
-        trainingHistoryMinError: "Please provide detailed training history (at least 50 characters).",
+        cardTitle: "AI Fitness Advisor", 
+        cardDescription: "Get personalized training advice from our AI coach. Your recent training history will be automatically analyzed along with your goals.",
+        trainingHistoryAutoCollectedInfo: "Your recent training history is automatically collected to provide personalized advice.",
         trainingGoalsLabel: "Training Goals",
         trainingGoalsPlaceholder: "e.g., Looking to gain muscle mass, improve strength in compound lifts, and increase overall endurance. Specifically want to grow my legs and shoulders.",
         trainingGoalsDescription: "What do you want to achieve with your training? (e.g., muscle gain, fat loss, strength increase)",
         trainingGoalsMinError: "Please describe your training goals (at least 10 characters).",
-        getAISuggestionButton: "Get AI Suggestion",
-        generatingSplitTitle: "Generating your split...",
+        getAISuggestionButton: "Get AI Advice",
+        generatingSplitTitle: "Generating your advice...",
         generatingSplitDescription: "Our AI is thinking. This might take a moment.",
-        yourSuggestedSplitTitle: "Your AI-Suggested Training Split",
-        suggestedSplitLabel: "Suggested Split:",
-        reasoningLabel: "Reasoning:",
-        toastSuggestionReadyTitle: "Suggestion Ready!",
-        toastSuggestionReadyDescription: "AI has generated a training split for you.",
+        yourSuggestedAdviceTitle: "Your AI Fitness Advice", // Changed
+        suggestedKeyPointsLabel: "Key Suggestions:", // Changed
+        detailedAnalysisLabel: "Detailed Analysis & Advice:", // Changed
+        toastSuggestionReadyTitle: "Advice Ready!",
+        toastSuggestionReadyDescription: "AI has generated training advice for you.",
         toastErrorTitle: "Error",
-        toastErrorDescription: "Failed to get AI suggestion. Please try again.",
+        toastErrorDescription: "Failed to get AI advice. Please try again.",
+        errorFetchingHistory: "Could not automatically retrieve your training history. Please ensure you have some logged workouts.",
     },
     calendarPage: {
         title: "Workout Calendar",
@@ -173,7 +166,6 @@ const translations: Record<Language, Translations> = {
         muscleGroupTriceps: "Triceps",
         muscleGroupAbs: "Abs",
         muscleGroupCardio: "Cardio",
-        muscleGroupOther: "Other",
         formTypeLabel: "Type",
         selectExerciseTypePlaceholder: "Select exercise type",
         typeStrength: "Strength",
@@ -189,9 +181,9 @@ const translations: Record<Language, Translations> = {
         description: "Visualize your fitness journey and celebrate your achievements.",
         performanceMetricsCardTitle: "Performance Metrics",
         performanceMetricsCardDescription: "Track your key lifts and measurements over time.",
-        weeklyTrainingVolumeLabel: "Weekly Training Volume (kg)", // New
-        benchPressLabel: "Bench Press (kg)", // Kept for potential future use or if second chart uses it
-        squatLabel: "Squat (kg)", // Kept for potential future use
+        weeklyTrainingVolumeLabel: "Weekly Training Volume (kg)", 
+        benchPressLabel: "Bench Press (kg)", 
+        squatLabel: "Squat (kg)", 
         bodyCompositionCardTitle: "Body Composition",
         bodyCompositionCardDescription: "Monitor changes in weight, body fat, etc.",
         weightLabel: "Weight (kg)", 
@@ -242,11 +234,11 @@ const translations: Record<Language, Translations> = {
         measurementDeleted: "Measurement Deleted",
         noMeasurementsYet: "No measurements recorded yet. Add your first one!",
         formValidationAlert: "Please fill in date, measurement type, and value.",
-        aiCoachCardTitle: "AI Fitness Coach", // New
-        aiCoachCardDescription: "Get personalized advice and training splits. Input your current training data below.", // New
+        aiCoachCardTitle: "AI Fitness Coach", 
+        aiCoachCardDescription: "Get personalized advice and training plans. Your training data is automatically used to provide tailored suggestions.",
     },
     workoutPlansPage: {
-        title: "Workout Plans",
+        title: "Workout Plans", // "Schede Allenamento" in Italian
         description: "Create, manage, and share your training schedules.",
         createNewPlanButton: "Create New Plan",
         exercisesLabel: "Exercises",
@@ -327,7 +319,6 @@ const translations: Record<Language, Translations> = {
       exercises: 'Esercizi',
       workoutPlans: 'Schede', 
       calendar: 'Calendario',
-      // aiSplitSuggester: 'Suggeritore Split AI', // Removed
       progress: 'Progressi',
     },
     userDropdown: {
@@ -353,7 +344,7 @@ const translations: Record<Language, Translations> = {
       quickActionsDescription: 'Entra subito nella tua routine di fitness.',
       logNewWorkout: 'Inizia Allenamento', 
       manageExercises: 'Gestisci Esercizi',
-      getAISplitSuggestion: 'Ottieni Suggerimento Split AI',
+      getAISplitSuggestion: 'Consigli Fitness AI', // Changed
       todaysFocus: "Focus di Oggi",
       todaysFocusDescription: "Cosa c'è in programma per oggi?",
       sampleWorkout: 'Giorno Gambe',
@@ -390,31 +381,25 @@ const translations: Record<Language, Translations> = {
       settingsSaved: 'Impostazioni Salvate',
       preferencesUpdated: 'Le tue preferenze sono state aggiornate.',
     },
-    aiSplitPage: { // Kept for AiSplitForm
-        title: "Suggeritore Split Allenamento AI",
-        description: "Ottieni una raccomandazione personalizzata per lo split di allenamento dal nostro coach AI.",
-    },
-    aiSplitForm: { // Used by AiSplitForm
-        cardTitle: "Suggeritore Split Allenamento AI",
-        cardDescription: "Lascia che la nostra AI crei uno split di allenamento personalizzato basato sulla tua storia e sui tuoi obiettivi. Fornisci più dettagli possibili per i migliori risultati.",
-        trainingHistoryLabel: "Storico Allenamenti",
-        trainingHistoryPlaceholder: "es., Mi alleno da 2 anni, split attuale PPL. Squat 100kg, Panca 80kg, Stacco 120kg. Mi alleno 3-4 volte a settimana...",
-        trainingHistoryDescription: "Descrivi i tuoi allenamenti passati e attuali, inclusi esercizi, frequenza, pesi, ecc.",
-        trainingHistoryMinError: "Fornisci uno storico allenamenti dettagliato (almeno 50 caratteri).",
+    aiSplitForm: { 
+        cardTitle: "Consulente Fitness AI",
+        cardDescription: "Ottieni consigli di allenamento personalizzati dal nostro coach AI. Il tuo storico allenamenti recente verrà analizzato automaticamente insieme ai tuoi obiettivi.",
+        trainingHistoryAutoCollectedInfo: "Il tuo storico allenamenti recente viene raccolto automaticamente per fornire consigli personalizzati.",
         trainingGoalsLabel: "Obiettivi di Allenamento",
         trainingGoalsPlaceholder: "es., Vorrei aumentare la massa muscolare, migliorare la forza nei composti e aumentare la resistenza generale. Voglio far crescere gambe e spalle.",
         trainingGoalsDescription: "Cosa vuoi ottenere con il tuo allenamento? (es. aumento massa, perdita grasso, aumento forza)",
         trainingGoalsMinError: "Descrivi i tuoi obiettivi di allenamento (almeno 10 caratteri).",
-        getAISuggestionButton: "Ottieni Suggerimento AI",
-        generatingSplitTitle: "Sto generando il tuo split...",
+        getAISuggestionButton: "Ottieni Consigli AI",
+        generatingSplitTitle: "Sto generando i tuoi consigli...",
         generatingSplitDescription: "La nostra AI sta elaborando. Potrebbe volerci un momento.",
-        yourSuggestedSplitTitle: "Il Tuo Split di Allenamento Suggerito dall'AI",
-        suggestedSplitLabel: "Split Suggerito:",
-        reasoningLabel: "Motivazione:",
-        toastSuggestionReadyTitle: "Suggerimento Pronto!",
-        toastSuggestionReadyDescription: "L'AI ha generato uno split di allenamento per te.",
+        yourSuggestedAdviceTitle: "I Tuoi Consigli dal Coach AI", // Changed
+        suggestedKeyPointsLabel: "Suggerimenti Chiave:", // Changed
+        detailedAnalysisLabel: "Analisi Dettagliata e Consigli:", // Changed
+        toastSuggestionReadyTitle: "Consigli Pronti!",
+        toastSuggestionReadyDescription: "L'AI ha generato consigli di allenamento per te.",
         toastErrorTitle: "Errore",
-        toastErrorDescription: "Impossibile ottenere il suggerimento AI. Riprova.",
+        toastErrorDescription: "Impossibile ottenere i consigli AI. Riprova.",
+        errorFetchingHistory: "Impossibile recuperare automaticamente il tuo storico allenamenti. Assicurati di avere degli allenamenti registrati.",
     },
     calendarPage: {
         title: "Calendario Allenamenti",
@@ -480,7 +465,6 @@ const translations: Record<Language, Translations> = {
         muscleGroupTriceps: "Tricipiti",
         muscleGroupAbs: "Addominali",
         muscleGroupCardio: "Cardio",
-        muscleGroupOther: "Altro",
         formTypeLabel: "Tipo",
         selectExerciseTypePlaceholder: "Seleziona tipo di esercizio",
         typeStrength: "Forza",
@@ -496,9 +480,9 @@ const translations: Record<Language, Translations> = {
         description: "Visualizza il tuo percorso di fitness e celebra i tuoi traguardi.",
         performanceMetricsCardTitle: "Metriche di Performance",
         performanceMetricsCardDescription: "Traccia i tuoi sollevamenti chiave e misurazioni nel tempo.",
-        weeklyTrainingVolumeLabel: "Volume Allenamento Settimanale (kg)", // New
-        benchPressLabel: "Panca Piana (kg)", // Kept
-        squatLabel: "Squat (kg)", // Kept
+        weeklyTrainingVolumeLabel: "Volume Allenamento Settimanale (kg)", 
+        benchPressLabel: "Panca Piana (kg)", 
+        squatLabel: "Squat (kg)", 
         bodyCompositionCardTitle: "Composizione Corporea",
         bodyCompositionCardDescription: "Monitora i cambiamenti di peso, grasso corporeo, ecc.",
         weightLabel: "Peso (kg)",
@@ -549,8 +533,8 @@ const translations: Record<Language, Translations> = {
         measurementDeleted: "Misura Eliminata",
         noMeasurementsYet: "Nessuna misura registrata. Aggiungi la prima!",
         formValidationAlert: "Compila data, tipo misurazione e valore.",
-        aiCoachCardTitle: "Coach Fitness AI", // New
-        aiCoachCardDescription: "Ottieni consigli personalizzati e split di allenamento. Inserisci i tuoi dati di allenamento qui sotto.", // New
+        aiCoachCardTitle: "Coach Fitness AI", 
+        aiCoachCardDescription: "Ottieni consigli personalizzati e piani di allenamento. I tuoi dati di allenamento vengono usati automaticamente per fornire suggerimenti su misura.",
     },
      workoutPlansPage: {
         title: "Schede Allenamento",
@@ -652,17 +636,20 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
       if (storedLanguage && translations[storedLanguage]) {
         clientInitialLanguage = storedLanguage;
       } else {
+        // If no language is stored, or stored language is invalid, set the default and store it.
         localStorage.setItem(LANGUAGE_STORAGE_KEY, DEFAULT_LANGUAGE);
       }
     } catch (e) {
       console.warn('LanguageProvider: Failed to access localStorage. Using default language.', e);
     }
     
+    // Only update state if the determined client language is different from the initial state
+    // This helps prevent unnecessary re-renders if the state is already correct.
     if (clientInitialLanguage !== language) { 
       setLanguageState(clientInitialLanguage);
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []); 
+  }, []); // Empty dependency array ensures this runs once on client mount.
 
   const setLanguage = useCallback((newLanguage: Language) => {
     if (translations[newLanguage]) {
@@ -672,42 +659,46 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
          console.warn('LanguageProvider: Failed to save language to localStorage.', e);
       }
       setLanguageState(newLanguage);
+      // Force document language update for accessibility and SEO, if running in browser
+      if (typeof document !== 'undefined') {
+        document.documentElement.lang = newLanguage;
+      }
     } else {
       console.warn(`LanguageProvider: Attempted to set unsupported language "${newLanguage}"`);
     }
   }, []);
 
   const t = useCallback((key: string, replacements?: Record<string, string | number | undefined>): string => {
-    const currentLang = isClient ? language : DEFAULT_LANGUAGE; // Use state language on client, default on server
+    // On the server, or before client-side hydration is complete, always use default language.
+    // On the client, once mounted, use the determined (potentially from localStorage) language.
+    const currentLang = isClient ? language : DEFAULT_LANGUAGE;
     const keys = key.split('.');
     let result: any = translations[currentLang];
     
     for (const k of keys) {
       result = result?.[k];
       if (result === undefined) {
-        // Fallback to default language if key not found in current language (and not already default)
+        // Fallback to default language if key not found in current language
         if (currentLang !== DEFAULT_LANGUAGE) {
             let fallbackResult: any = translations[DEFAULT_LANGUAGE];
             for (const fk of keys) {
                 fallbackResult = fallbackResult?.[fk];
                 if (fallbackResult === undefined) {
-                  return replacements?.default?.toString() || key; // Fallback to default replacement or key itself
+                  return replacements?.default?.toString() || key; 
                 }
             }
-            result = fallbackResult; // Use result from default language
-            break; // Exit loop once fallback is found
+            result = fallbackResult; 
+            break; 
         }
-        return replacements?.default?.toString() || key; // Fallback for default language or if no default replacement
+        return replacements?.default?.toString() || key; 
       }
     }
     
-    // Perform replacements if the result is a string and replacements are provided
     if (typeof result === 'string' && replacements) {
       const actualReplacements = { ...replacements };
-      delete actualReplacements.default; // Remove 'default' from replacements object
+      delete actualReplacements.default; 
 
       return Object.entries(actualReplacements).reduce((acc, [placeholder, value]) => {
-        // Ensure value is a string or number before replacing
         const replacementValue = (typeof value === 'string' || typeof value === 'number') ? String(value) : '';
         return acc.replace(new RegExp(`{${placeholder}}`, 'g'), replacementValue);
       }, result);
@@ -716,6 +707,13 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
     return typeof result === 'string' ? result : (replacements?.default?.toString() || key) ;
   }, [language, isClient]);
 
+
+  // Effect to update HTML lang attribute when language changes on client
+  useEffect(() => {
+    if (isClient) {
+      document.documentElement.lang = language;
+    }
+  }, [language, isClient]);
 
   return (
     <LanguageContext.Provider value={{ language, setLanguage, t, isClient }}>

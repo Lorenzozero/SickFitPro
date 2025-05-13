@@ -3,9 +3,9 @@
 'use server';
 
 /**
- * @fileOverview AI-powered training split suggestion flow.
+ * @fileOverview AI-powered training advice and suggestion flow.
  *
- * - suggestTrainingSplit - A function that suggests a training split based on user history and goals.
+ * - suggestTrainingSplit - A function that provides training advice based on user history and goals.
  * - SuggestTrainingSplitInput - The input type for the suggestTrainingSplit function.
  * - SuggestTrainingSplitOutput - The return type for the suggestTrainingSplit function.
  */
@@ -16,20 +16,20 @@ import {z} from 'genkit';
 const SuggestTrainingSplitInputSchema = z.object({
   trainingHistory: z
     .string()
-    .describe('The user training history, including exercises, sets, reps, and weights.'),
-  trainingGoals: z.string().describe('The user training goals (e.g., muscle gain, weight loss).'),
+    .describe('The user training history, including exercises, sets, reps, and weights. This will be auto-collected.'),
+  trainingGoals: z.string().describe('The user training goals (e.g., muscle gain, weight loss, strength improvement).'),
 });
 export type SuggestTrainingSplitInput = z.infer<typeof SuggestTrainingSplitInputSchema>;
 
 const SuggestTrainingSplitOutputSchema = z.object({
-  suggestedSplit: z
+  suggestedSplit: z // Renamed to "keySuggestions" or "mainAdvice" in translations
     .string()
     .describe(
-      'A suggested training split, including which muscle groups to train on which days. For example: Monday: Chest and Triceps, Tuesday: Back and Biceps, Wednesday: Rest, Thursday: Legs and Shoulders, Friday: Arms, Saturday: Rest, Sunday: Full Body'
+      'Key training suggestions, which might include a sample weekly structure or primary focus areas. For example: Prioritize compound lifts 3 times a week (Squat, Bench, Deadlift). Incorporate 2-3 dedicated accessory days for muscle groups X and Y. Add 2 cardio sessions of 30 minutes.'
     ),
-  reasoning: z
+  reasoning: z // Renamed to "detailedAnalysisAndAdvice" in translations
     .string()
-    .describe('The reasoning behind the suggested training split, based on the user history and goals.'),
+    .describe('Detailed analysis of the training history in relation to goals, specific advice on exercise selection, rep ranges, potential deloads, and other actionable recommendations.'),
 });
 export type SuggestTrainingSplitOutput = z.infer<typeof SuggestTrainingSplitOutputSchema>;
 
@@ -38,25 +38,45 @@ export async function suggestTrainingSplit(input: SuggestTrainingSplitInput): Pr
 }
 
 const prompt = ai.definePrompt({
-  name: 'suggestTrainingSplitPrompt',
+  name: 'suggestTrainingAdvicePrompt', // Renamed prompt for clarity
   input: {schema: SuggestTrainingSplitInputSchema},
   output: {schema: SuggestTrainingSplitOutputSchema},
-  prompt: `You are an expert personal trainer. Based on the user's training history and goals, you will suggest an optimal training split.
+  prompt: `Sei un personal trainer esperto e un consulente fitness.
+Il tuo compito è analizzare lo storico degli allenamenti e gli obiettivi forniti dall'utente per offrire consigli di allenamento completi e personalizzati.
 
-Training History: {{{trainingHistory}}}
-Training Goals: {{{trainingGoals}}}
+Basandoti sui seguenti dati:
+Storico Allenamenti (raccolto automaticamente):
+{{{trainingHistory}}}
 
-Suggested Training Split:`,
+Obiettivi dell'Utente:
+{{{trainingGoals}}}
+
+Fornisci quanto segue:
+1.  **Suggerimenti Chiave (per il campo 'suggestedSplit')**: Riassumi le raccomandazioni principali. Questo potrebbe includere una struttura settimanale di base, aree di focus primario, o modifiche ad alto livello alla routine attuale. Sii conciso e orientato all'azione.
+2.  **Analisi e Consigli Dettagliati (per il campo 'reasoning')**:
+    *   Analizza lo storico fornito in relazione agli obiettivi.
+    *   Offri consigli specifici sulla selezione degli esercizi, sui range di ripetizioni/serie, sull'intensità e sul volume.
+    *   Suggerisci eventuali aggiustamenti, miglioramenti o strategie (es. progressione del carico, periodizzazione, deload).
+    *   Spiega il perché delle tue raccomandazioni.
+    *   Se lo storico è insufficiente o assente, spiega come l'utente può iniziare a tracciare i propri allenamenti e fornisci consigli generici basati sugli obiettivi.
+
+Il tuo tono deve essere incoraggiante, competente e facile da capire. Evita un linguaggio eccessivamente tecnico se non necessario.
+L'obiettivo è fornire all'utente un piano d'azione chiaro e motivante.`,
 });
 
 const suggestTrainingSplitFlow = ai.defineFlow(
   {
-    name: 'suggestTrainingSplitFlow',
+    name: 'suggestTrainingAdviceFlow', // Renamed flow for clarity
     inputSchema: SuggestTrainingSplitInputSchema,
     outputSchema: SuggestTrainingSplitOutputSchema,
   },
   async input => {
+    // Simulate a brief delay if needed, or directly call the prompt
+    if (input.trainingHistory.trim() === "Nessuno storico allenamenti disponibile." || input.trainingHistory.trim() === "") {
+        input.trainingHistory = "L'utente non ha uno storico allenamenti registrato o non è stato possibile recuperarlo. Fornisci consigli generali basati solo sugli obiettivi e suggerisci come iniziare a tracciare gli allenamenti.";
+    }
     const {output} = await prompt(input);
     return output!;
   }
 );
+

@@ -108,7 +108,11 @@ export default function ProgressPage() {
   const getMonthAbbreviation = (fullMonthName: string) => {
     if (!languageContextIsClient) return fullMonthName.slice(0, 3);
 
-    if (language === 'it') {
+    // Fallback for server or if language context isn't ready
+    const currentLanguage = languageContextIsClient ? language : 'en';
+
+
+    if (currentLanguage === 'it') {
         const monthMap: { [key: string]: string } = {
             "January": "Gen", "February": "Feb", "March": "Mar", "April": "Apr",
             "May": "Mag", "June": "Giu", "July": "Lug", "August": "Ago",
@@ -184,7 +188,7 @@ export default function ProgressPage() {
                     tickLine={false}
                     tickMargin={10}
                     axisLine={false}
-                    tickFormatter={(value) => value} // Display week as is
+                    tickFormatter={(value) => value} 
                   />
                   <YAxis />
                   <RechartsTooltip content={<ChartTooltipContent hideLabel />} />
@@ -252,7 +256,7 @@ export default function ProgressPage() {
                     <TableBody>
                         {bodyMeasurements.sort((a,b) => new Date(b.date).getTime() - new Date(a.date).getTime()).map(m => (
                             <TableRow key={m.id}>
-                                <TableCell>{new Date(m.date + 'T00:00:00').toLocaleDateString(language === 'it' ? 'it-IT' : 'en-US', { year: 'numeric', month: 'short', day: 'numeric' })}</TableCell>
+                                <TableCell>{new Date(m.date + 'T00:00:00').toLocaleDateString(languageContextIsClient ? language : 'en-US', { year: 'numeric', month: 'short', day: 'numeric' })}</TableCell>
                                 <TableCell>{t(`progressPage.measurementName${m.measurementName.charAt(0).toUpperCase() + m.measurementName.slice(1)}`, { default: m.measurementName })}</TableCell>
                                 <TableCell>{m.value} {m.unit}{m.notes ? ` (${m.notes})` : ''}</TableCell>
                                 <TableCell className="text-right space-x-2">
@@ -337,22 +341,10 @@ export default function ProgressPage() {
         </CardContent>
       </Card>
       
-      {/* AI Split Suggester Form */}
+      {/* AI Fitness Advisor Form */}
       <div className="mt-8">
-        <Card className="shadow-lg">
-            <CardHeader>
-                <CardTitle className="flex items-center">
-                    <Wand2 className="w-6 h-6 mr-2 text-primary" />
-                    {t('progressPage.aiCoachCardTitle')}
-                </CardTitle>
-                <CardDescription>
-                    {t('progressPage.aiCoachCardDescription')}
-                </CardDescription>
-            </CardHeader>
-            <CardContent>
-                <AiSplitForm />
-            </CardContent>
-        </Card>
+         {/* Card wrapper for AiSplitForm is now handled within AiSplitForm itself */}
+         <AiSplitForm />
       </div>
 
 
