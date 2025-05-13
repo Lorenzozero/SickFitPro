@@ -1,8 +1,8 @@
 
 'use client';
 
-import { useState } from 'react';
-import type { ChangeEvent } from 'react'; // Keep ChangeEvent if used elsewhere, not in current snippet
+import { useState, useEffect } from 'react';
+import type { ChangeEvent } from 'react'; 
 import { PageHeader } from '@/components/shared/page-header';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
@@ -24,6 +24,11 @@ export default function SettingsPage() {
   const [notifications, setNotifications] = useState(true);
   const { theme, setTheme, resolvedTheme } = useTheme();
   const { toast } = useToast();
+  const [isClient, setIsClient] = useState(false);
+
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
 
   const handleSaveChanges = () => {
     // Theme is saved by ThemeProvider. Language and notifications are local state for now.
@@ -110,7 +115,11 @@ export default function SettingsPage() {
           <CardContent className="space-y-4">
             <div className="w-full max-w-sm space-y-2">
               <Label htmlFor="theme-preference" className="flex items-center">
-                {resolvedTheme === 'dark' ? <Moon className="w-4 h-4 mr-2" /> : <Sun className="w-4 h-4 mr-2" />}
+                {isClient ? (
+                  resolvedTheme === 'dark' ? <Moon className="w-4 h-4 mr-2" /> : <Sun className="w-4 h-4 mr-2" />
+                ) : (
+                  <Palette className="w-4 h-4 mr-2" /> // Placeholder icon
+                )}
                 Theme
               </Label>
                <Select value={theme} onValueChange={(value) => setTheme(value as 'light' | 'dark' | 'system')}>
@@ -125,7 +134,7 @@ export default function SettingsPage() {
               </Select>
                <p className="text-xs text-muted-foreground">
                 Current preference: {theme.charAt(0).toUpperCase() + theme.slice(1)}. 
-                {theme === 'system' && ` (System is currently applying: ${resolvedTheme})`}
+                {isClient && theme === 'system' && ` (System is currently applying: ${resolvedTheme})`}
               </p>
             </div>
           </CardContent>
