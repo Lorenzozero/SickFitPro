@@ -290,6 +290,7 @@ const translations: Record<Language, Translations> = {
       repsInputLabel: "Reps",
       weightInputLabel: "Weight (kg)",
       setColumnLabel: "Set",
+      dateColumnLabel: "Date",
       repsColumnLabel: "Reps",
       weightColumnLabel: "Weight (kg)",
       toastSetLoggedTitle: "Set Logged",
@@ -300,6 +301,7 @@ const translations: Record<Language, Translations> = {
       overallProgressLabel: "Overall Workout Progress",
       setCompletionLabel: "Sets: {completed}/{total}",
       noGifAvailable: "No GIF available",
+      exerciseDemoAlt: "exercise demonstration",
       nextExerciseButton: "Next Exercise",
       completeWorkoutButton: "Complete Workout",
       workoutCompleteTitle: "Workout Complete!",
@@ -310,6 +312,10 @@ const translations: Record<Language, Translations> = {
       confirmFinishDescription: "Are you sure you want to mark this workout as complete?",
       confirmFinishButton: "Yes, Finish",
       noSetsLoggedYet: "No sets logged for this exercise yet.",
+      sessionPBsLabel: "Session PBs",
+      maxWeightLabel: "Max Weight",
+      maxRepsLabel: "Max Reps",
+      repsUnitLabel: "reps",
     }
   },
   it: {
@@ -588,6 +594,7 @@ const translations: Record<Language, Translations> = {
       repsInputLabel: "Ripetizioni",
       weightInputLabel: "Peso (kg)",
       setColumnLabel: "Serie",
+      dateColumnLabel: "Data",
       repsColumnLabel: "Ripetizioni",
       weightColumnLabel: "Peso (kg)",
       toastSetLoggedTitle: "Serie Registrata",
@@ -598,6 +605,7 @@ const translations: Record<Language, Translations> = {
       overallProgressLabel: "Progresso Allenamento Complessivo",
       setCompletionLabel: "Serie: {completed}/{total}",
       noGifAvailable: "Nessun GIF disponibile",
+      exerciseDemoAlt: "dimostrazione esercizio",
       nextExerciseButton: "Prossimo Esercizio",
       completeWorkoutButton: "Completa Allenamento",
       workoutCompleteTitle: "Allenamento Completato!",
@@ -608,6 +616,10 @@ const translations: Record<Language, Translations> = {
       confirmFinishDescription: "Sei sicuro di voler contrassegnare questo allenamento come completato?",
       confirmFinishButton: "Sì, Termina",
       noSetsLoggedYet: "Nessuna serie registrata per questo esercizio.",
+      sessionPBsLabel: "PB Sessione",
+      maxWeightLabel: "Peso Max",
+      maxRepsLabel: "Rip. Max",
+      repsUnitLabel: "rip.",
     }
   },
 };

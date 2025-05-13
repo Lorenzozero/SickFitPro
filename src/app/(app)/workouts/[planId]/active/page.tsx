@@ -10,11 +10,12 @@ import { Label } from '@/components/ui/label';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Progress } from '@/components/ui/progress';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
-import { CheckCircle, XCircle, Timer, Play, Pause, ChevronLeft, ChevronRight, PlusCircle, Trash2 } from 'lucide-react';
+import { CheckCircle, XCircle, Timer, Play, Pause, PlusCircle, Trash2, Award, Repeat } from 'lucide-react';
 import { useLanguage } from '@/context/language-context';
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState, useRef, useCallback } from 'react';
 import Image from 'next/image';
 import { useToast } from '@/hooks/use-toast';
+import { cn } from '@/lib/utils';
 
 // Mock data for workout plans
 const mockWorkoutPlans = [
@@ -70,10 +71,166 @@ interface LoggedSet {
   id: string;
   reps: string;
   weight: string;
+  date: string; // Added date
 }
 
 interface ActiveExercise extends ExerciseMock {
   loggedSets: LoggedSet[];
+}
+
+interface SessionPBs {
+  maxWeight: number;
+  maxReps: number;
+}
+
+interface ExerciseCardProps {
+  exercise: ActiveExercise;
+  onLogSet: (exerciseId: string, setData: { reps: string; weight: string }) => void;
+  onDeleteSet: (exerciseId: string, setId: string) => void;
+  isCurrentlyVisible: boolean;
+  exerciseIndex: number;
+  totalExercises: number;
+  t: (key: string, replacements?: Record<string, string | number | undefined>) => string;
+}
+
+function ExerciseCard({ exercise, onLogSet, onDeleteSet, isCurrentlyVisible, exerciseIndex, totalExercises, t }: ExerciseCardProps) {
+  const [repsInput, setRepsInput] = useState('');
+  const [weightInput, setWeightInput] = useState('');
+
+  const completedSets = exercise.loggedSets.length;
+  const progress = exercise.targetSets > 0 ? (completedSets / exercise.targetSets) * 100 : 0;
+
+  const handleLogSetSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    if (!repsInput || !weightInput) return;
+    onLogSet(exercise.id, { reps: repsInput, weight: weightInput });
+    setRepsInput('');
+    setWeightInput('');
+  };
+
+  const sessionPBs = exercise.loggedSets.reduce<SessionPBs>((acc, set) => {
+    const weightNum = parseFloat(set.weight);
+    const repsNum = parseInt(set.reps, 10);
+    if (!isNaN(weightNum) && weightNum > acc.maxWeight) acc.maxWeight = weightNum;
+    if (!isNaN(repsNum) && repsNum > acc.maxReps) acc.maxReps = repsNum;
+    return acc;
+  }, { maxWeight: 0, maxReps: 0 });
+
+  return (
+    <Card 
+        className={cn(
+            "shadow-xl overflow-hidden bg-card/80 backdrop-blur-sm transition-opacity duration-500 ease-in-out mb-8",
+            isCurrentlyVisible ? 'opacity-100' : 'opacity-60'
+        )}
+        id={`exercise-${exercise.id}`}
+    >
+      <div className="md:grid md:grid-cols-3">
+        <div className="md:col-span-1 p-4 bg-muted/30 flex items-center justify-center">
+          {exercise.gifUrl ? (
+            <Image 
+              src={exercise.gifUrl} 
+              alt={`${exercise.name} ${t('activeWorkoutPage.exerciseDemoAlt')}`} 
+              width={300} 
+              height={200} 
+              className="rounded-md object-cover shadow-md"
+              data-ai-hint="exercise movement"
+            />
+          ) : (
+            <div className="w-full h-[200px] flex items-center justify-center bg-muted rounded-md text-muted-foreground">
+              {t('activeWorkoutPage.noGifAvailable')}
+            </div>
+          )}
+        </div>
+        <div className="md:col-span-2">
+          <CardHeader className="pb-3">
+            <div className="flex justify-between items-start">
+              <div>
+                <CardTitle className="text-2xl font-bold text-primary">
+                  {exerciseIndex + 1}. {exercise.name}
+                </CardTitle>
+                <CardDescription className="text-base">
+                  {t('activeWorkoutPage.targetSetsLabel')}: {exercise.targetSets} | {t('activeWorkoutPage.targetRepsLabel')}: {exercise.targetReps}
+                </CardDescription>
+              </div>
+              <span className="text-sm text-muted-foreground">{exerciseIndex + 1} / {totalExercises}</span>
+            </div>
+            <div className="mt-2">
+              <div className="flex items-center justify-between mb-1">
+                <span className="text-xs text-muted-foreground">{t('activeWorkoutPage.setCompletionLabel', { completed: completedSets, total: exercise.targetSets })}</span>
+                <span className="text-xs font-medium">{Math.round(progress)}%</span>
+              </div>
+              <Progress value={progress} className="h-1.5" />
+            </div>
+          </CardHeader>
+          <CardContent className="pt-0">
+            <form onSubmit={handleLogSetSubmit} className="grid grid-cols-6 gap-3 items-end mb-4">
+              <div className="col-span-2">
+                <Label htmlFor={`reps-${exercise.id}`} className="text-xs">{t('activeWorkoutPage.repsInputLabel')}</Label>
+                <Input id={`reps-${exercise.id}`} type="number" placeholder="8" value={repsInput} onChange={(e) => setRepsInput(e.target.value)} required className="h-9"/>
+              </div>
+              <div className="col-span-2">
+                <Label htmlFor={`weight-${exercise.id}`} className="text-xs">{t('activeWorkoutPage.weightInputLabel')}</Label>
+                <Input id={`weight-${exercise.id}`} type="number" placeholder="60" value={weightInput} onChange={(e) => setWeightInput(e.target.value)} required className="h-9" />
+              </div>
+              <div className="col-span-2">
+                <Button type="submit" className="w-full h-9" disabled={completedSets >= exercise.targetSets}>
+                  <PlusCircle className="w-4 h-4 mr-1.5" /> {t('activeWorkoutPage.logSetButton')}
+                </Button>
+              </div>
+            </form>
+
+            {exercise.loggedSets.length > 0 && (
+              <div className="max-h-48 overflow-y-auto pr-1 mb-4">
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead className="w-1/5 h-8 text-xs">{t('activeWorkoutPage.setColumnLabel')}</TableHead>
+                      <TableHead className="w-1/4 h-8 text-xs">{t('activeWorkoutPage.dateColumnLabel')}</TableHead>
+                      <TableHead className="w-1/4 h-8 text-xs">{t('activeWorkoutPage.repsColumnLabel')}</TableHead>
+                      <TableHead className="w-1/4 h-8 text-xs">{t('activeWorkoutPage.weightColumnLabel')}</TableHead>
+                      <TableHead className="w-auto h-8 text-xs text-right"></TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {exercise.loggedSets.map((set, index) => (
+                      <TableRow key={set.id}>
+                        <TableCell className="py-1.5 text-sm font-medium">{index + 1}</TableCell>
+                        <TableCell className="py-1.5 text-sm">{set.date}</TableCell>
+                        <TableCell className="py-1.5 text-sm">{set.reps}</TableCell>
+                        <TableCell className="py-1.5 text-sm">{set.weight} kg</TableCell>
+                        <TableCell className="py-1.5 text-right">
+                          <Button variant="ghost" size="icon" className="h-6 w-6 text-destructive" onClick={() => onDeleteSet(exercise.id, set.id)}>
+                            <Trash2 className="h-3.5 w-3.5"/>
+                          </Button>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </div>
+            )}
+            {exercise.loggedSets.length === 0 && (
+                <p className="text-sm text-center text-muted-foreground py-4">{t('activeWorkoutPage.noSetsLoggedYet')}</p>
+            )}
+            
+            {sessionPBs.maxWeight > 0 || sessionPBs.maxReps > 0 ? (
+                <div className="p-3 mt-2 border rounded-md bg-accent/10">
+                    <h4 className="mb-2 text-sm font-semibold text-accent-foreground flex items-center">
+                        <Award className="w-4 h-4 mr-2 text-accent" />
+                        {t('activeWorkoutPage.sessionPBsLabel')}
+                    </h4>
+                    <div className="grid grid-cols-2 gap-2 text-xs text-accent-foreground/80">
+                        <p>{t('activeWorkoutPage.maxWeightLabel')}: {sessionPBs.maxWeight} kg</p>
+                        <p>{t('activeWorkoutPage.maxRepsLabel')}: {sessionPBs.maxReps} {t('activeWorkoutPage.repsUnitLabel')}</p>
+                    </div>
+                </div>
+            ) : null}
+
+          </CardContent>
+        </div>
+      </div>
+    </Card>
+  );
 }
 
 
@@ -85,16 +242,14 @@ export default function ActiveWorkoutPage() {
 
   const [plan, setPlan] = useState<WorkoutPlan | null | undefined>(undefined);
   const [activeWorkout, setActiveWorkout] = useState<ActiveExercise[] | null>(null);
-  const [currentExerciseIndex, setCurrentExerciseIndex] = useState(0);
   
-  const [currentReps, setCurrentReps] = useState('');
-  const [currentWeight, setCurrentWeight] = useState('');
-
   const [workoutStartTime, setWorkoutStartTime] = useState<Date | null>(null);
   const [elapsedTime, setElapsedTime] = useState('00:00');
   const [isTimerRunning, setIsTimerRunning] = useState(false);
   const [isFinished, setIsFinished] = useState(false);
-
+  const [visibleExerciseId, setVisibleExerciseId] = useState<string | null>(null);
+  
+  const exerciseRefs = useRef<(HTMLDivElement | null)[]>([]);
   const planId = typeof params.planId === 'string' ? params.planId : undefined;
 
   useEffect(() => {
@@ -102,9 +257,14 @@ export default function ActiveWorkoutPage() {
       const foundPlan = mockWorkoutPlans.find(p => p.id === planId);
       setPlan(foundPlan || null);
       if (foundPlan) {
-        setActiveWorkout(foundPlan.exercises.map(ex => ({ ...ex, loggedSets: [] })));
+        const initialActiveWorkout = foundPlan.exercises.map(ex => ({ ...ex, loggedSets: [] }));
+        setActiveWorkout(initialActiveWorkout);
         setWorkoutStartTime(new Date());
         setIsTimerRunning(true);
+        if (initialActiveWorkout.length > 0) {
+            setVisibleExerciseId(initialActiveWorkout[0].id); // Set first exercise as visible initially
+            exerciseRefs.current = initialActiveWorkout.map(() => null);
+        }
       } else {
         setActiveWorkout(null);
       }
@@ -132,50 +292,89 @@ export default function ActiveWorkoutPage() {
     };
   }, [isTimerRunning, workoutStartTime]);
 
-  const handleLogSet = () => {
-    if (!currentReps || !currentWeight || !activeWorkout) return;
-    const updatedWorkout = [...activeWorkout];
-    const currentExercise = updatedWorkout[currentExerciseIndex];
-    currentExercise.loggedSets.push({ id: String(Date.now()), reps: currentReps, weight: currentWeight });
-    setActiveWorkout(updatedWorkout);
-    setCurrentReps('');
-    setCurrentWeight('');
-    toast({ title: t('activeWorkoutPage.toastSetLoggedTitle'), description: t('activeWorkoutPage.toastSetLoggedDescription', { exerciseName: currentExercise.name }) });
+  useEffect(() => {
+    if (!activeWorkout || activeWorkout.length === 0) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting && entry.intersectionRatio >= 0.5) {
+            setVisibleExerciseId(entry.target.id.replace('exercise-', ''));
+          }
+        });
+      },
+      { threshold: 0.5, rootMargin: "-40% 0px -40% 0px" } // Adjust rootMargin to make it more sensitive to centered items
+    );
+
+    exerciseRefs.current.forEach(ref => {
+      if (ref) observer.observe(ref);
+    });
+
+    return () => {
+      exerciseRefs.current.forEach(ref => {
+        if (ref) observer.unobserve(ref);
+      });
+      observer.disconnect();
+    };
+  }, [activeWorkout]);
+
+
+  const updateExerciseData = (exerciseId: string, updatedLoggedSets: LoggedSet[]) => {
+    setActiveWorkout(prevWorkout => {
+        if (!prevWorkout) return null;
+        const newWorkoutState = prevWorkout.map(ex => 
+            ex.id === exerciseId 
+            ? { ...ex, loggedSets: updatedLoggedSets } 
+            : ex
+        );
+        return newWorkoutState;
+    });
   };
 
-  const handleDeleteSet = (setIndex: number) => {
+  const handleLogSet = (exerciseId: string, setData: { reps: string; weight: string }) => {
     if (!activeWorkout) return;
-    const updatedWorkout = [...activeWorkout];
-    updatedWorkout[currentExerciseIndex].loggedSets.splice(setIndex, 1);
-    setActiveWorkout(updatedWorkout);
-     toast({ title: t('activeWorkoutPage.toastSetDeletedTitle'), variant: 'destructive' });
+    const targetExercise = activeWorkout.find(ex => ex.id === exerciseId);
+    if (!targetExercise) return;
+
+    const newSet: LoggedSet = { 
+        id: String(Date.now()), 
+        reps: setData.reps, 
+        weight: setData.weight, 
+        date: new Date().toLocaleDateString(undefined, { year: 'numeric', month: '2-digit', day: '2-digit' }) 
+    };
+    const updatedLoggedSets = [...targetExercise.loggedSets, newSet];
+    updateExerciseData(exerciseId, updatedLoggedSets);
+    
+    toast({ 
+        title: t('activeWorkoutPage.toastSetLoggedTitle'), 
+        description: t('activeWorkoutPage.toastSetLoggedDescription', { exerciseName: targetExercise.name }) 
+    });
   };
 
-  const handleNextExercise = () => {
-    if (activeWorkout && currentExerciseIndex < activeWorkout.length - 1) {
-      setCurrentExerciseIndex(prev => prev + 1);
-    }
-  };
+  const handleDeleteSet = (exerciseId: string, setId: string) => {
+    if (!activeWorkout) return;
+    const targetExercise = activeWorkout.find(ex => ex.id === exerciseId);
+    if (!targetExercise) return;
 
-  const handlePrevExercise = () => {
-    if (currentExerciseIndex > 0) {
-      setCurrentExerciseIndex(prev => prev - 1);
-    }
+    const updatedLoggedSets = targetExercise.loggedSets.filter(s => s.id !== setId);
+    updateExerciseData(exerciseId, updatedLoggedSets);
+
+    toast({ title: t('activeWorkoutPage.toastSetDeletedTitle'), variant: 'destructive' });
   };
 
   const handleFinishWorkout = () => {
     setIsTimerRunning(false);
     setIsFinished(true);
-    toast({ title: t('activeWorkoutPage.toastWorkoutFinishedTitle'), description: t('activeWorkoutPage.toastWorkoutFinishedDescription', { duration: elapsedTime }) });
-    // router.push('/'); // Or to a summary page
+    toast({ 
+        title: t('activeWorkoutPage.toastWorkoutFinishedTitle'), 
+        description: t('activeWorkoutPage.toastWorkoutFinishedDescription', { duration: elapsedTime }) 
+    });
   };
-
-  const currentExercise = activeWorkout ? activeWorkout[currentExerciseIndex] : null;
-  const totalSetsForCurrentExercise = currentExercise?.targetSets ?? 0;
-  const completedSetsForCurrentExercise = currentExercise?.loggedSets.length ?? 0;
-  const progressForCurrentExercise = totalSetsForCurrentExercise > 0 ? (completedSetsForCurrentExercise / totalSetsForCurrentExercise) * 100 : 0;
   
-  const overallProgress = activeWorkout ? (activeWorkout.reduce((acc, ex) => acc + ex.loggedSets.length, 0) / activeWorkout.reduce((acc, ex) => acc + ex.targetSets, 0)) * 100 : 0;
+  const overallProgress = activeWorkout 
+    ? (activeWorkout.reduce((acc, ex) => acc + ex.loggedSets.length, 0) / 
+       activeWorkout.reduce((acc, ex) => acc + ex.targetSets, 0)) * 100 
+    : 0;
 
 
   if (plan === undefined) {
@@ -249,118 +448,28 @@ export default function ActiveWorkoutPage() {
         <Progress value={overallProgress} className="w-full h-2" />
       </div>
 
-
-      {currentExercise && (
-        <Card className="shadow-xl overflow-hidden bg-card/80 backdrop-blur-sm">
-          <div className="md:grid md:grid-cols-3">
-            <div className="md:col-span-1 p-2 bg-muted/30 flex items-center justify-center">
-              {currentExercise.gifUrl ? (
-                  <Image 
-                    src={currentExercise.gifUrl} 
-                    alt={`${currentExercise.name} exercise demonstration`} 
-                    width={300} 
-                    height={200} 
-                    className="rounded-md object-cover shadow-md"
-                    data-ai-hint="exercise movement"
-                />
-              ) : (
-                <div className="w-full h-[200px] flex items-center justify-center bg-muted rounded-md text-muted-foreground">
-                  {t('activeWorkoutPage.noGifAvailable')}
-                </div>
-              )}
-            </div>
-            <div className="md:col-span-2">
-              <CardHeader className="pb-3">
-                <div className="flex justify-between items-start">
-                    <div>
-                        <CardTitle className="text-2xl font-bold text-primary">
-                            {currentExerciseIndex + 1}. {currentExercise.name}
-                        </CardTitle>
-                        <CardDescription className="text-base">
-                            {t('activeWorkoutPage.targetSetsLabel')}: {currentExercise.targetSets} | {t('activeWorkoutPage.targetRepsLabel')}: {currentExercise.targetReps}
-                        </CardDescription>
-                    </div>
-                     <div className="flex gap-2">
-                        <Button variant="outline" size="icon" onClick={handlePrevExercise} disabled={currentExerciseIndex === 0}>
-                            <ChevronLeft className="w-5 h-5" />
-                        </Button>
-                        <Button variant="outline" size="icon" onClick={handleNextExercise} disabled={currentExerciseIndex === activeWorkout.length - 1}>
-                            <ChevronRight className="w-5 h-5" />
-                        </Button>
-                    </div>
-                </div>
-                <div className="mt-2">
-                    <div className="flex items-center justify-between mb-1">
-                        <span className="text-xs text-muted-foreground">{t('activeWorkoutPage.setCompletionLabel', { completed: completedSetsForCurrentExercise, total: totalSetsForCurrentExercise })}</span>
-                         <span className="text-xs font-medium">{Math.round(progressForCurrentExercise)}%</span>
-                    </div>
-                    <Progress value={progressForCurrentExercise} className="h-1.5" />
-                </div>
-              </CardHeader>
-              <CardContent className="pt-0">
-                <form onSubmit={(e) => { e.preventDefault(); handleLogSet(); }} className="grid grid-cols-6 gap-3 items-end mb-4">
-                  <div className="col-span-2">
-                    <Label htmlFor="reps" className="text-xs">{t('activeWorkoutPage.repsInputLabel')}</Label>
-                    <Input id="reps" type="number" placeholder="8" value={currentReps} onChange={(e) => setCurrentReps(e.target.value)} required className="h-9"/>
-                  </div>
-                  <div className="col-span-2">
-                    <Label htmlFor="weight" className="text-xs">{t('activeWorkoutPage.weightInputLabel')}</Label>
-                    <Input id="weight" type="number" placeholder="60" value={currentWeight} onChange={(e) => setCurrentWeight(e.target.value)} required className="h-9" />
-                  </div>
-                  <div className="col-span-2">
-                    <Button type="submit" className="w-full h-9" disabled={completedSetsForCurrentExercise >= totalSetsForCurrentExercise}>
-                      <PlusCircle className="w-4 h-4 mr-1.5" /> {t('activeWorkoutPage.logSetButton')}
-                    </Button>
-                  </div>
-                </form>
-
-                {currentExercise.loggedSets.length > 0 && (
-                  <div className="max-h-40 overflow-y-auto pr-1">
-                    <Table>
-                      <TableHeader>
-                        <TableRow>
-                          <TableHead className="w-1/4 h-8 text-xs">{t('activeWorkoutPage.setColumnLabel')}</TableHead>
-                          <TableHead className="w-1/3 h-8 text-xs">{t('activeWorkoutPage.repsColumnLabel')}</TableHead>
-                          <TableHead className="w-1/3 h-8 text-xs">{t('activeWorkoutPage.weightColumnLabel')}</TableHead>
-                          <TableHead className="w-auto h-8 text-xs text-right"></TableHead>
-                        </TableRow>
-                      </TableHeader>
-                      <TableBody>
-                        {currentExercise.loggedSets.map((set, index) => (
-                          <TableRow key={set.id}>
-                            <TableCell className="py-1.5 text-sm font-medium">{index + 1}</TableCell>
-                            <TableCell className="py-1.5 text-sm">{set.reps}</TableCell>
-                            <TableCell className="py-1.5 text-sm">{set.weight} kg</TableCell>
-                            <TableCell className="py-1.5 text-right">
-                                <Button variant="ghost" size="icon" className="h-6 w-6 text-destructive" onClick={() => handleDeleteSet(index)}>
-                                    <Trash2 className="h-3.5 w-3.5"/>
-                                </Button>
-                            </TableCell>
-                          </TableRow>
-                        ))}
-                      </TableBody>
-                    </Table>
-                  </div>
-                )}
-                {currentExercise.loggedSets.length === 0 && (
-                    <p className="text-sm text-center text-muted-foreground py-4">{t('activeWorkoutPage.noSetsLoggedYet')}</p>
-                )}
-              </CardContent>
-            </div>
+      <div className="space-y-8">
+        {activeWorkout.map((exercise, index) => (
+          <div key={exercise.id} ref={el => exerciseRefs.current[index] = el} id={`exercise-wrapper-${exercise.id}`}>
+            <ExerciseCard
+              exercise={exercise}
+              onLogSet={handleLogSet}
+              onDeleteSet={handleDeleteSet}
+              isCurrentlyVisible={exercise.id === visibleExerciseId}
+              exerciseIndex={index}
+              totalExercises={activeWorkout.length}
+              t={t}
+            />
           </div>
-           <CardFooter className="p-4 border-t flex justify-center">
-                {completedSetsForCurrentExercise >= totalSetsForCurrentExercise && currentExerciseIndex < activeWorkout.length - 1 && (
-                    <Button onClick={handleNextExercise} variant="default" size="lg" className="w-full md:w-auto bg-gradient-to-r from-primary to-accent text-primary-foreground shadow-lg hover:shadow-xl transition-shadow">
-                        {t('activeWorkoutPage.nextExerciseButton')} <ChevronRight className="w-5 h-5 ml-2" />
-                    </Button>
-                )}
-                 {completedSetsForCurrentExercise >= totalSetsForCurrentExercise && currentExerciseIndex === activeWorkout.length - 1 && (
-                    <Button onClick={handleFinishWorkout} variant="default" size="lg" className="w-full md:w-auto bg-gradient-to-r from-green-500 to-emerald-600 text-white shadow-lg hover:shadow-xl transition-shadow">
-                        <CheckCircle className="w-5 h-5 mr-2" /> {t('activeWorkoutPage.completeWorkoutButton')}
-                    </Button>
-                )}
-            </CardFooter>
-        </Card>
+        ))}
+      </div>
+
+      {activeWorkout.length > 0 && !isFinished && (
+        <CardFooter className="p-4 mt-8 border-t flex justify-center">
+            <Button onClick={handleFinishWorkout} variant="default" size="lg" className="w-full md:w-auto bg-gradient-to-r from-green-500 to-emerald-600 text-white shadow-lg hover:shadow-xl transition-shadow">
+                <CheckCircle className="w-5 h-5 mr-2" /> {t('activeWorkoutPage.completeWorkoutButton')}
+            </Button>
+        </CardFooter>
       )}
     </>
   );
