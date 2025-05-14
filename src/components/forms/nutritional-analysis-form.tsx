@@ -14,19 +14,19 @@ import { Loader2, Wand2, UploadCloud, XCircle, Info } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { useLanguage } from '@/context/language-context';
 import { getHealthAdvice, type HealthContextInput, type HealthAdviceOutput } from '@/ai/flows/analyze-meal-flow';
-import { HealthContextInputSchema } from '@/ai/schemas/health-advisor-schemas'; // Import schema from new location
+import { HealthContextInputSchema } from '@/ai/schemas/health-advisor-schemas'; 
 import { Skeleton } from '@/components/ui/skeleton';
 import type { BodyMeasurement } from '@/app/(app)/progress/page'; 
 import { mockGetUserTrainingData, formatTrainingDataToString } from '@/components/forms/ai-split-form'; 
-import type { z } from 'zod';
+import { z } from 'zod';
 
 
 // Zod schema for form validation (only for fields user directly interacts with)
-const formValidationSchema = HealthContextInputSchema.pick({ // Use the imported schema
-  mealDescription: true,
-  mealPhotoDataUri: true,
+const formValidationSchema = HealthContextInputSchema.pick({ 
+  // mealDescription: true, // Will be overridden by extend
+  mealPhotoDataUri: true,    
 }).extend({
-  mealDescription: HealthContextInputSchema.shape.mealDescription.min(5, { message: "aiHealthAdvisor.mealDescriptionMinError" }).optional(), 
+  mealDescription: z.string().min(5, { message: "aiHealthAdvisor.mealDescriptionMinError" }).optional(),
 });
 
 // Type for the fields managed by react-hook-form
@@ -50,19 +50,14 @@ export default function AiHealthAdvisorForm() {
   });
   
   useEffect(() => {
-    const currentLang = t('aiHealthAdvisor.mealDescriptionMinError'); // Get current translation
-    const updatedSchema = HealthContextInputSchema.pick({
-      mealDescription: true,
-      mealPhotoDataUri: true,
-    }).extend({
-      mealDescription: HealthContextInputSchema.shape.mealDescription.min(5, { message: currentLang }).optional(),
-    });
+    const currentLang = t('aiHealthAdvisor.mealDescriptionMinError'); 
+    // const updatedSchema = HealthContextInputSchema.pick({
+    //   mealDescription: true,
+    //   mealPhotoDataUri: true,
+    // }).extend({
+    //   mealDescription: z.string().min(5, { message: currentLang }).optional(), // Corrected definition here as well if used
+    // });
     
-    // This approach to updating the resolver dynamically is complex with RHF and Zod.
-    // A full re-initialization of the form or manually updating error messages is typically needed.
-    // For simplicity, we'll assume the initial t() call in the schema definition is sufficient
-    // if the language is set before the form mounts, or that re-rendering handles it.
-    // The form.trigger() will re-validate against the schema it was initialized with.
     form.trigger(); 
   }, [t, form]);
 
@@ -299,3 +294,4 @@ export default function AiHealthAdvisorForm() {
     </Card>
   );
 }
+
