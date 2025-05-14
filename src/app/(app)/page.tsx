@@ -72,7 +72,7 @@ export default function DashboardPage() {
     return dayKeys.reduce((sum, dayKey) => sum + (weeklySchedule[dayKey]?.length || 0), 0);
   }, [scheduleIsClient, weeklySchedule]);
 
-  const completedWorkoutsThisWeek = 0; 
+  const completedWorkoutsThisWeek = 0; // Placeholder - implement actual tracking later
 
 
   const stats = [
@@ -112,14 +112,14 @@ export default function DashboardPage() {
         ))}
       </div>
 
-      <div className="mt-6 grid gap-4 md:grid-cols-1 lg:grid-cols-1"> {/* Reduced mt-8 to mt-6, gap to 4 */}
+      <div className="mt-6 grid gap-4 md:grid-cols-1 lg:grid-cols-2"> {/* Reduced mt-8 to mt-6, gap to 4. Changed to lg:grid-cols-2 */}
         <Card className="shadow-lg">
           <CardHeader>
             <CardTitle>{isMounted ? t('dashboard.todaysFocus') : "Today's Focus"}</CardTitle>
             <CardDescription>{isMounted ? t('dashboard.todaysFocusDescription') : "What's on the agenda?"}</CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="p-4 text-center border-2 border-dashed rounded-lg border-border" data-ai-hint="workout routine">
+            <div className="p-4 text-center border-2 border-dashed rounded-lg border-border min-h-[180px] flex flex-col justify-center" data-ai-hint="workout routine"> {/* Added min-height and flex for centering */}
               {isMounted && scheduleIsClient && languageContextIsClient ? (
                 todaysWorkouts.length > 0 ? (
                   <>
@@ -149,55 +149,55 @@ export default function DashboardPage() {
             </div>
           </CardContent>
         </Card>
-      </div>
 
-      <Card className="mt-6 shadow-lg"> {/* Reduced mt-8 to mt-6 */}
-        <CardHeader>
-          <CardTitle>{isMounted ? t('dashboard.activityAndHistoryTitle') : "Activity & History"}</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="mb-4 flex justify-center"> {/* Reduced mb-6 to mb-4 */}
-            <Button asChild className="w-full md:w-auto">
-              <Link href="/start-workout">
-                <PlayCircle className="w-4 h-4 mr-2"/> {isMounted ? t('dashboard.logNewWorkout') : 'Start Workout'}
-              </Link>
-            </Button>
-          </div>
+        <Card className="shadow-lg"> {/* Was Card for Activity & History */}
+          <CardHeader>
+            <CardTitle>{isMounted ? t('dashboard.activityAndHistoryTitle') : "Activity & History"}</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="mb-4 flex justify-center"> {/* Reduced mb-6 to mb-4 */}
+              <Button asChild className="w-full md:w-auto">
+                <Link href="/start-workout">
+                  <PlayCircle className="w-4 h-4 mr-2"/> {isMounted ? t('dashboard.logNewWorkout') : 'Start Workout'}
+                </Link>
+              </Button>
+            </div>
 
-          {mockWorkoutHistory.length > 0 ? (
-            <ScrollArea className="h-64"> {/* Reduced height from h-72 */}
-              <ul className="space-y-2 pr-3"> {/* Reduced space-y-3 to space-y-2, pr-4 to pr-3 */}
-                {mockWorkoutHistory.map((item, index) => (
-                  <li key={item.id}>
-                    <div className="flex items-center justify-between p-2 rounded-md bg-secondary/50 hover:bg-secondary transition-colors"> {/* Reduced p-3 to p-2 */}
-                      <div className="flex-grow">
-                        <p className="font-semibold text-secondary-foreground">
-                          {isMounted ? t(item.planNameKey, { default: item.defaultPlanName }) : item.defaultPlanName}
-                        </p>
-                        <p className="text-xs text-muted-foreground">{formatDate(item.date)}</p>
+            {mockWorkoutHistory.length > 0 ? (
+              <ScrollArea className="h-64"> {/* Reduced height from h-72 */}
+                <ul className="space-y-2 pr-3"> {/* Reduced space-y-3 to space-y-2, pr-4 to pr-3 */}
+                  {mockWorkoutHistory.map((item, index) => (
+                    <li key={item.id}>
+                      <div className="flex items-center justify-between p-2 rounded-md bg-secondary/50 hover:bg-secondary transition-colors"> {/* Reduced p-3 to p-2 */}
+                        <div className="flex-grow">
+                          <p className="font-semibold text-secondary-foreground">
+                            {isMounted ? t(item.planNameKey, { default: item.defaultPlanName }) : item.defaultPlanName}
+                          </p>
+                          <p className="text-xs text-muted-foreground">{formatDate(item.date)}</p>
+                        </div>
+                        <div className="flex items-center text-sm text-muted-foreground shrink-0">
+                          <Clock className="w-3.5 h-3.5 mr-1.5" />
+                          <span>{item.duration}</span>
+                        </div>
                       </div>
-                      <div className="flex items-center text-sm text-muted-foreground shrink-0">
-                        <Clock className="w-3.5 h-3.5 mr-1.5" />
-                        <span>{item.duration}</span>
-                      </div>
-                    </div>
-                    {index < mockWorkoutHistory.length - 1 && <Separator className="my-2" />} {/* Reduced my-3 to my-2 */}
-                  </li>
-                ))}
-              </ul>
-            </ScrollArea>
-          ) : (
-            <p className="text-center text-muted-foreground py-4">{isMounted ? t('dashboard.noWorkoutHistory') : "No workout history yet."}</p>
+                      {index < mockWorkoutHistory.length - 1 && <Separator className="my-2" />} {/* Reduced my-3 to my-2 */}
+                    </li>
+                  ))}
+                </ul>
+              </ScrollArea>
+            ) : (
+              <p className="text-center text-muted-foreground py-4">{isMounted ? t('dashboard.noWorkoutHistory') : "No workout history yet."}</p>
+            )}
+          </CardContent>
+          {mockWorkoutHistory.length > 0 && (
+              <CardFooter className="justify-center pt-3 border-t"> {/* Reduced pt-4 to pt-3 */}
+                   <Button asChild variant="outline" size="sm">
+                      <Link href="/progress">{isMounted ? t('dashboard.viewAllHistoryButton') : "View All History"}</Link>
+                  </Button>
+              </CardFooter>
           )}
-        </CardContent>
-        {mockWorkoutHistory.length > 0 && (
-            <CardFooter className="justify-center pt-3 border-t"> {/* Reduced pt-4 to pt-3 */}
-                 <Button asChild variant="outline" size="sm">
-                    <Link href="/progress">{isMounted ? t('dashboard.viewAllHistoryButton') : "View All History"}</Link>
-                </Button>
-            </CardFooter>
-        )}
-      </Card>
+        </Card>
+      </div>
     </>
   );
 }
