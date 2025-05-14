@@ -17,15 +17,16 @@ export interface WorkoutPlanOption {
   nameKey: string;
   defaultName: string;
   muscleGroups: MuscleGroup[];
+  duration: string; // Added duration
 }
 
 export const dayKeys = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'];
 
 export const defaultAvailableWorkoutPlans: WorkoutPlanOption[] = [
-  { id: '1', nameKey: 'calendarPage.samplePlan1', defaultName: 'Full Body Blast', muscleGroups: ['Full Body'] },
-  { id: '2', nameKey: 'calendarPage.samplePlan2', defaultName: 'Upper Body Power', muscleGroups: ['Chest', 'Back', 'Shoulders', 'Biceps', 'Triceps'] },
-  { id: '3', nameKey: 'calendarPage.samplePlan3', defaultName: 'Leg Day Domination', muscleGroups: ['Legs', 'Abs'] },
-  { id: '4', nameKey: 'calendarPage.samplePlan4', defaultName: 'Cardio Session', muscleGroups: ['Cardio'] },
+  { id: '1', nameKey: 'calendarPage.samplePlan1', defaultName: 'Full Body Blast', muscleGroups: ['Full Body'], duration: '60 min' },
+  { id: '2', nameKey: 'calendarPage.samplePlan2', defaultName: 'Upper Body Power', muscleGroups: ['Chest', 'Back', 'Shoulders', 'Biceps', 'Triceps'], duration: '75 min' },
+  { id: '3', nameKey: 'calendarPage.samplePlan3', defaultName: 'Leg Day Domination', muscleGroups: ['Legs', 'Abs'], duration: '90 min' },
+  { id: '4', nameKey: 'calendarPage.samplePlan4', defaultName: 'Cardio Session', muscleGroups: ['Cardio'], duration: '45 min' },
 ];
 
 interface WeeklyScheduleContextType {

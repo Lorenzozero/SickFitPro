@@ -54,7 +54,7 @@ export default function DashboardPage() {
     return dayKeys[dayIndex];
   }, [isMounted]);
 
-  const todaysWorkouts = useMemo(() => {
+  const todaysWorkoutsDetails = useMemo(() => {
     if (!isMounted || !today || !scheduleIsClient || !weeklySchedule[today]) {
       return [];
     }
@@ -63,6 +63,7 @@ export default function DashboardPage() {
         return {
             ...scheduledWorkout,
             planName: planDetails ? t(planDetails.nameKey, {default: planDetails.defaultName}) : scheduledWorkout.planName,
+            duration: planDetails?.duration, // Get duration from planDetails
         };
     });
   }, [isMounted, today, scheduleIsClient, weeklySchedule, availableWorkoutPlans, t]);
@@ -96,7 +97,7 @@ export default function DashboardPage() {
         title={t('dashboard.welcomeTitle')}
         description={t('dashboard.welcomeDescription')}
       />
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3"> {/* Reduced gap from 6 to 4 */}
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
         {stats.map((stat) => (
           <Card key={stat.titleKey} className="shadow-lg hover:shadow-xl transition-shadow duration-300">
             <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
@@ -112,24 +113,29 @@ export default function DashboardPage() {
         ))}
       </div>
 
-      <div className="mt-6 grid gap-4 md:grid-cols-1 lg:grid-cols-2"> {/* Reduced mt-8 to mt-6, gap to 4. Changed to lg:grid-cols-2 */}
+      <div className="mt-6 grid gap-4 md:grid-cols-1 lg:grid-cols-2">
         <Card className="shadow-lg">
           <CardHeader>
             <CardTitle>{isMounted ? t('dashboard.todaysFocus') : "Today's Focus"}</CardTitle>
             <CardDescription>{isMounted ? t('dashboard.todaysFocusDescription') : "What's on the agenda?"}</CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="p-4 text-center border-2 border-dashed rounded-lg border-border min-h-[180px] flex flex-col justify-center" data-ai-hint="workout routine"> {/* Added min-height and flex for centering */}
+            <div className="p-4 text-center border-2 border-dashed rounded-lg border-border min-h-[180px] flex flex-col justify-center" data-ai-hint="workout routine">
               {isMounted && scheduleIsClient && languageContextIsClient ? (
-                todaysWorkouts.length > 0 ? (
+                todaysWorkoutsDetails.length > 0 ? (
                   <>
-                    <CalendarDays className="w-12 h-12 mx-auto mb-2 text-primary" />
-                    <p className="font-semibold">{t('dashboard.checkCalendarForWorkout')}</p>
-                    <ul className="mt-1 text-sm text-muted-foreground">
-                      {todaysWorkouts.map(workout => (
-                        <li key={workout.id}>{workout.planName}</li>
-                      ))}
-                    </ul>
+                    <CalendarDays className="w-10 h-10 mx-auto mb-2 text-primary" />
+                    {todaysWorkoutsDetails.map(workout => (
+                      <div key={workout.id} className="mb-2">
+                        <p className="text-xl font-semibold text-primary">{workout.planName}</p>
+                        {workout.duration && (
+                          <div className="flex items-center justify-center text-sm text-muted-foreground mt-1">
+                            <Clock className="w-3.5 h-3.5 mr-1.5" />
+                            <span>{workout.duration}</span>
+                          </div>
+                        )}
+                      </div>
+                    ))}
                   </>
                 ) : (
                   <>
@@ -150,12 +156,12 @@ export default function DashboardPage() {
           </CardContent>
         </Card>
 
-        <Card className="shadow-lg"> {/* Was Card for Activity & History */}
+        <Card className="shadow-lg">
           <CardHeader>
             <CardTitle>{isMounted ? t('dashboard.activityAndHistoryTitle') : "Activity & History"}</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="mb-4 flex justify-center"> {/* Reduced mb-6 to mb-4 */}
+            <div className="mb-4 flex justify-center">
               <Button asChild className="w-full md:w-auto">
                 <Link href="/start-workout">
                   <PlayCircle className="w-4 h-4 mr-2"/> {isMounted ? t('dashboard.logNewWorkout') : 'Start Workout'}
@@ -164,11 +170,11 @@ export default function DashboardPage() {
             </div>
 
             {mockWorkoutHistory.length > 0 ? (
-              <ScrollArea className="h-64"> {/* Reduced height from h-72 */}
-                <ul className="space-y-2 pr-3"> {/* Reduced space-y-3 to space-y-2, pr-4 to pr-3 */}
+              <ScrollArea className="h-64">
+                <ul className="space-y-2 pr-3">
                   {mockWorkoutHistory.map((item, index) => (
                     <li key={item.id}>
-                      <div className="flex items-center justify-between p-2 rounded-md bg-secondary/50 hover:bg-secondary transition-colors"> {/* Reduced p-3 to p-2 */}
+                      <div className="flex items-center justify-between p-2 rounded-md bg-secondary/50 hover:bg-secondary transition-colors">
                         <div className="flex-grow">
                           <p className="font-semibold text-secondary-foreground">
                             {isMounted ? t(item.planNameKey, { default: item.defaultPlanName }) : item.defaultPlanName}
@@ -180,7 +186,7 @@ export default function DashboardPage() {
                           <span>{item.duration}</span>
                         </div>
                       </div>
-                      {index < mockWorkoutHistory.length - 1 && <Separator className="my-2" />} {/* Reduced my-3 to my-2 */}
+                      {index < mockWorkoutHistory.length - 1 && <Separator className="my-2" />}
                     </li>
                   ))}
                 </ul>
@@ -190,7 +196,7 @@ export default function DashboardPage() {
             )}
           </CardContent>
           {mockWorkoutHistory.length > 0 && (
-              <CardFooter className="justify-center pt-3 border-t"> {/* Reduced pt-4 to pt-3 */}
+              <CardFooter className="justify-center pt-3 border-t">
                    <Button asChild variant="outline" size="sm">
                       <Link href="/progress">{isMounted ? t('dashboard.viewAllHistoryButton') : "View All History"}</Link>
                   </Button>
@@ -201,4 +207,3 @@ export default function DashboardPage() {
     </>
   );
 }
-
