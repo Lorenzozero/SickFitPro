@@ -25,6 +25,7 @@ import { useRouter } from 'next/navigation';
 import type { MuscleGroup } from '@/components/shared/muscle-group-icons'; 
 import { Button } from '@/components/ui/button';
 import { CardHeader } from '@/components/ui/card'; // Ensure CardHeader is imported
+import { PageHeader } from '@/components/shared/page-header'; // Added import for PageHeader
 
 interface ExerciseDetail {
   id: string;
@@ -228,12 +229,12 @@ export default function WorkoutPlansPage() {
             <CardContent className="flex-grow p-4">
               <div className="flex flex-col sm:flex-row items-start gap-4">
                 {/* Left: Image */}
-                <div className="relative w-full sm:w-40 h-52 flex-shrink-0"> {/* Slightly larger image */}
+                <div className="relative w-full sm:w-36 h-48 flex-shrink-0"> {/* Adjusted size */}
                   <Image 
                       src={
-                        plan.id === '1' ? "https://placehold.co/160x208.png" : // Adjusted size
-                        plan.id === '2' ? "https://placehold.co/160x208.png" :
-                        "https://placehold.co/160x208.png" 
+                        plan.id === '1' ? "https://placehold.co/144x192.png" :
+                        plan.id === '2' ? "https://placehold.co/144x192.png" :
+                        "https://placehold.co/144x192.png" 
                       }
                       alt={t('workoutPlansPage.muscleSilhouetteAlt', {default: 'Muscle groups involved'})} 
                       layout="fill"
@@ -258,7 +259,7 @@ export default function WorkoutPlansPage() {
                       </h4>
                       {plan.muscleGroups && plan.muscleGroups.length > 0 ? (
                           <ul className="list-disc list-inside text-xs space-y-0.5 pl-4 text-muted-foreground">
-                              {plan.muscleGroups.map(group => <li key={group}>{group}</li>)}
+                              {plan.muscleGroups.map(group => <li key={group}>{t(`exercisesPage.muscleGroup${group.replace(/\s+/g, '')}`, {default: group})}</li>)}
                           </ul>
                       ) : (
                           <p className="text-xs text-muted-foreground">{t('workoutPlansPage.noMuscleGroupsSpecified', {default: 'N/A'})}</p>
