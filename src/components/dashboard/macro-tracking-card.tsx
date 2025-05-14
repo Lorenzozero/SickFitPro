@@ -5,7 +5,7 @@ import { useState, useEffect, type ChangeEvent, useCallback } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Utensils, Bell, Drumstick, Wheat, Fish } from 'lucide-react';
+import { Utensils, Drumstick, Wheat, Fish } from 'lucide-react';
 import { useLanguage } from '@/context/language-context';
 import { Button } from '../ui/button';
 import { useToast } from '@/hooks/use-toast';
@@ -27,7 +27,6 @@ const initialWeeklyMacroGoals: Record<string, DailyMacroGoals> = appDayKeys.redu
     return acc;
 }, {} as Record<string, DailyMacroGoals>);
 
-type ReminderFrequency = 'off' | 'daily' | 'mealtime';
 const MACRO_GOALS_STORAGE_KEY = 'sickfit-pro-weeklyMacroGoals';
 
 export default function MacroTrackingCard() {
@@ -38,7 +37,6 @@ export default function MacroTrackingCard() {
   const [selectedDayForGoalSetting, setSelectedDayForGoalSetting] = useState<string>(appDayKeys[0]);
   const [currentMonthTotals, setCurrentMonthTotals] = useState<DailyMacroGoals | null>(null);
   
-  const [reminderFrequency, setReminderFrequency] = useState<ReminderFrequency>('off');
   const [isClient, setIsClient] = useState(false);
 
   useEffect(() => {
@@ -58,11 +56,6 @@ export default function MacroTrackingCard() {
           setWeeklyMacroGoals(initialWeeklyMacroGoals);
         }
       }
-      // Load reminder frequency if stored
-      const storedReminderFreq = localStorage.getItem('sickfit-pro-macroReminderFrequency');
-      if (storedReminderFreq && ['off', 'daily', 'mealtime'].includes(storedReminderFreq)) {
-        setReminderFrequency(storedReminderFreq as ReminderFrequency);
-      }
     }
   }, []);
 
@@ -71,12 +64,6 @@ export default function MacroTrackingCard() {
       localStorage.setItem(MACRO_GOALS_STORAGE_KEY, JSON.stringify(weeklyMacroGoals));
     }
   }, [weeklyMacroGoals, isClient]);
-
-  useEffect(() => {
-    if (isClient && typeof window !== 'undefined') {
-        localStorage.setItem('sickfit-pro-macroReminderFrequency', reminderFrequency);
-    }
-  }, [reminderFrequency, isClient]);
 
   const handleGoalPropertyChange = (dayKey: string, macroKey: keyof DailyMacroGoals, value: string) => {
     const numValue = parseInt(value, 10);
@@ -160,23 +147,11 @@ export default function MacroTrackingCard() {
 
   return (
     <Card className="shadow-lg">
-      <CardHeader className="flex flex-row items-center justify-between">
+      <CardHeader>
         <CardTitle className="flex items-center">
           <Utensils className="w-5 h-5 mr-2 text-orange-500" />
           {t('macroTrackingCard.title')}
         </CardTitle>
-        <Select value={reminderFrequency} onValueChange={(value) => setReminderFrequency(value as ReminderFrequency)}>
-            <SelectTrigger asChild>
-                <Button variant="ghost" size="icon" aria-label={t('macroTrackingCard.reminderSettingsAriaLabel', {default: "Impostazioni promemoria macro"})}>
-                    <Bell className="w-4 h-4" />
-                </Button>
-            </SelectTrigger>
-            <SelectContent align="end">
-                <SelectItem value="off">{t('macroTrackingCard.reminderOff')}</SelectItem>
-                <SelectItem value="daily">{t('macroTrackingCard.reminderDaily')}</SelectItem>
-                <SelectItem value="mealtime">{t('macroTrackingCard.reminderMealtime')}</SelectItem>
-            </SelectContent>
-        </Select>
       </CardHeader>
       <CardContent className="space-y-6">
         <div>
