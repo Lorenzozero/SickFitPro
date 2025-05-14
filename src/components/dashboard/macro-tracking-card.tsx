@@ -5,7 +5,7 @@ import { useState, useEffect, type ChangeEvent, useCallback } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Utensils, Drumstick, Wheat, Fish } from 'lucide-react';
+import { Utensils, Drumstick, Wheat, Fish, LineChart } from 'lucide-react';
 import { useLanguage } from '@/context/language-context';
 import { Button } from '../ui/button';
 import { useToast } from '@/hooks/use-toast';
@@ -13,12 +13,24 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Skeleton } from '../ui/skeleton';
 import { dayKeys as appDayKeys } from '@/context/weekly-schedule-context';
 import { Separator } from '../ui/separator';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { ChartContainer, ChartTooltip, ChartTooltipContent, ChartLegend, ChartLegendContent, type ChartConfig } from "@/components/ui/chart";
+import { Line, CartesianGrid, XAxis, YAxis, Tooltip as RechartsTooltip, ResponsiveContainer, LineChart as RechartsPrimitiveLineChart } from "recharts";
+import { format, subDays, subWeeks, subMonths, startOfWeek, startOfMonth, eachDayOfInterval, getDay, getISOWeek, getMonth } from 'date-fns';
+
 
 interface DailyMacroGoals {
   protein: number;
   carbs: number;
   fat: number;
 }
+
+type ChartDataPoint = {
+  date: string;
+  protein?: number;
+  carbs?: number;
+  fat?: number;
+};
 
 const initialDailyGoals: DailyMacroGoals = { protein: 150, carbs: 250, fat: 70 };
 
@@ -35,9 +47,10 @@ export default function MacroTrackingCard() {
   
   const [weeklyMacroGoals, setWeeklyMacroGoals] = useState<Record<string, DailyMacroGoals>>(initialWeeklyMacroGoals);
   const [selectedDayForGoalSetting, setSelectedDayForGoalSetting] = useState<string>(appDayKeys[0]);
-  const [currentMonthTotals, setCurrentMonthTotals] = useState<DailyMacroGoals | null>(null);
   
   const [isClient, setIsClient] = useState(false);
+  const [selectedTimeRange, setSelectedTimeRange] = useState<'daily' | 'weekly' | 'monthly'>('weekly');
+  const [chartData, setChartData] = useState<ChartDataPoint[]>([]);
 
   useEffect(() => {
     setIsClient(true);
@@ -87,45 +100,99 @@ export default function MacroTrackingCard() {
     });
   }
 
-  const calculateMonthlyTotals = useCallback((year: number, month: number, goals: Record<string, DailyMacroGoals>): DailyMacroGoals => {
-    const totals: DailyMacroGoals = { protein: 0, carbs: 0, fat: 0 };
-    if (Object.keys(goals).length === 0 || Object.values(goals).every(g => !g)) return totals;
-
-    const daysInMonth = new Date(year, month + 1, 0).getDate();
-
-    for (let i = 1; i <= daysInMonth; i++) {
-        const currentDate = new Date(year, month, i);
-        const jsDayIndex = currentDate.getDay();
-        const appDayKey = appDayKeys[jsDayIndex === 0 ? 6 : jsDayIndex - 1];
-        
-        const dailyGoal = goals[appDayKey];
-        if (dailyGoal) {
-            totals.protein += dailyGoal.protein;
-            totals.carbs += dailyGoal.carbs;
-            totals.fat += dailyGoal.fat;
-        }
-    }
-    return totals;
-  }, []);
-
   useEffect(() => {
-    if (isClient && languageContextIsClient) {
-      const now = new Date();
-      const year = now.getFullYear();
-      const month = now.getMonth();
-      const totals = calculateMonthlyTotals(year, month, weeklyMacroGoals);
-      setCurrentMonthTotals(totals);
+    if (!isClient || !languageContextIsClient || Object.keys(weeklyMacroGoals).length === 0) {
+      setChartData([]);
+      return;
     }
-  }, [weeklyMacroGoals, isClient, languageContextIsClient, calculateMonthlyTotals]);
+
+    const today = new Date();
+    const newChartData: ChartDataPoint[] = [];
+
+    if (selectedTimeRange === 'daily') {
+      for (let i = 6; i >= 0; i--) {
+        const day = subDays(today, i);
+        // getDay() returns 0 for Sunday, 1 for Monday, ..., 6 for Saturday.
+        // appDayKeys is ['monday', ..., 'sunday']
+        const dayIndex = getDay(day);
+        const appDayKey = appDayKeys[dayIndex === 0 ? 6 : dayIndex - 1]; // Adjust for Sunday
+        const goalsForDay = weeklyMacroGoals[appDayKey] || { protein: 0, carbs: 0, fat: 0 };
+        newChartData.push({
+          date: format(day, 'MMM d'),
+          protein: goalsForDay.protein,
+          carbs: goalsForDay.carbs,
+          fat: goalsForDay.fat,
+        });
+      }
+    } else if (selectedTimeRange === 'weekly') {
+      for (let i = 3; i >= 0; i--) {
+        const weekStart = startOfWeek(subWeeks(today, i), { weekStartsOn: 1 }); // Monday as start
+        let weeklyProtein = 0;
+        let weeklyCarbs = 0;
+        let weeklyFat = 0;
+        
+        const daysInThisWeek = eachDayOfInterval({ start: weekStart, end: subDays(startOfWeek(subWeeks(today, i-1), {weekStartsOn:1}),1) });
+
+        daysInThisWeek.slice(0,7).forEach(dayInWeek => {
+            const dayIndex = getDay(dayInWeek);
+            const appDayKey = appDayKeys[dayIndex === 0 ? 6 : dayIndex - 1];
+            const goalsForDay = weeklyMacroGoals[appDayKey] || { protein: 0, carbs: 0, fat: 0 };
+            weeklyProtein += goalsForDay.protein;
+            weeklyCarbs += goalsForDay.carbs;
+            weeklyFat += goalsForDay.fat;
+        });
+        
+        newChartData.push({
+          date: t('macroTrackingCard.weekLabel', { weekNum: getISOWeek(weekStart) }),
+          protein: weeklyProtein,
+          carbs: weeklyCarbs,
+          fat: weeklyFat,
+        });
+      }
+    } else if (selectedTimeRange === 'monthly') {
+      for (let i = 2; i >= 0; i--) { // Show last 3 months
+        const monthStart = startOfMonth(subMonths(today, i));
+        const daysInMonth = eachDayOfInterval({ start: monthStart, end: subDays(startOfMonth(subMonths(today, i-1)), 1) });
+        
+        let monthlyProtein = 0;
+        let monthlyCarbs = 0;
+        let monthlyFat = 0;
+
+        daysInMonth.forEach(dayInMonth => {
+            const dayIndex = getDay(dayInMonth);
+            const appDayKey = appDayKeys[dayIndex === 0 ? 6 : dayIndex - 1];
+            const goalsForDay = weeklyMacroGoals[appDayKey] || { protein: 0, carbs: 0, fat: 0 };
+            monthlyProtein += goalsForDay.protein;
+            monthlyCarbs += goalsForDay.carbs;
+            monthlyFat += goalsForDay.fat;
+        });
+        
+        newChartData.push({
+          date: format(monthStart, 'MMM yyyy'),
+          protein: monthlyProtein,
+          carbs: monthlyCarbs,
+          fat: monthlyFat,
+        });
+      }
+    }
+    setChartData(newChartData);
+  }, [selectedTimeRange, weeklyMacroGoals, isClient, languageContextIsClient, t, language]);
 
 
   const macroDetails: Array<{ key: keyof DailyMacroGoals; labelKey: string; icon: React.ElementType; unit: string; color: string }> = [
-    { key: 'protein', labelKey: 'macroTrackingCard.proteinLabel', icon: Drumstick, unit: 'g', color: 'bg-red-500' },
-    { key: 'carbs', labelKey: 'macroTrackingCard.carbsLabel', icon: Wheat, unit: 'g', color: 'bg-yellow-500' },
-    { key: 'fat', labelKey: 'macroTrackingCard.fatLabel', icon: Fish, unit: 'g', color: 'bg-green-500' },
+    { key: 'protein', labelKey: 'macroTrackingCard.proteinLabel', icon: Drumstick, unit: 'g', color: 'hsl(var(--chart-1))' },
+    { key: 'carbs', labelKey: 'macroTrackingCard.carbsLabel', icon: Wheat, unit: 'g', color: 'hsl(var(--chart-2))' },
+    { key: 'fat', labelKey: 'macroTrackingCard.fatLabel', icon: Fish, unit: 'g', color: 'hsl(var(--chart-3))' },
   ];
   
   const currentGoalsForSelectedDay = weeklyMacroGoals[selectedDayForGoalSetting] || initialDailyGoals;
+
+  const chartConfig = {
+    protein: { label: t('macroTrackingCard.proteinLabel'), color: macroDetails.find(m=>m.key==='protein')?.color || 'hsl(var(--chart-1))' },
+    carbs: { label: t('macroTrackingCard.carbsLabel'), color: macroDetails.find(m=>m.key==='carbs')?.color || 'hsl(var(--chart-2))' },
+    fat: { label: t('macroTrackingCard.fatLabel'), color: macroDetails.find(m=>m.key==='fat')?.color || 'hsl(var(--chart-3))' },
+  } satisfies ChartConfig;
+
 
   if (!isClient) {
     return (
@@ -182,7 +249,7 @@ export default function MacroTrackingCard() {
                 <Input
                   id={`${selectedDayForGoalSetting}-${m.key}-goal`}
                   type="number"
-                  value={currentGoalsForSelectedDay[m.key]}
+                  value={String(currentGoalsForSelectedDay[m.key])} // Ensure value is a string
                   onChange={(e: ChangeEvent<HTMLInputElement>) => handleGoalPropertyChange(selectedDayForGoalSetting, m.key, e.target.value)}
                   min="0"
                 />
@@ -197,29 +264,62 @@ export default function MacroTrackingCard() {
         <Separator />
 
         <div>
-            <h3 className="text-md font-semibold mb-3">{t('macroTrackingCard.monthlyTotalsTitle')}</h3>
-            {currentMonthTotals ? (
-                 <Card className="bg-muted/30">
-                    <CardContent className="p-4 space-y-1 text-sm">
-                        <p className="flex justify-between">
-                            <span>{t('macroTrackingCard.totalProteinMonth')}:</span> 
-                            <span className="font-medium">{currentMonthTotals.protein.toLocaleString()} {t('macroTrackingCard.unitGrams')}</span>
-                        </p>
-                        <p className="flex justify-between">
-                            <span>{t('macroTrackingCard.totalCarbsMonth')}:</span>
-                            <span className="font-medium">{currentMonthTotals.carbs.toLocaleString()} {t('macroTrackingCard.unitGrams')}</span>
-                        </p>
-                        <p className="flex justify-between">
-                            <span>{t('macroTrackingCard.totalFatMonth')}:</span>
-                            <span className="font-medium">{currentMonthTotals.fat.toLocaleString()} {t('macroTrackingCard.unitGrams')}</span>
-                        </p>
-                    </CardContent>
-                </Card>
-            ) : (
-                <p className="text-sm text-muted-foreground">{t('macroTrackingCard.loadingTotals')}</p>
-            )}
+            <h3 className="text-md font-semibold mb-3 flex items-center">
+                <LineChart className="w-5 h-5 mr-2 text-primary" />
+                {t('macroTrackingCard.macroTrendChartTitle')}
+            </h3>
+            <Tabs value={selectedTimeRange} onValueChange={(value) => setSelectedTimeRange(value as any)} className="w-full">
+              <TabsList className="grid w-full grid-cols-3 mb-4">
+                <TabsTrigger value="daily">{t('macroTrackingCard.dailyTab')}</TabsTrigger>
+                <TabsTrigger value="weekly">{t('macroTrackingCard.weeklyTab')}</TabsTrigger>
+                <TabsTrigger value="monthly">{t('macroTrackingCard.monthlyTab')}</TabsTrigger>
+              </TabsList>
+              <TabsContent value="daily">
+                <ChartContainer config={chartConfig} className="h-[300px] w-full">
+                    <RechartsPrimitiveLineChart data={chartData}>
+                        <CartesianGrid vertical={false} />
+                        <XAxis dataKey="date" tickLine={false} axisLine={false} tickMargin={8} />
+                        <YAxis />
+                        <ChartTooltip content={<ChartTooltipContent />} />
+                        <ChartLegend content={<ChartLegendContent />} />
+                        <Line dataKey="protein" type="monotone" stroke="var(--color-protein)" strokeWidth={2} dot={false} />
+                        <Line dataKey="carbs" type="monotone" stroke="var(--color-carbs)" strokeWidth={2} dot={false} />
+                        <Line dataKey="fat" type="monotone" stroke="var(--color-fat)" strokeWidth={2} dot={false} />
+                    </RechartsPrimitiveLineChart>
+                </ChartContainer>
+              </TabsContent>
+              <TabsContent value="weekly">
+                 <ChartContainer config={chartConfig} className="h-[300px] w-full">
+                    <RechartsPrimitiveLineChart data={chartData}>
+                        <CartesianGrid vertical={false} />
+                        <XAxis dataKey="date" tickLine={false} axisLine={false} tickMargin={8} />
+                        <YAxis />
+                        <ChartTooltip content={<ChartTooltipContent />} />
+                        <ChartLegend content={<ChartLegendContent />} />
+                        <Line dataKey="protein" type="monotone" stroke="var(--color-protein)" strokeWidth={2} dot={false} />
+                        <Line dataKey="carbs" type="monotone" stroke="var(--color-carbs)" strokeWidth={2} dot={false} />
+                        <Line dataKey="fat" type="monotone" stroke="var(--color-fat)" strokeWidth={2} dot={false} />
+                    </RechartsPrimitiveLineChart>
+                </ChartContainer>
+              </TabsContent>
+              <TabsContent value="monthly">
+                 <ChartContainer config={chartConfig} className="h-[300px] w-full">
+                    <RechartsPrimitiveLineChart data={chartData}>
+                        <CartesianGrid vertical={false} />
+                        <XAxis dataKey="date" tickLine={false} axisLine={false} tickMargin={8} />
+                        <YAxis />
+                        <ChartTooltip content={<ChartTooltipContent />} />
+                        <ChartLegend content={<ChartLegendContent />} />
+                        <Line dataKey="protein" type="monotone" stroke="var(--color-protein)" strokeWidth={2} dot={false} />
+                        <Line dataKey="carbs" type="monotone" stroke="var(--color-carbs)" strokeWidth={2} dot={false} />
+                        <Line dataKey="fat" type="monotone" stroke="var(--color-fat)" strokeWidth={2} dot={false} />
+                    </RechartsPrimitiveLineChart>
+                </ChartContainer>
+              </TabsContent>
+            </Tabs>
         </div>
       </CardContent>
     </Card>
   );
 }
+

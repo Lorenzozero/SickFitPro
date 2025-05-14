@@ -83,14 +83,17 @@ const translations: Record<Language, Translations> = {
         saveGoalsButton: "Save Goals for Day",
         goalsSavedTitle: "Macro Goals Saved",
         goalsForDaySaved: "Goals for {dayOfWeek} saved successfully!",
-        monthlyTotalsTitle: "Estimated Monthly Totals",
-        totalProteinMonth: "Total Protein (Month)",
-        totalCarbsMonth: "Total Carbs (Month)",
-        totalFatMonth: "Total Fat (Month)",
+        monthlyTotalsTitle: "Estimated Monthly Totals", // Kept for potential future use, not currently displayed
+        totalProteinMonth: "Total Protein (Month)", // Kept for potential future use
+        totalCarbsMonth: "Total Carbs (Month)", // Kept for potential future use
+        totalFatMonth: "Total Fat (Month)", // Kept for potential future use
         unitGrams: "g",
-        loadingTotals: "Calculating monthly totals...",
-        macroReminderSettingsAriaLabel: "Macro Reminder Settings",
-        macroReminderTooltip: "Set macro logging reminder",
+        loadingTotals: "Calculating monthly totals...", // Kept for potential future use
+        macroTrendChartTitle: "Macronutrient Goal Trends",
+        dailyTab: "Daily",
+        weeklyTab: "Weekly",
+        monthlyTab: "Monthly",
+        weekLabel: "Week {weekNum}",
     },
     aiHealthAdvisor: {
         cardTitle: "AI Health Advisor",
@@ -472,8 +475,11 @@ const translations: Record<Language, Translations> = {
         totalFatMonth: "Grassi Totali (Mese)",
         unitGrams: "g",
         loadingTotals: "Calcolo totali mensili...",
-        macroReminderSettingsAriaLabel: "Impostazioni Promemoria Macro",
-        macroReminderTooltip: "Imposta promemoria registrazione macro",
+        macroTrendChartTitle: "Andamento Obiettivi Macronutrienti",
+        dailyTab: "Giornaliero",
+        weeklyTab: "Settimanale",
+        monthlyTab: "Mensile",
+        weekLabel: "Sett. {weekNum}",
     },
      aiHealthAdvisor: {
         cardTitle: "Consulente Salute AI",
@@ -531,8 +537,8 @@ const translations: Record<Language, Translations> = {
       currentWeightLabel: 'Peso Attuale (kg)',
       currentWeightPlaceholder: 'es. 70.5',
     },
-    aiSplitForm: { // Assicurati che queste traduzioni siano coerenti se riutilizzi questo componente
-        cardTitle: "Consulente Fitness AI", // Potrebbe diventare "Consulente Allenamento AI" se specifico per gli split
+    aiSplitForm: { 
+        cardTitle: "Consulente Fitness AI", 
         cardDescription: "Ottieni consigli di allenamento personalizzati dal nostro coach AI. Il tuo storico allenamenti recente verrà analizzato automaticamente insieme ai tuoi obiettivi.",
         trainingHistoryAutoCollectedInfo: "Il tuo storico allenamenti recente viene raccolto automaticamente per fornire consigli personalizzati.",
         trainingGoalsLabel: "Obiettivi di Allenamento",
@@ -780,7 +786,7 @@ const translations: Record<Language, Translations> = {
       resume: "Riprendi: {planName}",
     }
   },
-  es: { // Keep for fallback, can be fully translated later
+  es: { 
     nav: {
       home: 'Inicio',
       exercises: 'Ejercicios',
@@ -896,8 +902,11 @@ const translations: Record<Language, Translations> = {
         loadingTotals: "Calculando totales mensuales...",
          goalsSavedTitle: "Metas de Macros Guardadas",
         goalsForDaySaved: "¡Metas para {dayOfWeek} guardadas con éxito!",
-        macroReminderSettingsAriaLabel: "Configuración de Recordatorio de Macros",
-        macroReminderTooltip: "Establecer recordatorio de registro de macros",
+        macroTrendChartTitle: "Tendencias de Metas de Macronutrientes",
+        dailyTab: "Diario",
+        weeklyTab: "Semanal",
+        monthlyTab: "Mensual",
+        weekLabel: "Semana {weekNum}",
     },
     aiHealthAdvisor: {
         cardTitle: "Asesor de Salud IA",
@@ -1151,7 +1160,7 @@ const translations: Record<Language, Translations> = {
       resume: "Reanudar: {planName}",
     }
   },
-  fr: { // Keep for fallback, can be fully translated later
+  fr: { 
     nav: {
       home: 'Accueil',
       exercises: 'Exercices',
@@ -1267,8 +1276,11 @@ const translations: Record<Language, Translations> = {
         loadingTotals: "Calcul des totaux mensuels...",
         goalsSavedTitle: "Objectifs Macros Sauvegardés",
         goalsForDaySaved: "Objectifs pour {dayOfWeek} sauvegardés avec succès !",
-        macroReminderSettingsAriaLabel: "Paramètres du Rappel des Macros",
-        macroReminderTooltip: "Définir le rappel de saisie des macros",
+        macroTrendChartTitle: "Tendances des Objectifs de Macronutriments",
+        dailyTab: "Quotidien",
+        weeklyTab: "Hebdomadaire",
+        monthlyTab: "Mensuel",
+        weekLabel: "Sem. {weekNum}",
     },
      aiHealthAdvisor: {
         cardTitle: "Conseiller Santé IA",
