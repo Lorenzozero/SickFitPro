@@ -4,57 +4,21 @@
  * @fileOverview Un agente AI per consulenza sulla salute e fitness.
  *
  * - getHealthAdvice - Una funzione che gestisce il processo di consulenza.
- * - HealthContextInputSchema - Lo schema Zod per l'input della funzione getHealthAdvice.
  * - HealthContextInput - Il tipo di input per la funzione getHealthAdvice.
  * - HealthAdviceOutput - Il tipo di ritorno per la funzione getHealthAdvice.
  */
 
 import {ai} from '@/ai/genkit';
-import {z} from 'genkit';
+import type { z } from 'genkit'; // Use import type for z if only used for types here
+import { HealthContextInputSchema, HealthAdviceOutputSchema } from '@/ai/schemas/health-advisor-schemas';
 
-export const HealthContextInputSchema = z.object({
-  mealDescription: z
-    .string()
-    .optional()
-    .describe('Una descrizione testuale opzionale del pasto più recente o di un pasto tipico.'),
-  mealPhotoDataUri: z
-    .string()
-    .optional()
-    .describe(
-      "Una foto opzionale del pasto, come URI dati che deve includere un tipo MIME e utilizzare la codifica Base64. Formato atteso: 'data:<mimetype>;base64,<encoded_data>'."
-    ),
-  userMacroGoalsSummary: z
-    .string()
-    .optional()
-    .describe("Riepilogo degli obiettivi macronutrizionali settimanali dell'utente."),
-  userWaterGoalMl: z
-    .number()
-    .optional()
-    .describe("Obiettivo di assunzione giornaliera di acqua dell'utente in millilitri."),
-  userBodyMeasurementsSummary: z
-    .string()
-    .optional()
-    .describe("Riepilogo delle recenti misurazioni corporee dell'utente."),
-  userTrainingSummary: z
-    .string()
-    .optional()
-    .describe("Riepilogo della recente attività/volume di allenamento dell'utente."),
-});
+
+// Type alias for input, inferred from the schema in the schemas file
 export type HealthContextInput = z.infer<typeof HealthContextInputSchema>;
 
-const HealthAdviceOutputSchema = z.object({
-  overallAssessment: z
-    .string()
-    .describe("Una valutazione generale dei dati sulla salute e degli obiettivi forniti dall'utente."),
-  specificAdvicePoints: z
-    .array(z.string())
-    .describe("Un elenco di punti di consulenza specifici e attuabili."),
-  mealSpecificFeedback: z
-    .string()
-    .optional()
-    .describe("Feedback specifico relativo al pasto, se è stato descritto un pasto."),
-});
+// Type alias for output, inferred from the schema in the schemas file
 export type HealthAdviceOutput = z.infer<typeof HealthAdviceOutputSchema>;
+
 
 export async function getHealthAdvice(input: HealthContextInput): Promise<HealthAdviceOutput> {
   return healthAdvisorFlow(input);
@@ -62,8 +26,8 @@ export async function getHealthAdvice(input: HealthContextInput): Promise<Health
 
 const healthAdvicePrompt = ai.definePrompt({
   name: 'healthAdvisorPrompt',
-  input: {schema: HealthContextInputSchema},
-  output: {schema: HealthAdviceOutputSchema},
+  input: {schema: HealthContextInputSchema}, // Use imported schema
+  output: {schema: HealthAdviceOutputSchema}, // Use imported schema
   prompt: `Sei un consulente esperto di salute e fitness olistico.
 Il tuo compito è analizzare i dati forniti dall'utente riguardanti i suoi obiettivi di macronutrienti, l'assunzione di acqua, le misurazioni corporee e l'attività di allenamento.
 Se l'utente fornisce dettagli su un pasto (descrizione e/o foto), includi un feedback specifico su quel pasto nel contesto più ampio della sua salute e dei suoi obiettivi.
@@ -113,8 +77,8 @@ Restituisci l'analisi nel formato JSON specificato.`,
 const healthAdvisorFlow = ai.defineFlow(
   {
     name: 'healthAdvisorFlow',
-    inputSchema: HealthContextInputSchema,
-    outputSchema: HealthAdviceOutputSchema,
+    inputSchema: HealthContextInputSchema, // Use imported schema
+    outputSchema: HealthAdviceOutputSchema, // Use imported schema
   },
   async input => {
     const {output} = await healthAdvicePrompt(input);

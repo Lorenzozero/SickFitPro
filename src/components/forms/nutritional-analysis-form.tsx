@@ -13,18 +13,20 @@ import { Textarea } from '@/components/ui/textarea';
 import { Loader2, Wand2, UploadCloud, XCircle, Info } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { useLanguage } from '@/context/language-context';
-import { getHealthAdvice, HealthContextInputSchema, type HealthContextInput, type HealthAdviceOutput } from '@/ai/flows/analyze-meal-flow';
+import { getHealthAdvice, type HealthContextInput, type HealthAdviceOutput } from '@/ai/flows/analyze-meal-flow';
+import { HealthContextInputSchema } from '@/ai/schemas/health-advisor-schemas'; // Import schema from new location
 import { Skeleton } from '@/components/ui/skeleton';
-import type { BodyMeasurement } from '@/app/(app)/progress/page';
-import { mockGetUserTrainingData, formatTrainingDataToString } from '@/components/forms/ai-split-form';
-import { z } from 'zod';
+import type { BodyMeasurement } from '@/app/(app)/progress/page'; 
+import { mockGetUserTrainingData, formatTrainingDataToString } from '@/components/forms/ai-split-form'; 
+import type { z } from 'zod';
+
 
 // Zod schema for form validation (only for fields user directly interacts with)
-const formValidationSchema = HealthContextInputSchema.pick({
+const formValidationSchema = HealthContextInputSchema.pick({ // Use the imported schema
   mealDescription: true,
   mealPhotoDataUri: true,
 }).extend({
-  mealDescription: HealthContextInputSchema.shape.mealDescription.min(5, { message: "aiHealthAdvisor.mealDescriptionMinError" }).optional(), // Use translation key directly for zod message
+  mealDescription: HealthContextInputSchema.shape.mealDescription.min(5, { message: "aiHealthAdvisor.mealDescriptionMinError" }).optional(), 
 });
 
 // Type for the fields managed by react-hook-form
@@ -48,19 +50,20 @@ export default function AiHealthAdvisorForm() {
   });
   
   useEffect(() => {
-    // Update error messages if language changes
-    const newSchema = HealthContextInputSchema.pick({
+    const currentLang = t('aiHealthAdvisor.mealDescriptionMinError'); // Get current translation
+    const updatedSchema = HealthContextInputSchema.pick({
       mealDescription: true,
       mealPhotoDataUri: true,
     }).extend({
-      mealDescription: HealthContextInputSchema.shape.mealDescription.min(5, { message: t("aiHealthAdvisor.mealDescriptionMinError") }).optional(),
+      mealDescription: HealthContextInputSchema.shape.mealDescription.min(5, { message: currentLang }).optional(),
     });
-    form.trigger(); // Re-trigger validation if language changes
-    // This way of updating resolver on language change might not be straightforward with RHF's zodResolver
-    // A simpler approach for zod messages is to use keys and translate them when displaying the message,
-    // or re-initialize the form on language change if messages are deeply embedded.
-    // For now, direct t() in .min() might not update dynamically with language context.
-    // For simplicity, we'll ensure the key is used and rely on re-render to pick up new `t` function.
+    
+    // This approach to updating the resolver dynamically is complex with RHF and Zod.
+    // A full re-initialization of the form or manually updating error messages is typically needed.
+    // For simplicity, we'll assume the initial t() call in the schema definition is sufficient
+    // if the language is set before the form mounts, or that re-rendering handles it.
+    // The form.trigger() will re-validate against the schema it was initialized with.
+    form.trigger(); 
   }, [t, form]);
 
   const handlePhotoChange = (event: ChangeEvent<HTMLInputElement>) => {
