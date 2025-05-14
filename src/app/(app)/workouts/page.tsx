@@ -6,7 +6,7 @@ import Link from 'next/link';
 import { PageHeader } from '@/components/shared/page-header';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { PlusCircle, Edit2, Trash2, Share2, PlayCircle, ListChecks } from 'lucide-react';
+import { PlusCircle, Edit2, Trash2, Share2, PlayCircle, ListChecks, Ban } from 'lucide-react'; // Added Ban
 import {
   Dialog,
   DialogContent,
@@ -22,6 +22,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
 import { useLanguage } from '@/context/language-context';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import { useActiveWorkout } from '@/context/active-workout-context'; // Added
 
 interface ExerciseDetail {
   id: string;
@@ -34,8 +35,8 @@ interface WorkoutPlan {
   id: string;
   name: string;
   description: string;
-  exercises: number; // This will be the count of exerciseDetails
-  duration: string; // Can be auto-calculated or manually set
+  exercises: number; 
+  duration: string; 
   exerciseDetails: ExerciseDetail[];
 }
 
@@ -53,13 +54,12 @@ const initialWorkoutPlans: WorkoutPlan[] = [
 
 export default function WorkoutPlansPage() {
   const { t } = useLanguage();
+  const { activePlanId, isClient: activeWorkoutIsClient } = useActiveWorkout();
   const [plans, setPlans] = useState<WorkoutPlan[]>(initialWorkoutPlans);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   
-  // State for the plan being edited or created in the dialog
   const [currentPlan, setCurrentPlan] = useState<Partial<WorkoutPlan> & { exerciseDetails: ExerciseDetail[] }>({ name: '', description: '', exerciseDetails: [] });
   
-  // State for the individual exercise being added within the dialog
   const [newExerciseName, setNewExerciseName] = useState('');
   const [newExerciseSets, setNewExerciseSets] = useState('');
   const [newExerciseReps, setNewExerciseReps] = useState('');
@@ -70,7 +70,6 @@ export default function WorkoutPlansPage() {
     if (plan) {
       setCurrentPlan({ ...plan, exerciseDetails: [...(plan.exerciseDetails || [])] });
     } else {
-      // For new plan
       setCurrentPlan({ name: '', description: '', exerciseDetails: [], duration: 'N/A' });
     }
     setNewExerciseName('');
@@ -85,7 +84,7 @@ export default function WorkoutPlansPage() {
       return;
     }
     const newExercise: ExerciseDetail = {
-      id: String(Date.now()), // Simple unique ID for client-side
+      id: String(Date.now()), 
       name: newExerciseName,
       sets: newExerciseSets,
       reps: newExerciseReps,
@@ -108,7 +107,6 @@ export default function WorkoutPlansPage() {
   
   const handleSavePlan = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    // Name and description are taken directly from currentPlan state which is bound to inputs
     if (!currentPlan.name?.trim()) {
         toast({title: t('toastErrorTitle'), description: "Plan name is required.", variant: "destructive"});
         return;
@@ -119,17 +117,17 @@ export default function WorkoutPlansPage() {
       name: currentPlan.name,
       description: currentPlan.description || '',
       exerciseDetails: currentPlan.exerciseDetails || [],
-      exercises: (currentPlan.exerciseDetails || []).length, // Count of exercises
-      duration: currentPlan.duration || 'N/A', // Or calculate based on exercises
+      exercises: (currentPlan.exerciseDetails || []).length,
+      duration: currentPlan.duration || 'N/A', 
     };
     
-    if (currentPlan.id) { // Editing existing plan
+    if (currentPlan.id) { 
       setPlans(plans.map(p => p.id === planToSave.id ? planToSave : p));
       toast({ 
         title: t('workoutPlansPage.toastPlanUpdatedTitle'), 
         description: t('workoutPlansPage.toastPlanUpdatedDescription', { planName: planToSave.name }) 
       });
-    } else { // Creating new plan
+    } else { 
       setPlans([...plans, planToSave]);
       toast({ 
         title: t('workoutPlansPage.toastPlanCreatedTitle'), 
@@ -137,7 +135,7 @@ export default function WorkoutPlansPage() {
       });
     }
     setIsDialogOpen(false);
-    setCurrentPlan({ name: '', description: '', exerciseDetails: [] }); // Reset for next time
+    setCurrentPlan({ name: '', description: '', exerciseDetails: [] }); 
   };
   
   const handleDeletePlan = (id: string, name: string) => {
@@ -150,7 +148,7 @@ export default function WorkoutPlansPage() {
   }
 
   const handleSharePlan = (planName: string) => {
-    navigator.clipboard.writeText(`Check out my workout plan: ${planName} on SickFit Pro!`); // Placeholder text
+    navigator.clipboard.writeText(`Check out my workout plan: ${planName} on SickFit Pro!`); 
     toast({ 
       title: t('workoutPlansPage.toastLinkCopiedTitle'), 
       description: t('workoutPlansPage.toastLinkCopiedDescription') 
@@ -163,11 +161,29 @@ export default function WorkoutPlansPage() {
         title={t('workoutPlansPage.title')}
         description={t('workoutPlansPage.description')}
         actions={
-          <Button onClick={() => openDialog()}>
+          <Button onClick={() => openDialog()} disabled={!!(activeWorkoutIsClient && activePlanId)}>
             <PlusCircle className="w-4 h-4 mr-2" /> {t('workoutPlansPage.createNewPlanButton')}
           </Button>
         }
       />
+      {activeWorkoutIsClient && activePlanId && (
+          <Card className="mb-6 shadow-md border-destructive bg-destructive/10">
+            <CardHeader>
+              <CardTitle className="text-destructive flex items-center">
+                <Ban className="w-5 h-5 mr-2" />
+                {t('activeWorkoutPage.workoutInProgressTitle', { default: 'Workout In Progress' })}
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p className="text-sm text-destructive-foreground">
+                 {t('activeWorkoutPage.finishCurrentWorkoutPrompt', { default: 'You have an active workout. Please finish or abandon it before starting a new one or creating/editing plans.' })}
+              </p>
+               <Button asChild variant="outline" className="mt-3">
+                <Link href={`/workouts/${activePlanId}/active`}>{t('resumeWorkoutButton.resumeTitle')}</Link>
+              </Button>
+            </CardContent>
+          </Card>
+        )}
 
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
         {plans.map((plan) => (
@@ -192,19 +208,24 @@ export default function WorkoutPlansPage() {
               )}
             </CardContent>
             <CardFooter className="flex justify-between items-center gap-2 pt-4 border-t">
-              <Button asChild variant="default" size="sm">
+              <Button 
+                asChild 
+                variant="default" 
+                size="sm"
+                disabled={!!(activeWorkoutIsClient && activePlanId)}
+              >
                 <Link href={`/workouts/${plan.id}/active`}>
                   <PlayCircle className="w-4 h-4 mr-2" /> {t('workoutPlansPage.startButton')}
                 </Link>
               </Button>
               <div className="flex gap-1">
-                <Button variant="ghost" size="icon" onClick={() => openDialog(plan)}>
+                <Button variant="ghost" size="icon" onClick={() => openDialog(plan)} disabled={!!(activeWorkoutIsClient && activePlanId)}>
                   <Edit2 className="w-4 h-4" />
                 </Button>
                 <Button variant="ghost" size="icon" onClick={() => handleSharePlan(plan.name)}>
                   <Share2 className="w-4 h-4" />
                 </Button>
-                <Button variant="ghost" size="icon" onClick={() => handleDeletePlan(plan.id, plan.name)}>
+                <Button variant="ghost" size="icon" onClick={() => handleDeletePlan(plan.id, plan.name)} disabled={!!(activeWorkoutIsClient && activePlanId)}>
                   <Trash2 className="w-4 h-4 text-destructive" />
                 </Button>
               </div>
@@ -223,7 +244,7 @@ export default function WorkoutPlansPage() {
           </DialogHeader>
           <form onSubmit={handleSavePlan}>
             <ScrollArea className="max-h-[calc(100vh-20rem)]">
-              <div className="grid gap-4 py-4 px-1"> {/* Added px-1 for scrollbar visibility */}
+              <div className="grid gap-4 py-4 px-1"> 
                 <div>
                   <Label htmlFor="planName">{t('workoutPlansPage.planNameLabel')}</Label>
                   <Input 
@@ -253,7 +274,6 @@ export default function WorkoutPlansPage() {
                   />
                 </div>
 
-                {/* Section to add individual exercises */}
                 <Card className="mt-4">
                   <CardHeader className="pb-2">
                     <CardTitle className="text-base flex items-center">
@@ -284,7 +304,6 @@ export default function WorkoutPlansPage() {
                   </CardContent>
                 </Card>
 
-                {/* Display added exercises */}
                 {currentPlan.exerciseDetails && currentPlan.exerciseDetails.length > 0 && (
                   <div className="mt-4 space-y-2">
                     <h4 className="text-sm font-medium">{t('workoutPlansPage.addedExercisesLabel')}</h4>

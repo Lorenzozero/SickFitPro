@@ -4,9 +4,10 @@
 import Link from 'next/link';
 import { PageHeader } from '@/components/shared/page-header';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { PlayCircle } from 'lucide-react';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'; // Removed CardDescription
+import { PlayCircle, Ban } from 'lucide-react'; // Added Ban
 import { useLanguage } from '@/context/language-context';
+import { useActiveWorkout } from '@/context/active-workout-context'; // Added
 
 // Mock data - similar to initialWorkoutPlans in workouts/page.tsx for consistency
 const availablePlans = [
@@ -17,6 +18,7 @@ const availablePlans = [
 
 export default function StartWorkoutPage() {
   const { t } = useLanguage();
+  const { activePlanId, isClient: activeWorkoutIsClient } = useActiveWorkout();
 
   return (
     <>
@@ -26,6 +28,24 @@ export default function StartWorkoutPage() {
       />
 
       <div className="space-y-6">
+        {activeWorkoutIsClient && activePlanId && (
+          <Card className="shadow-md border-destructive bg-destructive/10">
+            <CardHeader>
+              <CardTitle className="text-destructive flex items-center">
+                <Ban className="w-5 h-5 mr-2" />
+                {t('activeWorkoutPage.workoutInProgressTitle', { default: 'Workout In Progress' })}
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p className="text-sm text-destructive-foreground">
+                {t('activeWorkoutPage.finishCurrentWorkoutPrompt', { default: 'You have an active workout. Please finish or abandon it before starting a new one.' })}
+              </p>
+              <Button asChild variant="outline" className="mt-3">
+                <Link href={`/workouts/${activePlanId}/active`}>{t('resumeWorkoutButton.resumeTitle')}</Link>
+              </Button>
+            </CardContent>
+          </Card>
+        )}
         <Card className="shadow-lg">
           <CardHeader>
             <CardTitle>{t('startWorkoutPage.selectPlanTitle')}</CardTitle>
@@ -34,12 +54,17 @@ export default function StartWorkoutPage() {
             {availablePlans.length > 0 ? (
               <div className="space-y-4">
                 {availablePlans.map((plan) => (
-                  <Card key={plan.id} className="flex items-center justify-between p-4">
-                    <div>
+                  <Card key={plan.id} className="flex flex-col sm:flex-row items-start sm:items-center justify-between p-4 gap-3">
+                    <div className="flex-grow">
                       <h3 className="font-semibold">{plan.name}</h3>
                       <p className="text-sm text-muted-foreground">{plan.description}</p>
                     </div>
-                    <Button asChild size="sm">
+                    <Button 
+                      asChild 
+                      size="sm" 
+                      disabled={!!(activeWorkoutIsClient && activePlanId)}
+                      className="w-full sm:w-auto"
+                    >
                       <Link href={`/workouts/${plan.id}/active`}>
                         <PlayCircle className="w-4 h-4 mr-2" />
                         {t('startWorkoutPage.startPlanButton')}
@@ -49,25 +74,12 @@ export default function StartWorkoutPage() {
                 ))}
               </div>
             ) : (
-              <p className="text-muted-foreground">{t('startWorkoutPage.noPlansAvailable')}</p>
+              <p className="text-muted-foreground text-center py-4">{t('startWorkoutPage.noPlansAvailable')}</p>
             )}
           </CardContent>
         </Card>
-
-        {/* Placeholder for ad-hoc workout, can be expanded later */}
-        {/* 
-        <Card className="shadow-lg">
-          <CardHeader>
-            <CardTitle>{t('startWorkoutPage.startAdHocButton')}</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <Button className="w-full" disabled>
-              {t('startWorkoutPage.startAdHocButton')} (Coming Soon)
-            </Button>
-          </CardContent>
-        </Card>
-        */}
       </div>
     </>
   );
 }
+// Add translations for activeWorkoutPage.workoutInProgressTitle and activeWorkoutPage.finishCurrentWorkoutPrompt

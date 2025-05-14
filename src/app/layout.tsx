@@ -5,6 +5,8 @@ import './globals.css';
 import { Toaster } from '@/components/ui/toaster';
 import { ThemeProvider } from '@/components/theme-provider';
 import { LanguageProvider } from '@/context/language-context';
+import { ActiveWorkoutProvider } from '@/context/active-workout-context';
+import { WeeklyScheduleProvider } from '@/context/weekly-schedule-context';
 
 const geistSans = Geist({
   variable: '--font-geist-sans',
@@ -37,8 +39,12 @@ export default function RootLayout({
           storageKey="app-theme"
         >
           <LanguageProvider>
-            {children}
-            <Toaster />
+            <ActiveWorkoutProvider>
+              <WeeklyScheduleProvider>
+                {children}
+                <Toaster />
+              </WeeklyScheduleProvider>
+            </ActiveWorkoutProvider>
           </LanguageProvider>
         </ThemeProvider>
       </body>

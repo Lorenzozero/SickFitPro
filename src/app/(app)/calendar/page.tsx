@@ -24,29 +24,8 @@ import {
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { useLanguage } from '@/context/language-context';
 import { useToast } from '@/hooks/use-toast';
-import { MuscleGroupIcons, type MuscleGroup } from '@/components/shared/muscle-group-icons';
-
-interface ScheduledWorkout {
-  id: string;
-  planId: string;
-  planName: string;
-}
-
-interface WorkoutPlanOption {
-  id:string;
-  nameKey: string;
-  defaultName: string;
-  muscleGroups: MuscleGroup[];
-}
-
-const availableWorkoutPlans: WorkoutPlanOption[] = [
-  { id: '1', nameKey: 'calendarPage.samplePlan1', defaultName: 'Full Body Blast', muscleGroups: ['Full Body'] },
-  { id: '2', nameKey: 'calendarPage.samplePlan2', defaultName: 'Upper Body Power', muscleGroups: ['Chest', 'Back', 'Shoulders', 'Biceps', 'Triceps'] },
-  { id: '3', nameKey: 'calendarPage.samplePlan3', defaultName: 'Leg Day Domination', muscleGroups: ['Legs', 'Abs'] },
-  { id: '4', nameKey: 'calendarPage.samplePlan4', defaultName: 'Cardio Session', muscleGroups: ['Cardio'] },
-];
-
-const dayKeys = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'];
+import { MuscleGroupIcons } from '@/components/shared/muscle-group-icons';
+import { useWeeklySchedule, type ScheduledWorkout, type WorkoutPlanOption, dayKeys } from '@/context/weekly-schedule-context';
 
 interface DayScheduleContentProps {
   dayKey: string;
@@ -107,20 +86,18 @@ const DayScheduleContent: React.FC<DayScheduleContentProps> = ({
 export default function CalendarPage() {
   const { t } = useLanguage();
   const { toast } = useToast();
+  const { 
+    weeklySchedule, 
+    availableWorkoutPlans, 
+    addWorkoutToDay, 
+    deleteWorkoutFromDay, 
+    isClient: scheduleIsClient 
+  } = useWeeklySchedule();
+
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [selectedDayForDialog, setSelectedDayForDialog] = useState<string | null>(null);
   const [selectedWorkoutPlanId, setSelectedWorkoutPlanId] = useState<string | undefined>(availableWorkoutPlans[0]?.id);
   
-  const [weeklySchedule, setWeeklySchedule] = useState<Record<string, ScheduledWorkout[]>>(
-    dayKeys.reduce((acc, day) => ({ ...acc, [day]: [] }), {})
-  );
-  const [isClient, setIsClient] = useState(false);
-
-  useEffect(() => {
-    setIsClient(true);
-  }, []);
-
-
   const handleOpenDialog = (dayKey: string) => {
     setSelectedDayForDialog(dayKey);
     setSelectedWorkoutPlanId(availableWorkoutPlans[0]?.id);
@@ -140,21 +117,12 @@ export default function CalendarPage() {
         return;
     }
 
-    const newWorkout: ScheduledWorkout = {
-      id: String(Date.now()),
-      planId: selectedWorkoutPlanId,
-      planName: t(plan.nameKey) || plan.defaultName,
-    };
-    
-    setWeeklySchedule(prev => {
-      const updatedWorkoutsForDay = [...(prev[selectedDayForDialog] || []), newWorkout];
-      return { ...prev, [selectedDayForDialog]: updatedWorkoutsForDay };
-    });
+    addWorkoutToDay(selectedDayForDialog, selectedWorkoutPlanId);
     
     toast({ 
         title: t('calendarPage.toastWorkoutScheduledTitle', {default: "Workout Scheduled!"}), 
         description: t('calendarPage.toastWorkoutScheduledDescriptionNoTime', { 
-            planName: newWorkout.planName, 
+            planName: t(plan.nameKey, { default: plan.defaultName}), 
             dayOfWeek: t(`calendarPage.days.${selectedDayForDialog}`),
         })
     });
@@ -163,15 +131,12 @@ export default function CalendarPage() {
   };
 
   const handleDeleteWorkoutFromWeek = (dayKey: string, workoutId: string) => {
-    setWeeklySchedule(prev => {
-        const updatedWorkoutsForDay = (prev[dayKey] || []).filter(w => w.id !== workoutId);
-        return {...prev, [dayKey]: updatedWorkoutsForDay};
-    });
+    deleteWorkoutFromDay(dayKey, workoutId);
     toast({ title: t('calendarPage.toastWorkoutRemovedTitle', { default: "Workout Removed" }), variant: "destructive"});
   }
 
 
-  if (!isClient) {
+  if (!scheduleIsClient) {
     return (
       <>
         <PageHeader
@@ -218,12 +183,12 @@ export default function CalendarPage() {
           </div>
 
           {/* Desktop View */}
-          <div className="hidden md:block overflow-x-auto">
-            <Table className="min-w-full">
+          <div className="hidden md:block"> {/* Removed overflow-x-auto to rely on page scroll if needed */}
+            <Table className="min-w-full md:min-w-0"> {/* Ensured table doesn't force overflow on md unless content demands */}
               <TableHeader>
                 <TableRow>
                   {dayKeys.map(dayKey => (
-                    <TableHead key={`desktop-head-${dayKey}`} className="text-center capitalize p-2 md:p-4 w-[14.28%] min-w-[100px]">
+                    <TableHead key={`desktop-head-${dayKey}`} className="text-center capitalize p-2 md:p-4 w-[14.28%] min-w-[120px] md:min-w-[100px]">
                       {t(`calendarPage.days.${dayKey}`)}
                     </TableHead>
                   ))}
@@ -273,7 +238,7 @@ export default function CalendarPage() {
                   <SelectContent>
                     {availableWorkoutPlans.map(plan => (
                         <SelectItem key={plan.id} value={plan.id}>
-                            {t(plan.nameKey) || plan.defaultName}
+                            {t(plan.nameKey, { default: plan.defaultName })}
                         </SelectItem>
                     ))}
                   </SelectContent>

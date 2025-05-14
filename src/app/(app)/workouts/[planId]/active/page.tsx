@@ -10,13 +10,14 @@ import { Label } from '@/components/ui/label';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Progress } from '@/components/ui/progress';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
-import { CheckCircle, XCircle, Timer, Play, Pause, PlusCircle, Trash2, Award, Repeat } from 'lucide-react';
+import { CheckCircle, XCircle, Timer, Play, Pause, PlusCircle, Trash2, Award } from 'lucide-react'; // Removed Repeat
 import { useLanguage } from '@/context/language-context';
-import { useEffect, useState, useRef, useCallback } from 'react';
+import { useEffect, useState, useRef } from 'react'; // Removed useCallback
 import Image from 'next/image';
 import { useToast } from '@/hooks/use-toast';
 import { cn } from '@/lib/utils';
-import { Skeleton } from '@/components/ui/skeleton'; // Added Skeleton for loading state
+import { Skeleton } from '@/components/ui/skeleton';
+import { useActiveWorkout } from '@/context/active-workout-context'; // Added
 
 // Mock data for workout plans
 const mockWorkoutPlans = [
@@ -72,7 +73,7 @@ interface LoggedSet {
   id: string;
   reps: string;
   weight: string;
-  date: string; // Added date
+  date: string;
 }
 
 interface ActiveExercise extends ExerciseMock {
@@ -240,32 +241,39 @@ export default function ActiveWorkoutPage() {
   const router = useRouter();
   const { t } = useLanguage();
   const { toast } = useToast();
+  const { startActiveWorkout, clearActiveWorkout, activeWorkoutStartTime: contextStartTime, isClient: activeWorkoutIsClient } = useActiveWorkout();
+
 
   const [plan, setPlan] = useState<WorkoutPlan | null | undefined>(undefined);
   const [activeWorkout, setActiveWorkout] = useState<ActiveExercise[] | null>(null);
   
-  const [workoutStartTime, setWorkoutStartTime] = useState<Date | null>(null);
+  const [componentWorkoutStartTime, setComponentWorkoutStartTime] = useState<Date | null>(null);
   const [elapsedTime, setElapsedTime] = useState('00:00');
   const [isTimerRunning, setIsTimerRunning] = useState(false);
   const [isFinished, setIsFinished] = useState(false);
   const [visibleExerciseId, setVisibleExerciseId] = useState<string | null>(null);
-  const [isClient, setIsClient] = useState(false); // For client-side rendering control
   
   const exerciseRefs = useRef<(HTMLDivElement | null)[]>([]);
   const planId = typeof params.planId === 'string' ? params.planId : undefined;
 
   useEffect(() => {
-    setIsClient(true); // Component has mounted on client
     if (planId) {
       const foundPlan = mockWorkoutPlans.find(p => p.id === planId);
       setPlan(foundPlan || null);
       if (foundPlan) {
+        startActiveWorkout(foundPlan.id, foundPlan.name);
         const initialActiveWorkout = foundPlan.exercises.map(ex => ({ ...ex, loggedSets: [] }));
         setActiveWorkout(initialActiveWorkout);
-        setWorkoutStartTime(new Date());
+
+        if (contextStartTime) {
+            setComponentWorkoutStartTime(new Date(contextStartTime));
+        } else {
+            setComponentWorkoutStartTime(new Date());
+        }
         setIsTimerRunning(true);
+
         if (initialActiveWorkout.length > 0) {
-            setVisibleExerciseId(initialActiveWorkout[0].id); // Set first exercise as visible initially
+            setVisibleExerciseId(initialActiveWorkout[0].id); 
             exerciseRefs.current = initialActiveWorkout.map(() => null);
         }
       } else {
@@ -275,14 +283,14 @@ export default function ActiveWorkoutPage() {
       setPlan(null);
       setActiveWorkout(null);
     }
-  }, [planId]);
+  }, [planId, startActiveWorkout, contextStartTime]);
 
   useEffect(() => {
     let interval: NodeJS.Timeout | undefined;
-    if (isTimerRunning && workoutStartTime && isClient) { // Ensure timer runs only on client
+    if (isTimerRunning && componentWorkoutStartTime && activeWorkoutIsClient) {
       interval = setInterval(() => {
         const now = new Date();
-        const diff = now.getTime() - workoutStartTime.getTime();
+        const diff = now.getTime() - componentWorkoutStartTime.getTime();
         const minutes = Math.floor(diff / 60000);
         const seconds = Math.floor((diff % 60000) / 1000);
         setElapsedTime(`${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`);
@@ -293,10 +301,10 @@ export default function ActiveWorkoutPage() {
     return () => {
       if (interval) clearInterval(interval);
     };
-  }, [isTimerRunning, workoutStartTime, isClient]);
+  }, [isTimerRunning, componentWorkoutStartTime, activeWorkoutIsClient]);
 
   useEffect(() => {
-    if (!activeWorkout || activeWorkout.length === 0 || !isClient) return;
+    if (!activeWorkout || activeWorkout.length === 0 || !activeWorkoutIsClient) return;
 
     const observer = new IntersectionObserver(
       (entries) => {
@@ -319,7 +327,7 @@ export default function ActiveWorkoutPage() {
       });
       observer.disconnect();
     };
-  }, [activeWorkout, isClient]);
+  }, [activeWorkout, activeWorkoutIsClient]);
 
 
   const updateExerciseData = (exerciseId: string, updatedLoggedSets: LoggedSet[]) => {
@@ -368,6 +376,7 @@ export default function ActiveWorkoutPage() {
   const handleFinishWorkout = () => {
     setIsTimerRunning(false);
     setIsFinished(true);
+    clearActiveWorkout(); // Clear from global state
     toast({ 
         title: t('activeWorkoutPage.toastWorkoutFinishedTitle'), 
         description: t('activeWorkoutPage.toastWorkoutFinishedDescription', { duration: elapsedTime }) 
@@ -380,11 +389,11 @@ export default function ActiveWorkoutPage() {
     : 0;
 
 
-  if (!isClient || plan === undefined) { // Show loading skeleton if not client or plan is loading
+  if (!activeWorkoutIsClient || plan === undefined) { 
     return (
         <>
             <PageHeader title={t('activeWorkoutPage.loadingWorkout')} description={t('activeWorkoutPage.loadingDescription')} />
-            <Skeleton className="h-8 w-full mb-6" /> {/* For progress bar */}
+            <Skeleton className="h-8 w-full mb-6" />
             <div className="space-y-8">
                 {[1,2,3].map(i => (
                     <Card key={i} className="shadow-xl overflow-hidden">

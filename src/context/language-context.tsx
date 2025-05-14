@@ -38,7 +38,6 @@ const translations: Record<Language, Translations> = {
     dashboard: {
       welcomeTitle: 'Welcome to SickFit Pro!',
       welcomeDescription: "Your journey to peak fitness starts here. Let's get to work.",
-      workoutsPlannedToday: 'Workouts Planned Today',
       workoutsThisWeek: 'Workouts This Week', 
       weightLifted: 'Total Weight Lifted', 
       currentWeight: 'Current Weight',
@@ -52,6 +51,8 @@ const translations: Record<Language, Translations> = {
       activityAndHistoryDescription: "Start a new workout or review your past sessions.",
       noWorkoutHistory: "No workout history yet. Complete a workout to see it here!",
       viewAllHistoryButton: "View All History",
+      todayIsRestDay: "Today is a rest day! Enjoy it! 😊",
+      noWorkoutScheduledForToday: "No workout scheduled for today.",
     },
     waterIntakeCard: {
       title: "Water Intake",
@@ -398,6 +399,10 @@ const translations: Record<Language, Translations> = {
         description: "Manage your daily nutritional intake and hydration.",
     },
     toastErrorTitle: "Error",
+    resumeWorkoutButton: {
+      resumeTitle: "Resume Workout",
+      resume: "Resume: {planName}",
+    }
   },
   it: {
     nav: {
@@ -423,7 +428,6 @@ const translations: Record<Language, Translations> = {
     dashboard: {
       welcomeTitle: 'Benvenuto in SickFit Pro!',
       welcomeDescription: 'Il tuo viaggio verso la forma fisica ottimale inizia qui. Mettiamoci al lavoro.',
-      workoutsPlannedToday: 'Allenamenti Previsti Oggi',
       workoutsThisWeek: 'Allenamenti Settimanali', 
       weightLifted: 'Peso Totale Sollevato',
       currentWeight: 'Peso Attuale',
@@ -437,6 +441,8 @@ const translations: Record<Language, Translations> = {
       activityAndHistoryDescription: "Inizia un nuovo allenamento o rivedi le tue sessioni passate.",
       noWorkoutHistory: "Nessuno storico allenamenti ancora. Completa un allenamento per vederlo qui!",
       viewAllHistoryButton: "Visualizza Tutto lo Storico",
+      todayIsRestDay: "Oggi è giorno di riposo! Goditelo! 😊",
+      noWorkoutScheduledForToday: "Nessun allenamento programmato per oggi.",
     },
     waterIntakeCard: {
       title: "Apporto Idrico",
@@ -783,6 +789,10 @@ const translations: Record<Language, Translations> = {
         description: "Gestisci il tuo apporto nutrizionale giornaliero e l'idratazione.",
     },
     toastErrorTitle: "Errore",
+    resumeWorkoutButton: {
+      resumeTitle: "Riprendi Allenamento",
+      resume: "Riprendi: {planName}",
+    }
   },
   es: { 
     nav: {
@@ -808,7 +818,6 @@ const translations: Record<Language, Translations> = {
      dashboard: {
       welcomeTitle: '¡Bienvenido a SickFit Pro!',
       welcomeDescription: "Tu viaje hacia la máxima forma física comienza aquí. ¡Manos a la obra!",
-      workoutsPlannedToday: 'Entrenamientos Planeados Hoy',
       workoutsThisWeek: 'Entrenamientos Esta Semana',
       weightLifted: 'Peso Total Levantado',
       currentWeight: 'Peso Actual',
@@ -822,6 +831,8 @@ const translations: Record<Language, Translations> = {
       activityAndHistoryDescription: "Comienza un nuevo entrenamiento o revisa tus sesiones pasadas.",
       noWorkoutHistory: "Aún no hay historial de entrenamientos. ¡Completa un entrenamiento para verlo aquí!",
       viewAllHistoryButton: "Ver Todo el Historial",
+      todayIsRestDay: "¡Hoy es día de descanso! ¡Disfrútalo! 😊",
+      noWorkoutScheduledForToday: "Ningún entrenamiento programado para hoy.",
     },
     settingsPage: {
       title: 'Configuración',
@@ -1150,6 +1161,10 @@ const translations: Record<Language, Translations> = {
         maxRepsLabel: "Rep. Máx.",
         repsUnitLabel: "reps",
     },
+    resumeWorkoutButton: {
+      resumeTitle: "Reanudar Entrenamiento",
+      resume: "Reanudar: {planName}",
+    }
   },
   fr: { 
     nav: {
@@ -1175,7 +1190,6 @@ const translations: Record<Language, Translations> = {
      dashboard: {
       welcomeTitle: 'Bienvenue sur SickFit Pro !',
       welcomeDescription: "Votre parcours vers une forme optimale commence ici. Mettons-nous au travail.",
-      workoutsPlannedToday: 'Entraînements Prévus Aujourd\'hui',
       workoutsThisWeek: 'Entraînements Cette Semaine',
       weightLifted: 'Poids Total Soulevé',
       currentWeight: 'Poids Actuel',
@@ -1189,6 +1203,8 @@ const translations: Record<Language, Translations> = {
       activityAndHistoryDescription: "Commencez un nouvel entraînement ou consultez vos sessions passées.",
       noWorkoutHistory: "Aucun historique d'entraînement pour le moment. Terminez un entraînement pour le voir ici !",
       viewAllHistoryButton: "Voir Tout l'Historique",
+      todayIsRestDay: "Aujourd'hui, c'est jour de repos ! Profitez-en ! 😊",
+      noWorkoutScheduledForToday: "Aucun entraînement programmé pour aujourd'hui.",
     },
     settingsPage: {
       title: 'Paramètres',
@@ -1517,6 +1533,10 @@ const translations: Record<Language, Translations> = {
         maxRepsLabel: "Rép. Max",
         repsUnitLabel: "réps",
     },
+    resumeWorkoutButton: {
+      resumeTitle: "Reprendre l'entraînement",
+      resume: "Reprendre : {planName}",
+    }
   }
 };
 

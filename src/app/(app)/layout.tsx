@@ -36,6 +36,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { useTheme } from '@/components/theme-provider';
 import { useLanguage } from '@/context/language-context';
+import ResumeWorkoutButton from '@/components/shared/resume-workout-button'; // Added
 
 export default function AppLayout({ children }: { children: ReactNode }) {
   const { theme, setTheme, resolvedTheme } = useTheme();
@@ -129,6 +130,7 @@ export default function AppLayout({ children }: { children: ReactNode }) {
         <main className="flex-1 p-4 md:p-6 lg:p-8">
           {children}
         </main>
+        <ResumeWorkoutButton /> {/* Added floating resume button */}
       </SidebarInset>
     </SidebarProvider>
   );
