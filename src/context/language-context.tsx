@@ -329,8 +329,8 @@ const translations: Record<Language, Translations> = {
         title: "Workout Plans",
         description: "Create, manage, and share your training schedules.",
         createNewPlanButton: "Create New Plan",
-        exercisesLabel: "Exercises",
-        estDurationLabel: "Est. Duration",
+        exercisesLabel: "Exercises", // Retained for dialog, but not card
+        estDurationLabel: "Est. Duration", // Retained for dialog, but not card
         startButton: "Start",
         dialogEditTitle: "Edit Workout Plan",
         dialogEditDescription: "Update the details of your workout plan.",
@@ -357,7 +357,8 @@ const translations: Record<Language, Translations> = {
         toastLinkCopiedTitle: "Link Copied!",
         toastLinkCopiedDescription: "Workout plan link copied to clipboard.",
         muscleSilhouetteAlt: "Muscle groups involved in the plan",
-        muscleGroupsLabel: "Muscle Groups",
+        involvedMusclesLabel: "Muscles Involved:",
+        noMuscleGroupsSpecified: "N/A"
     },
      startWorkoutPage: {
       title: "Start New Workout",
@@ -735,8 +736,8 @@ const translations: Record<Language, Translations> = {
         title: "Schede Allenamento",
         description: "Crea, gestisci e condividi i tuoi programmi di allenamento.",
         createNewPlanButton: "Crea Nuova Scheda",
-        exercisesLabel: "Esercizi",
-        estDurationLabel: "Durata Stimata",
+        exercisesLabel: "Esercizi", // Mantenuto per dialog, non per card
+        estDurationLabel: "Durata Stimata", // Mantenuto per dialog, non per card
         startButton: "Inizia",
         dialogEditTitle: "Modifica Scheda Allenamento",
         dialogEditDescription: "Aggiorna i dettagli della tua scheda di allenamento.",
@@ -763,7 +764,8 @@ const translations: Record<Language, Translations> = {
         toastLinkCopiedTitle: "Link Copiato!",
         toastLinkCopiedDescription: "Link della scheda di allenamento copiato negli appunti.",
         muscleSilhouetteAlt: "Gruppi muscolari coinvolti nella scheda",
-        muscleGroupsLabel: "Gruppi Muscolari",
+        involvedMusclesLabel: "Muscoli Coinvolti:",
+        noMuscleGroupsSpecified: "N/D"
     },
     startWorkoutPage: {
       title: "Inizia Nuovo Allenamento",
@@ -1132,8 +1134,8 @@ const translations: Record<Language, Translations> = {
         title: "Planes de Entrenamiento",
         description: "Crea, gestiona y comparte tus horarios de entrenamiento.",
         createNewPlanButton: "Crear Nuevo Plan",
-        exercisesLabel: "Ejercicios",
-        estDurationLabel: "Duración Estimada",
+        exercisesLabel: "Ejercicios", // Retenido para diálogo, no para tarjeta
+        estDurationLabel: "Duración Estimada", // Retenido para diálogo, no para tarjeta
         startButton: "Empezar",
         dialogEditTitle: "Editar Plan de Entrenamiento",
         dialogEditDescription: "Actualiza los detalles de tu plan de entrenamiento.",
@@ -1158,7 +1160,8 @@ const translations: Record<Language, Translations> = {
         toastLinkCopiedTitle: "¡Enlace Copiado!",
         toastLinkCopiedDescription: "Enlace del plan de entrenamiento copiado al portapapeles.",
         muscleSilhouetteAlt: "Grupos musculares involucrados en el plan",
-        muscleGroupsLabel: "Grupos Musculares",
+        involvedMusclesLabel: "Músculos Involucrados:",
+        noMuscleGroupsSpecified: "N/A"
     },
     startWorkoutPage: {
       title: "Empezar Nuevo Entrenamiento",
@@ -1520,8 +1523,8 @@ const translations: Record<Language, Translations> = {
         title: "Programmes d'Entraînement",
         description: "Créez, gérez et partagez vos programmes d'entraînement.",
         createNewPlanButton: "Créer un Nouveau Programme",
-        exercisesLabel: "Exercices",
-        estDurationLabel: "Durée Estimée",
+        exercisesLabel: "Exercices", // Conservé pour la boîte de dialogue, pas pour la carte
+        estDurationLabel: "Durée Estimée", // Conservé pour la boîte de dialogue, pas pour la carte
         startButton: "Commencer",
         dialogEditTitle: "Modifier le Programme d'Entraînement",
         dialogEditDescription: "Mettez à jour les détails de votre programme d'entraînement.",
@@ -1546,7 +1549,8 @@ const translations: Record<Language, Translations> = {
         toastLinkCopiedTitle: "Lien Copié !",
         toastLinkCopiedDescription: "Lien du programme d'entraînement copié dans le presse-papiers.",
         muscleSilhouetteAlt: "Groupes musculaires impliqués dans le programme",
-        muscleGroupsLabel: "Groupes Musculaires",
+        involvedMusclesLabel: "Muscles Impliqués :",
+        noMuscleGroupsSpecified: "N/A"
     },
     startWorkoutPage: {
       title: "Commencer un Nouvel Entraînement",

@@ -6,8 +6,8 @@ import Link from 'next/link';
 import Image from 'next/image'; 
 import { PageHeader } from '@/components/shared/page-header';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card'; 
-import { PlusCircle, Edit2, Trash2, Share2, PlayCircle, ListChecks, Ban } from 'lucide-react';
+import { Card, CardContent, CardFooter } from '@/components/ui/card'; 
+import { PlusCircle, Edit2, Trash2, Share2, PlayCircle, ListChecks, Ban, Clock } from 'lucide-react'; // Added Clock
 import {
   Dialog,
   DialogContent,
@@ -25,7 +25,7 @@ import { useLanguage } from '@/context/language-context';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { useActiveWorkout } from '@/context/active-workout-context';
 import { useRouter } from 'next/navigation';
-import { MuscleGroupIcons, type MuscleGroup } from '@/components/shared/muscle-group-icons'; 
+import type { MuscleGroup } from '@/components/shared/muscle-group-icons'; 
 
 interface ExerciseDetail {
   id: string;
@@ -37,7 +37,7 @@ interface ExerciseDetail {
 interface WorkoutPlan {
   id: string;
   name: string;
-  description: string;
+  description: string; // Kept for dialog, but not displayed on card summary
   exercises: number; 
   duration: string; 
   exerciseDetails: ExerciseDetail[];
@@ -206,12 +206,12 @@ export default function WorkoutPlansPage() {
       />
       {activeWorkoutIsClient && activePlanId && (
           <Card className="mb-6 shadow-md border-destructive bg-destructive/10">
-            <CardHeader className="p-4"> 
+            <UIDialogHeader className="p-4"> 
               <h3 className="text-destructive flex items-center font-semibold"> 
                 <Ban className="w-5 h-5 mr-2" />
                 {t('activeWorkoutPage.workoutInProgressTitle', { default: 'Workout In Progress' })}
               </h3>
-            </CardHeader>
+            </UIDialogHeader>
             <CardContent>
               <p className="text-sm text-destructive-foreground">
                  {t('activeWorkoutPage.finishCurrentWorkoutPrompt', { default: 'You have an active workout. Please finish or abandon it before starting a new one or creating/editing plans.' })}
@@ -223,49 +223,57 @@ export default function WorkoutPlansPage() {
           </Card>
         )}
 
-      <div className="space-y-4"> {/* Reduced space-y-6 to space-y-4 */}
+      <div className="space-y-4">
         {plans.map((plan) => (
           <Card key={plan.id} className="flex flex-col shadow-lg hover:shadow-xl transition-shadow duration-300">
             <CardContent className="flex-grow p-4">
               <div className="flex flex-col sm:flex-row items-start gap-4">
                 {/* Left: Image */}
-                <div className="relative w-full sm:w-32 h-44 flex-shrink-0"> {/* Adjusted image size */}
+                <div className="relative w-full sm:w-36 h-48 flex-shrink-0">
                   <Image 
-                      src="https://placehold.co/128x176.png" // Adjusted placeholder size to match new h-44
+                      src={
+                        plan.id === '1' ? "https://placehold.co/144x192.png" :
+                        plan.id === '2' ? "https://placehold.co/144x192.png" :
+                        "https://placehold.co/144x192.png" 
+                      }
                       alt={t('workoutPlansPage.muscleSilhouetteAlt', {default: 'Muscle groups involved'})} 
                       layout="fill"
-                      objectFit="contain" 
+                      objectFit="cover" 
                       className="rounded-sm"
-                      data-ai-hint="muscle map human anatomy"
+                      data-ai-hint={
+                        plan.id === '1' ? "energetic fitness" :
+                        plan.id === '2' ? "strength arms" :
+                        "powerful legs"
+                      }
                   />
                 </div>
 
                 {/* Right: Details */}
-                <div className="flex-grow space-y-1.5"> {/* Reduced space-y-2 to space-y-1.5 */}
+                <div className="flex-grow space-y-1.5">
                   <h3 className="text-xl font-semibold text-primary">{plan.name}</h3>
                   
-                  <div className="flex items-center gap-2">
-                    <span className="text-xs font-medium text-muted-foreground uppercase tracking-wider">{t('workoutPlansPage.muscleGroupsLabel', {default: 'Muscles'})}:</span>
-                    <MuscleGroupIcons muscleGroups={plan.muscleGroups} iconClassName="w-3.5 h-3.5 text-accent" /> {/* Slightly larger icons */}
+                  <div>
+                    <h4 className="text-sm font-semibold text-muted-foreground mb-0.5">
+                        {t('workoutPlansPage.involvedMusclesLabel', { default: "Muscles Involved:"})}
+                    </h4>
+                    {plan.muscleGroups && plan.muscleGroups.length > 0 ? (
+                        <ul className="list-disc list-inside text-xs space-y-0.5 pl-4 text-muted-foreground">
+                            {plan.muscleGroups.map(group => <li key={group}>{group}</li>)}
+                        </ul>
+                    ) : (
+                        <p className="text-xs text-muted-foreground">{t('workoutPlansPage.noMuscleGroupsSpecified', {default: 'N/A'})}</p>
+                    )}
                   </div>
                   
-                  <p className="text-sm text-muted-foreground">{t('workoutPlansPage.exercisesLabel')}: {plan.exercises}</p>
-                  <p className="text-sm text-muted-foreground">{t('workoutPlansPage.estDurationLabel')}: {plan.duration}</p>
-                  
-                  {plan.exerciseDetails && plan.exerciseDetails.length > 0 && (
-                    <div className="mt-2"> {/* Reduced mt-3 to mt-2 */}
-                        <h4 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1">{t('workoutPlansPage.exercisesLabel')}</h4>
-                        <ScrollArea className="h-20"> {/* Reduced h-24 to h-20 */}
-                            <ul className="list-disc list-inside text-xs space-y-0.5 pr-2">
-                                {plan.exerciseDetails.map(ex => <li key={ex.id} className="truncate">{ex.name} ({ex.sets}x{ex.reps})</li>)}
-                            </ul>
-                        </ScrollArea>
-                    </div>
-                  )}
+                  <div className="flex items-center text-sm text-muted-foreground">
+                    <Clock className="w-3.5 h-3.5 mr-1.5" /> 
+                    <span>{plan.duration}</span>
+                  </div>
+
                 </div>
               </div>
             </CardContent>
-            <CardFooter className="flex flex-col sm:flex-row justify-between items-center gap-2 pt-3 border-t p-3"> {/* Reduced padding */}
+            <CardFooter className="flex flex-col sm:flex-row justify-between items-center gap-2 pt-3 border-t p-3">
               <Button 
                 variant="default" 
                 size="sm"
@@ -333,12 +341,12 @@ export default function WorkoutPlansPage() {
                 
 
                 <Card className="mt-4">
-                  <CardHeader className="pb-2 p-4">
+                  <UIDialogHeader className="pb-2 p-4">
                     <h4 className="text-base flex items-center font-semibold">
                         <ListChecks className="w-4 h-4 mr-2" />
                         {t('workoutPlansPage.addExerciseButton')}
                     </h4>
-                  </CardHeader>
+                  </UIDialogHeader>
                   <CardContent className="space-y-3 p-4">
                     <div>
                       <Label htmlFor="newExerciseName">{t('workoutPlansPage.exerciseNameLabel')}</Label>
