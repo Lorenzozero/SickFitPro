@@ -73,18 +73,9 @@ export default function DashboardPage() {
         ))}
       </div>
 
-      <div className="mt-8 grid gap-6 md:grid-cols-1 lg:grid-cols-3">
-        <Card className="shadow-lg lg:col-span-1 flex flex-col justify-center">
-          <CardContent className="p-6">
-            <Button asChild className="w-full">
-              <Link href="/start-workout">
-                <PlayCircle className="w-4 h-4 mr-2"/> {isMounted ? t('dashboard.logNewWorkout') : 'Start Workout'}
-              </Link>
-            </Button>
-          </CardContent>
-        </Card>
-
-        <Card className="shadow-lg lg:col-span-2">
+      {/* Today's Focus card - now takes full width on larger screens if it's the only item in this grid row */}
+      <div className="mt-8 grid gap-6 md:grid-cols-1 lg:grid-cols-1"> {/* Changed lg:grid-cols-3 to lg:grid-cols-1 */}
+        <Card className="shadow-lg"> {/* Removed lg:col-span-2 */}
           <CardHeader>
             <CardTitle>{isMounted ? t('dashboard.todaysFocus') : "Today's Focus"}</CardTitle>
             <CardDescription>{isMounted ? t('dashboard.todaysFocusDescription') : "What's on the agenda?"}</CardDescription>
@@ -102,12 +93,21 @@ export default function DashboardPage() {
         </Card>
       </div>
 
+      {/* Combined Start Workout and Activity History Card */}
       <Card className="mt-8 shadow-lg">
         <CardHeader>
-          <CardTitle>{isMounted ? t('dashboard.workoutHistoryTitle') : "Workout History"}</CardTitle>
-          <CardDescription>{isMounted ? t('dashboard.workoutHistoryDescription') : "Review your past sessions."}</CardDescription>
+          <CardTitle>{isMounted ? t('dashboard.activityAndHistoryTitle') : "Activity & History"}</CardTitle>
+          <CardDescription>{isMounted ? t('dashboard.activityAndHistoryDescription') : "Start a new workout or review your past sessions."}</CardDescription>
         </CardHeader>
         <CardContent>
+          <div className="mb-6">
+            <Button asChild className="w-full">
+              <Link href="/start-workout">
+                <PlayCircle className="w-4 h-4 mr-2"/> {isMounted ? t('dashboard.logNewWorkout') : 'Start Workout'}
+              </Link>
+            </Button>
+          </div>
+
           {mockWorkoutHistory.length > 0 ? (
             <ScrollArea className="h-72">
               <ul className="space-y-3 pr-4">
