@@ -31,16 +31,14 @@ export default function AiHealthAdvisorForm() {
   const [adviceResult, setAdviceResult] = useState<HealthAdviceOutput | null>(null);
 
   const formValidationSchema = useMemo(() => {
-    return z.object({ // We define the schema for the form fields directly
+    return z.object({
       userQuery: z.string()
         .optional()
         .refine(val => {
-          // If the value is present (not undefined and not an empty string), then its length must be >= 10.
-          // If it's undefined or an empty string, it's considered valid.
           if (val && val.length > 0) {
             return val.length >= 10;
           }
-          return true; // Valid if undefined or empty string
+          return true; 
         }, { message: t('aiHealthAdvisor.userQueryMinError') }),
     });
   }, [t]);
@@ -159,7 +157,6 @@ export default function AiHealthAdvisorForm() {
                       {...field}
                     />
                   </FormControl>
-                  <FormDescription>{t('aiHealthAdvisor.userQueryDescription')}</FormDescription>
                   <FormMessage />
                 </FormItem>
               )}
@@ -213,4 +210,3 @@ export default function AiHealthAdvisorForm() {
     </Card>
   );
 }
-
