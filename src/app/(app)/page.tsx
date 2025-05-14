@@ -63,7 +63,7 @@ export default function DashboardPage() {
         return {
             ...scheduledWorkout,
             planName: planDetails ? t(planDetails.nameKey, {default: planDetails.defaultName}) : scheduledWorkout.planName,
-            duration: planDetails?.duration, // Get duration from planDetails
+            duration: planDetails?.duration,
         };
     });
   }, [isMounted, today, scheduleIsClient, weeklySchedule, availableWorkoutPlans, t]);
@@ -120,11 +120,10 @@ export default function DashboardPage() {
             <CardDescription>{isMounted ? t('dashboard.todaysFocusDescription') : "What's on the agenda?"}</CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="p-4 text-center border-2 border-dashed rounded-lg border-border min-h-[180px] flex flex-col justify-center" data-ai-hint="workout routine">
+            <div className="relative p-4 text-center border-2 border-dashed rounded-lg border-border min-h-[180px] flex flex-col justify-center" data-ai-hint="workout routine">
               {isMounted && scheduleIsClient && languageContextIsClient ? (
                 todaysWorkoutsDetails.length > 0 ? (
                   <>
-                    <CalendarDays className="w-10 h-10 mx-auto mb-2 text-primary" />
                     {todaysWorkoutsDetails.map(workout => (
                       <div key={workout.id} className="mb-2">
                         <p className="text-xl font-semibold text-primary">{workout.planName}</p>
@@ -149,9 +148,9 @@ export default function DashboardPage() {
                   <p className="font-semibold">{t('dashboard.viewCalendarToSeeWorkout')}</p>
                  </>
               )}
-              <Button asChild variant="link" className="mt-2">
-                <Link href="/calendar">{isMounted ? t('dashboard.viewFullSchedule') : "View Schedule"}</Link>
-              </Button>
+              <Link href="/calendar" className="absolute bottom-3 right-3 text-primary hover:text-accent transition-colors" aria-label={t('dashboard.viewFullSchedule', { default: "View Full Schedule"})}>
+                <CalendarDays className="w-6 h-6" />
+              </Link>
             </div>
           </CardContent>
         </Card>
