@@ -1,3 +1,4 @@
+
 "use client"
 
 import * as React from "react"
@@ -15,7 +16,7 @@ const SelectValue = SelectPrimitive.Value
 const SelectTrigger = React.forwardRef<
   React.ElementRef<typeof SelectPrimitive.Trigger>,
   React.ComponentPropsWithoutRef<typeof SelectPrimitive.Trigger>
->(({ className, children, ...props }, ref) => (
+>(({ className, children, asChild = false, ...props }, ref) => ( // Destructure asChild
   <SelectPrimitive.Trigger
     ref={ref}
     className={cn(
@@ -23,11 +24,18 @@ const SelectTrigger = React.forwardRef<
       className
     )}
     {...props}
+    asChild={asChild} // Pass asChild to the primitive
   >
-    {children}
-    <SelectPrimitive.Icon asChild>
-      <ChevronDown className="h-4 w-4 opacity-50" />
-    </SelectPrimitive.Icon>
+    {asChild ? (
+      children // If asChild, render only consumer's children
+    ) : (
+      <>
+        {children} {/* Default: render consumer's children and the icon */}
+        <SelectPrimitive.Icon asChild>
+          <ChevronDown className="h-4 w-4 opacity-50" />
+        </SelectPrimitive.Icon>
+      </>
+    )}
   </SelectPrimitive.Trigger>
 ))
 SelectTrigger.displayName = SelectPrimitive.Trigger.displayName
