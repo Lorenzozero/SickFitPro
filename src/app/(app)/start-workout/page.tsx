@@ -1,13 +1,13 @@
-
 'use client';
 
 import Link from 'next/link';
 import { PageHeader } from '@/components/shared/page-header';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'; // Removed CardDescription
-import { PlayCircle, Ban } from 'lucide-react'; // Added Ban
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { PlayCircle, Ban } from 'lucide-react';
 import { useLanguage } from '@/context/language-context';
-import { useActiveWorkout } from '@/context/active-workout-context'; // Added
+import { useActiveWorkout } from '@/context/active-workout-context';
+import { useRouter } from 'next/navigation';
 
 // Mock data - similar to initialWorkoutPlans in workouts/page.tsx for consistency
 const availablePlans = [
@@ -18,7 +18,17 @@ const availablePlans = [
 
 export default function StartWorkoutPage() {
   const { t } = useLanguage();
-  const { activePlanId, isClient: activeWorkoutIsClient } = useActiveWorkout();
+  const { activePlanId, isClient: activeWorkoutIsClient, startActiveWorkout: contextStartWorkout } = useActiveWorkout();
+  const router = useRouter();
+
+  const handleStartPlan = (planId: string, planName: string) => {
+    if (activeWorkoutIsClient && activePlanId) {
+      // Button should be disabled, but this is a safeguard
+      return;
+    }
+    contextStartWorkout(planId, planName);
+    router.push(`/workouts/${planId}/active`);
+  };
 
   return (
     <>
@@ -60,15 +70,13 @@ export default function StartWorkoutPage() {
                       <p className="text-sm text-muted-foreground">{plan.description}</p>
                     </div>
                     <Button 
-                      asChild 
                       size="sm" 
                       disabled={!!(activeWorkoutIsClient && activePlanId)}
                       className="w-full sm:w-auto"
+                      onClick={() => handleStartPlan(plan.id, plan.name)}
                     >
-                      <Link href={`/workouts/${plan.id}/active`}>
-                        <PlayCircle className="w-4 h-4 mr-2" />
-                        {t('startWorkoutPage.startPlanButton')}
-                      </Link>
+                      <PlayCircle className="w-4 h-4 mr-2" />
+                      {t('startWorkoutPage.startPlanButton')}
                     </Button>
                   </Card>
                 ))}
@@ -82,4 +90,3 @@ export default function StartWorkoutPage() {
     </>
   );
 }
-// Add translations for activeWorkoutPage.workoutInProgressTitle and activeWorkoutPage.finishCurrentWorkoutPrompt

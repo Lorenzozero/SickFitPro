@@ -1,4 +1,3 @@
-
 'use client';
 
 import { useParams, useRouter } from 'next/navigation';
@@ -10,14 +9,14 @@ import { Label } from '@/components/ui/label';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Progress } from '@/components/ui/progress';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
-import { CheckCircle, XCircle, Timer, Play, Pause, PlusCircle, Trash2, Award } from 'lucide-react'; // Removed Repeat
+import { CheckCircle, XCircle, Timer, Play, Pause, PlusCircle, Trash2, Award } from 'lucide-react';
 import { useLanguage } from '@/context/language-context';
-import { useEffect, useState, useRef } from 'react'; // Removed useCallback
+import { useEffect, useState, useRef } from 'react';
 import Image from 'next/image';
 import { useToast } from '@/hooks/use-toast';
 import { cn } from '@/lib/utils';
 import { Skeleton } from '@/components/ui/skeleton';
-import { useActiveWorkout } from '@/context/active-workout-context'; // Added
+import { useActiveWorkout } from '@/context/active-workout-context';
 
 // Mock data for workout plans
 const mockWorkoutPlans = [
@@ -241,7 +240,12 @@ export default function ActiveWorkoutPage() {
   const router = useRouter();
   const { t } = useLanguage();
   const { toast } = useToast();
-  const { startActiveWorkout, clearActiveWorkout, activeWorkoutStartTime: contextStartTime, isClient: activeWorkoutIsClient } = useActiveWorkout();
+  const { 
+    activePlanId: contextActivePlanId,
+    activeWorkoutStartTime: contextStartTimeFromProvider, 
+    clearActiveWorkout, 
+    isClient: activeWorkoutIsClient 
+  } = useActiveWorkout();
 
 
   const [plan, setPlan] = useState<WorkoutPlan | null | undefined>(undefined);
@@ -254,37 +258,65 @@ export default function ActiveWorkoutPage() {
   const [visibleExerciseId, setVisibleExerciseId] = useState<string | null>(null);
   
   const exerciseRefs = useRef<(HTMLDivElement | null)[]>([]);
-  const planId = typeof params.planId === 'string' ? params.planId : undefined;
+  const planIdFromRoute = typeof params.planId === 'string' ? params.planId : undefined;
 
+  // Effect 1: Load plan details and initialize local exercise state.
+  // Validates if the current route's planId matches the one in context.
   useEffect(() => {
-    if (planId) {
-      const foundPlan = mockWorkoutPlans.find(p => p.id === planId);
-      setPlan(foundPlan || null);
-      if (foundPlan) {
-        startActiveWorkout(foundPlan.id, foundPlan.name);
-        const initialActiveWorkout = foundPlan.exercises.map(ex => ({ ...ex, loggedSets: [] }));
-        setActiveWorkout(initialActiveWorkout);
-
-        if (contextStartTime) {
-            setComponentWorkoutStartTime(new Date(contextStartTime));
-        } else {
-            setComponentWorkoutStartTime(new Date());
-        }
-        setIsTimerRunning(true);
-
-        if (initialActiveWorkout.length > 0) {
-            setVisibleExerciseId(initialActiveWorkout[0].id); 
-            exerciseRefs.current = initialActiveWorkout.map(() => null);
-        }
-      } else {
-        setActiveWorkout(null);
-      }
-    } else {
+    if (!activeWorkoutIsClient || !planIdFromRoute) {
       setPlan(null);
       setActiveWorkout(null);
+      return;
     }
-  }, [planId, startActiveWorkout, contextStartTime]);
 
+    if (!contextActivePlanId || contextActivePlanId !== planIdFromRoute) {
+      toast({ 
+        title: t('activeWorkoutPage.planNotFound', { default: "Workout Mismatch"}), 
+        description: t('activeWorkoutPage.planNotFoundDescription', { default: "No active workout for this plan or mismatch. Redirecting..."}), 
+        variant: "destructive" 
+      });
+      router.push('/start-workout'); 
+      setPlan(null);
+      setActiveWorkout(null);
+      return;
+    }
+
+    const foundPlan = mockWorkoutPlans.find(p => p.id === planIdFromRoute);
+    setPlan(foundPlan || null);
+
+    if (foundPlan) {
+      // TODO: Implement loading of logged sets if resuming a workout session.
+      // This currently always starts fresh.
+      const initialActiveWorkout = foundPlan.exercises.map(ex => ({ ...ex, loggedSets: [] }));
+      setActiveWorkout(initialActiveWorkout);
+      if (initialActiveWorkout.length > 0) {
+        setVisibleExerciseId(initialActiveWorkout[0].id);
+        exerciseRefs.current = initialActiveWorkout.map(() => null);
+      }
+    } else {
+      setActiveWorkout(null); 
+      toast({ 
+        title: t('activeWorkoutPage.planNotFound', { default: "Plan Not Found"}), 
+        description: t('activeWorkoutPage.planNotFoundDescription', { default: "The workout plan could not be loaded."}), 
+        variant: "destructive" 
+      });
+      router.push('/workouts');
+    }
+  }, [planIdFromRoute, activeWorkoutIsClient, contextActivePlanId, router, toast, t]);
+
+
+  // Effect 2: Set up local timer based on context's start time.
+  useEffect(() => {
+    if (plan && activeWorkoutIsClient && contextStartTimeFromProvider) {
+      setComponentWorkoutStartTime(new Date(contextStartTimeFromProvider));
+      setIsTimerRunning(true); 
+    } else {
+      setIsTimerRunning(false); 
+    }
+  }, [plan, contextStartTimeFromProvider, activeWorkoutIsClient]);
+
+
+  // Effect for elapsedTime string update
   useEffect(() => {
     let interval: NodeJS.Timeout | undefined;
     if (isTimerRunning && componentWorkoutStartTime && activeWorkoutIsClient) {
@@ -303,6 +335,7 @@ export default function ActiveWorkoutPage() {
     };
   }, [isTimerRunning, componentWorkoutStartTime, activeWorkoutIsClient]);
 
+  // Effect for IntersectionObserver
   useEffect(() => {
     if (!activeWorkout || activeWorkout.length === 0 || !activeWorkoutIsClient) return;
 
@@ -338,6 +371,7 @@ export default function ActiveWorkoutPage() {
             ? { ...ex, loggedSets: updatedLoggedSets } 
             : ex
         );
+        // TODO: Persist newWorkoutState for resume functionality if desired
         return newWorkoutState;
     });
   };
@@ -376,14 +410,15 @@ export default function ActiveWorkoutPage() {
   const handleFinishWorkout = () => {
     setIsTimerRunning(false);
     setIsFinished(true);
-    clearActiveWorkout(); // Clear from global state
+    clearActiveWorkout(); 
     toast({ 
         title: t('activeWorkoutPage.toastWorkoutFinishedTitle'), 
         description: t('activeWorkoutPage.toastWorkoutFinishedDescription', { duration: elapsedTime }) 
     });
+    // TODO: Save completed workout data to history
   };
   
-  const overallProgress = activeWorkout && activeWorkout.length > 0
+  const overallProgress = activeWorkout && activeWorkout.length > 0 && activeWorkout.reduce((acc, ex) => acc + ex.targetSets, 0) > 0
     ? (activeWorkout.reduce((acc, ex) => acc + ex.loggedSets.length, 0) / 
        activeWorkout.reduce((acc, ex) => acc + ex.targetSets, 0)) * 100 
     : 0;
@@ -415,7 +450,7 @@ export default function ActiveWorkoutPage() {
     );
   }
 
-  if (!plan || !activeWorkout) {
+  if (!plan || !activeWorkout) { // Plan might be null if not found or if context mismatch occurred
     return <PageHeader title={t('activeWorkoutPage.planNotFound')} description={t('activeWorkoutPage.planNotFoundDescription')} />;
   }
   

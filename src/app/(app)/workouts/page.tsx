@@ -1,4 +1,3 @@
-
 'use client';
 
 import { useState, type FormEvent } from 'react';
@@ -6,7 +5,7 @@ import Link from 'next/link';
 import { PageHeader } from '@/components/shared/page-header';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { PlusCircle, Edit2, Trash2, Share2, PlayCircle, ListChecks, Ban } from 'lucide-react'; // Added Ban
+import { PlusCircle, Edit2, Trash2, Share2, PlayCircle, ListChecks, Ban } from 'lucide-react';
 import {
   Dialog,
   DialogContent,
@@ -22,7 +21,8 @@ import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
 import { useLanguage } from '@/context/language-context';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { useActiveWorkout } from '@/context/active-workout-context'; // Added
+import { useActiveWorkout } from '@/context/active-workout-context';
+import { useRouter } from 'next/navigation';
 
 interface ExerciseDetail {
   id: string;
@@ -54,7 +54,8 @@ const initialWorkoutPlans: WorkoutPlan[] = [
 
 export default function WorkoutPlansPage() {
   const { t } = useLanguage();
-  const { activePlanId, isClient: activeWorkoutIsClient } = useActiveWorkout();
+  const { activePlanId, isClient: activeWorkoutIsClient, startActiveWorkout: contextStartWorkout } = useActiveWorkout();
+  const router = useRouter();
   const [plans, setPlans] = useState<WorkoutPlan[]>(initialWorkoutPlans);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   
@@ -155,6 +156,15 @@ export default function WorkoutPlansPage() {
     });
   }
 
+  const handleStartPlanClick = (planId: string, planName: string) => {
+    if (activeWorkoutIsClient && activePlanId) {
+      // Button should be disabled anyway
+      return;
+    }
+    contextStartWorkout(planId, planName);
+    router.push(`/workouts/${planId}/active`);
+  };
+
   return (
     <>
       <PageHeader
@@ -209,14 +219,12 @@ export default function WorkoutPlansPage() {
             </CardContent>
             <CardFooter className="flex justify-between items-center gap-2 pt-4 border-t">
               <Button 
-                asChild 
                 variant="default" 
                 size="sm"
                 disabled={!!(activeWorkoutIsClient && activePlanId)}
+                onClick={() => handleStartPlanClick(plan.id, plan.name)}
               >
-                <Link href={`/workouts/${plan.id}/active`}>
-                  <PlayCircle className="w-4 h-4 mr-2" /> {t('workoutPlansPage.startButton')}
-                </Link>
+                <PlayCircle className="w-4 h-4 mr-2" /> {t('workoutPlansPage.startButton')}
               </Button>
               <div className="flex gap-1">
                 <Button variant="ghost" size="icon" onClick={() => openDialog(plan)} disabled={!!(activeWorkoutIsClient && activePlanId)}>
