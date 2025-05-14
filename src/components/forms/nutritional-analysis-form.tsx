@@ -3,51 +3,52 @@
 import { useState, type ChangeEvent, useEffect } from 'react';
 import { useForm, type SubmitHandler } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { z } from 'zod';
 import Image from 'next/image';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
-import { Loader2, Wand2, UploadCloud, XCircle } from 'lucide-react';
+import { Loader2, Wand2, UploadCloud, XCircle, Info } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { useLanguage } from '@/context/language-context';
-import { analyzeMeal, type AnalyzeMealInput, type AnalyzeMealOutput } from '@/ai/flows/analyze-meal-flow';
+import { getHealthAdvice, type HealthContextInput, type HealthAdviceOutput } from '@/ai/flows/analyze-meal-flow'; //  Path remains same, but exported function and types are different
 import { Skeleton } from '@/components/ui/skeleton';
+import type { BodyMeasurement } from '@/app/(app)/progress/page'; // Import BodyMeasurement type
+import { mockGetUserTrainingData, formatTrainingDataToString } from '@/components/forms/ai-split-form'; // Re-use for training data
 
-const NutritionalAnalysisFormSchema = z.object({
-  mealDescription: z.string().min(10, { message: "Please describe the meal (at least 10 characters)." }), // Message will be translated by t()
-  mealPhotoDataUri: z.string().optional(),
-});
+// Schema is now based on HealthContextInput
+const AiHealthAdvisorFormSchema = HealthContextInput.schema;
+type AiHealthAdvisorFormValues = HealthContextInput;
 
-type NutritionalAnalysisFormValues = z.infer<typeof NutritionalAnalysisFormSchema>;
-
-export default function NutritionalAnalysisForm() {
+export default function AiHealthAdvisorForm() {
   const { t } = useLanguage();
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
-  const [analysisResult, setAnalysisResult] = useState<AnalyzeMealOutput | null>(null);
+  const [adviceResult, setAdviceResult] = useState<HealthAdviceOutput | null>(null);
   const [photoPreview, setPhotoPreview] = useState<string | null>(null);
-  const [photoFile, setPhotoFile] = useState<File | null>(null);
+  const [photoFile, setPhotoFile] = useState<File | null>(null); // Keep for meal photo if provided
 
-  const formSchema = NutritionalAnalysisFormSchema.extend({
-     mealDescription: z.string().min(10, { message: t('nutritionalAnalysis.mealDescriptionPlaceholder') }),
+  // Zod schema for form validation (only for fields user directly interacts with if needed)
+  // The main schema is already imported. We only validate what user types here.
+  const formValidationSchema = AiHealthAdvisorFormSchema.pick({ 
+    mealDescription: true, 
+    mealPhotoDataUri: true 
+  }).extend({
+    mealDescription: AiHealthAdvisorFormSchema.shape.mealDescription.min(5, { message: t('aiHealthAdvisor.mealDescriptionMinError') }).optional(),
   });
 
 
-  const form = useForm<NutritionalAnalysisFormValues>({
-    resolver: zodResolver(formSchema),
+  const form = useForm<Pick<AiHealthAdvisorFormValues, 'mealDescription' | 'mealPhotoDataUri'>>({
+    resolver: zodResolver(formValidationSchema),
     defaultValues: {
       mealDescription: '',
       mealPhotoDataUri: undefined,
     },
   });
   
-  // Update resolver if language changes to re-validate with correct messages
   useEffect(() => {
     form.trigger();
-     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [t, form.trigger]);
 
   const handlePhotoChange = (event: ChangeEvent<HTMLInputElement>) => {
@@ -55,8 +56,8 @@ export default function NutritionalAnalysisForm() {
     if (file) {
       if (file.size > 2 * 1024 * 1024) { // 2MB limit
         toast({
-            title: t('nutritionalAnalysis.errorTitle'),
-            description: "Photo size should not exceed 2MB.", // Add translation key if needed
+            title: t('nutritionalAnalysis.errorTitle'), // Can reuse or make specific
+            description: t('settingsPage.photoSizeError'), // Re-use translation
             variant: "destructive"
         });
         return;
@@ -65,7 +66,7 @@ export default function NutritionalAnalysisForm() {
       const reader = new FileReader();
       reader.onloadend = () => {
         setPhotoPreview(reader.result as string);
-        form.setValue('mealPhotoDataUri', reader.result as string, { shouldValidate: true });
+        form.setValue('mealPhotoDataUri', reader.result as string);
       };
       reader.readAsDataURL(file);
     }
@@ -75,36 +76,82 @@ export default function NutritionalAnalysisForm() {
     setPhotoFile(null);
     setPhotoPreview(null);
     form.setValue('mealPhotoDataUri', undefined);
-    const photoInput = document.getElementById('mealPhoto') as HTMLInputElement | null;
+    const photoInput = document.getElementById('mealPhotoForAdvisor') as HTMLInputElement | null;
     if (photoInput) {
-        photoInput.value = ''; // Reset file input
+        photoInput.value = '';
     }
   };
 
-  const onSubmit: SubmitHandler<NutritionalAnalysisFormValues> = async (data) => {
+  const onSubmit: SubmitHandler<Pick<AiHealthAdvisorFormValues, 'mealDescription' | 'mealPhotoDataUri'>> = async (formData) => {
     setIsLoading(true);
-    setAnalysisResult(null);
+    setAdviceResult(null);
 
-    const inputData: AnalyzeMealInput = {
-      mealDescription: data.mealDescription,
-    };
+    let userMacroGoalsSummary: string | undefined = undefined;
+    let userWaterGoalMl: number | undefined = undefined;
+    let userBodyMeasurementsSummary: string | undefined = undefined;
+    let userTrainingSummary: string | undefined = undefined;
 
-    if (photoFile && photoPreview) {
-      inputData.mealPhotoDataUri = photoPreview; // Already a data URI
+    if (typeof window !== 'undefined') {
+        // Macro Goals
+        const storedMacroGoals = localStorage.getItem('sickfit-pro-weeklyMacroGoals');
+        if (storedMacroGoals) {
+            try {
+                const parsedGoals = JSON.parse(storedMacroGoals);
+                // Simple summary, can be improved
+                userMacroGoalsSummary = Object.entries(parsedGoals)
+                    .map(([day, goals]: [string, any]) => 
+                        `${t(`calendarPage.days.${day}`)}: P ${goals.protein}g, C ${goals.carbs}g, F ${goals.fat}g`
+                    ).join('; ');
+            } catch (e) { console.error("Error parsing macro goals for AI advisor", e); }
+        }
+
+        // Water Goal
+        const storedWaterGoal = localStorage.getItem('sickfit-pro-userWaterGoal');
+        if (storedWaterGoal) {
+            userWaterGoalMl = parseInt(storedWaterGoal, 10);
+        }
+
+        // Body Measurements
+        const storedBodyMeasurements = localStorage.getItem('sickfit-pro-userBodyMeasurements');
+        if (storedBodyMeasurements) {
+            try {
+                const measurements: BodyMeasurement[] = JSON.parse(storedBodyMeasurements);
+                userBodyMeasurementsSummary = measurements
+                    .slice(-5) // Last 5 measurements for brevity
+                    .map(m => `${m.date} - ${m.measurementName}: ${m.value} ${m.unit}`)
+                    .join('; ');
+            } catch (e) { console.error("Error parsing body measurements for AI advisor", e); }
+        }
+        
+        // Training Summary (reusing mock logic from AiSplitForm for now)
+        try {
+            const rawTrainingData = await mockGetUserTrainingData(); // Replace with actual data source if available
+            userTrainingSummary = formatTrainingDataToString(rawTrainingData);
+        } catch (e) { console.error("Error fetching training data for AI advisor", e); }
     }
+
+
+    const inputData: HealthContextInput = {
+      mealDescription: formData.mealDescription,
+      mealPhotoDataUri: formData.mealPhotoDataUri,
+      userMacroGoalsSummary,
+      userWaterGoalMl,
+      userBodyMeasurementsSummary,
+      userTrainingSummary,
+    };
     
     try {
-      const response = await analyzeMeal(inputData);
-      setAnalysisResult(response);
+      const response = await getHealthAdvice(inputData);
+      setAdviceResult(response);
       toast({
-        title: t('nutritionalAnalysis.analysisReadyTitle'),
-        description: t('nutritionalAnalysis.analysisReadyDescription'),
+        title: t('aiHealthAdvisor.adviceReadyTitle'),
+        description: t('aiHealthAdvisor.adviceReadyDescription'),
       });
     } catch (error) {
-      console.error("Error fetching nutritional analysis:", error);
+      console.error("Error fetching AI health advice:", error);
       toast({
-        title: t('nutritionalAnalysis.errorTitle'),
-        description: t('nutritionalAnalysis.errorDescription'),
+        title: t('aiHealthAdvisor.errorTitle'),
+        description: t('aiHealthAdvisor.errorDescription'),
         variant: "destructive",
       });
     } finally {
@@ -117,11 +164,17 @@ export default function NutritionalAnalysisForm() {
       <CardHeader>
         <CardTitle className="flex items-center">
           <Wand2 className="w-6 h-6 mr-2 text-primary" />
-          {t('nutritionalAnalysis.cardTitle')}
+          {t('aiHealthAdvisor.cardTitle')}
         </CardTitle>
-        <CardDescription>{t('nutritionalAnalysis.cardDescription')}</CardDescription>
+        <CardDescription>{t('aiHealthAdvisor.cardDescription')}</CardDescription>
       </CardHeader>
       <CardContent>
+        <div className="p-3 mb-6 text-sm border rounded-md bg-accent/10 text-accent-foreground">
+            <div className="flex items-start">
+                <Info className="w-5 h-5 mr-2 shrink-0 mt-0.5" />
+                <p>{t('aiHealthAdvisor.dataUsageInfo')}</p>
+            </div>
+        </div>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
             <FormField
@@ -129,24 +182,25 @@ export default function NutritionalAnalysisForm() {
               name="mealDescription"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>{t('nutritionalAnalysis.mealDescriptionLabel')}</FormLabel>
+                  <FormLabel>{t('aiHealthAdvisor.mealDescriptionLabel')}</FormLabel>
                   <FormControl>
                     <Textarea
-                      placeholder={t('nutritionalAnalysis.mealDescriptionPlaceholder')}
-                      className="min-h-[100px]"
+                      placeholder={t('aiHealthAdvisor.mealDescriptionPlaceholder')}
+                      className="min-h-[80px]"
                       {...field}
                     />
                   </FormControl>
+                  <FormDescription>{t('aiHealthAdvisor.mealContextInfo')}</FormDescription>
                   <FormMessage />
                 </FormItem>
               )}
             />
 
             <FormItem>
-              <FormLabel>{t('nutritionalAnalysis.mealPhotoLabel')}</FormLabel>
+              <FormLabel>{t('aiHealthAdvisor.mealPhotoLabel')}</FormLabel>
               <FormControl>
                 <Input 
-                    id="mealPhoto" 
+                    id="mealPhotoForAdvisor" 
                     type="file" 
                     accept="image/*" 
                     onChange={handlePhotoChange} 
@@ -155,7 +209,7 @@ export default function NutritionalAnalysisForm() {
               </FormControl>
               {photoPreview && (
                 <div className="mt-4 relative w-full max-w-xs aspect-video border rounded-md overflow-hidden group">
-                  <Image src={photoPreview} alt={t('nutritionalAnalysis.photoPreviewAlt')} layout="fill" objectFit="cover" data-ai-hint="food meal" />
+                  <Image src={photoPreview} alt={t('nutritionalAnalysis.photoPreviewAlt')} layout="fill" objectFit="cover" data-ai-hint="food meal context" />
                    <Button 
                         type="button" 
                         variant="destructive" 
@@ -174,7 +228,7 @@ export default function NutritionalAnalysisForm() {
                     <p className="mt-1 text-xs text-muted-foreground">{t('nutritionalAnalysis.noPhotoSelected')}</p>
                 </div>
               )}
-              <FormDescription>{t('nutritionalAnalysis.uploadPhotoButton')}</FormDescription>
+              <FormDescription>{t('aiHealthAdvisor.mealContextInfoPhoto')}</FormDescription>
               <FormMessage />
             </FormItem>
             
@@ -185,7 +239,7 @@ export default function NutritionalAnalysisForm() {
                 ) : (
                     <Wand2 className="w-4 h-4 mr-2" />
                 )}
-                {t('nutritionalAnalysis.analyzeMealButton')}
+                {t('aiHealthAdvisor.getAdviceButton')}
                 </Button>
             </div>
           </form>
@@ -194,26 +248,41 @@ export default function NutritionalAnalysisForm() {
         {isLoading && (
           <div className="mt-8 space-y-4">
             <Skeleton className="h-8 w-1/2 mx-auto" />
-            <Skeleton className="h-24 w-full" />
             <Skeleton className="h-16 w-full" />
+            <Skeleton className="h-24 w-full" />
           </div>
         )}
 
-        {analysisResult && !isLoading && (
-          <div className="mt-8 space-y-4">
-            <h3 className="text-xl font-semibold text-center text-primary">{t('nutritionalAnalysis.resultsTitle')}</h3>
-            <Card className="bg-secondary/50">
-                <CardContent className="p-4 space-y-2">
-                    <p><strong>{t('nutritionalAnalysis.estimatedCalories')}:</strong> {analysisResult.estimatedCalories.toLocaleString()}</p>
-                    <p><strong>{t('nutritionalAnalysis.protein')}:</strong> {analysisResult.macronutrients.proteinGrams.toLocaleString()} g</p>
-                    <p><strong>{t('nutritionalAnalysis.carbs')}:</strong> {analysisResult.macronutrients.carbsGrams.toLocaleString()} g</p>
-                    <p><strong>{t('nutritionalAnalysis.fat')}:</strong> {analysisResult.macronutrients.fatGrams.toLocaleString()} g</p>
-                    <div>
-                        <h4 className="font-semibold mt-2">{t('nutritionalAnalysis.generalAdvice')}:</h4>
-                        <p className="whitespace-pre-line text-sm text-muted-foreground">{analysisResult.generalAdvice}</p>
-                    </div>
+        {adviceResult && !isLoading && (
+          <div className="mt-8 space-y-6">
+            <h3 className="text-xl font-semibold text-center text-primary">{t('aiHealthAdvisor.resultsTitle')}</h3>
+            
+            <Card className="bg-secondary/30">
+                <CardHeader><CardTitle className="text-lg">{t('aiHealthAdvisor.overallAssessment')}</CardTitle></CardHeader>
+                <CardContent>
+                    <p className="whitespace-pre-line text-sm">{adviceResult.overallAssessment}</p>
                 </CardContent>
             </Card>
+
+            <Card className="bg-secondary/30">
+                <CardHeader><CardTitle className="text-lg">{t('aiHealthAdvisor.specificAdvice')}</CardTitle></CardHeader>
+                <CardContent>
+                    <ul className="list-disc pl-5 space-y-1 text-sm">
+                        {adviceResult.specificAdvicePoints.map((advice, index) => (
+                            <li key={index}>{advice}</li>
+                        ))}
+                    </ul>
+                </CardContent>
+            </Card>
+            
+            {adviceResult.mealSpecificFeedback && (
+                 <Card className="bg-secondary/30">
+                    <CardHeader><CardTitle className="text-lg">{t('aiHealthAdvisor.mealFeedback')}</CardTitle></CardHeader>
+                    <CardContent>
+                        <p className="whitespace-pre-line text-sm">{adviceResult.mealSpecificFeedback}</p>
+                    </CardContent>
+                </Card>
+            )}
           </div>
         )}
       </CardContent>

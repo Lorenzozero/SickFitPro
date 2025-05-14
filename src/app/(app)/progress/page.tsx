@@ -1,4 +1,3 @@
-
 'use client';
 
 import { useState, type ChangeEvent, useEffect } from 'react';
@@ -9,7 +8,7 @@ import { Input } from '@/components/ui/input';
 import Image from 'next/image';
 import { LineChart as LucideLineChart, UploadCloud, BarChart as LucideBarChart, Users, PlusCircle, Edit2, Trash2, Bell, Wand2 } from 'lucide-react';
 import { ChartContainer, ChartTooltip, ChartTooltipContent, ChartLegend, ChartLegendContent } from "@/components/ui/chart";
-import { Bar, CartesianGrid, XAxis, YAxis, Tooltip as RechartsTooltip, ResponsiveContainer, Line, Legend as RechartsLegend, BarChart, LineChart as RechartsPrimitiveLineChart, BarChart as RechartsPrimitiveBarChart } from "recharts";
+import { Bar, CartesianGrid, XAxis, YAxis, Tooltip as RechartsTooltip, ResponsiveContainer, Line, Legend as RechartsLegend, BarChart as RechartsPrimitiveBarChart, LineChart as RechartsPrimitiveLineChart } from "recharts";
 import type { ChartConfig } from '@/components/ui/chart';
 import { useLanguage } from '@/context/language-context';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
@@ -19,6 +18,9 @@ import { useToast } from '@/hooks/use-toast';
 import { AddMeasurementDialog } from '@/components/dialogs/add-measurement-dialog'; 
 import { Skeleton } from '@/components/ui/skeleton';
 import { AiSplitForm } from '@/components/forms/ai-split-form';
+
+
+const BODY_MEASUREMENTS_STORAGE_KEY = 'sickfit-pro-userBodyMeasurements';
 
 // Mock data for weekly training volume
 const weeklyVolumeChartData = [
@@ -52,13 +54,11 @@ export interface BodyMeasurement {
   notes?: string;
 }
 
-// Mock initial measurements
+// Mock initial measurements - will be overridden by localStorage if present
 const initialBodyMeasurements: BodyMeasurement[] = [
     { id: 'm1', date: '2023-01-15', measurementName: 'Biceps', value: 35, unit: 'cm', notes: 'Right arm, flexed' },
     { id: 'm2', date: '2023-01-15', measurementName: 'Waist', value: 80, unit: 'cm' },
     { id: 'm3', date: '2023-01-15', measurementName: 'Weight', value: 70, unit: 'kg' },
-    { id: 'm4', date: '2023-03-15', measurementName: 'Biceps', value: 36, unit: 'cm', notes: 'Right arm, flexed' },
-    { id: 'm5', date: '2023-03-15', measurementName: 'Weight', value: 69.5, unit: 'kg' },
 ];
 
 type ReminderFrequency = 'off' | 'daily' | 'weekly' | 'bi-weekly' | 'monthly';
@@ -79,7 +79,25 @@ export default function ProgressPage() {
 
   useEffect(() => {
     setIsClient(true);
+    if (typeof window !== 'undefined') {
+        const storedMeasurements = localStorage.getItem(BODY_MEASUREMENTS_STORAGE_KEY);
+        if (storedMeasurements) {
+            try {
+                setBodyMeasurements(JSON.parse(storedMeasurements));
+            } catch (e) {
+                console.error("Error parsing body measurements from localStorage", e);
+                setBodyMeasurements(initialBodyMeasurements); // Fallback
+            }
+        }
+    }
   }, []);
+
+  const persistMeasurements = (updatedMeasurements: BodyMeasurement[]) => {
+    if (typeof window !== 'undefined') {
+      localStorage.setItem(BODY_MEASUREMENTS_STORAGE_KEY, JSON.stringify(updatedMeasurements));
+    }
+  };
+
 
   const chartConfig: ChartConfig = {
     weeklyVolume: {
@@ -108,9 +126,7 @@ export default function ProgressPage() {
   const getMonthAbbreviation = (fullMonthName: string) => {
     if (!languageContextIsClient) return fullMonthName.slice(0, 3);
 
-    // Fallback for server or if language context isn't ready
     const currentLanguage = languageContextIsClient ? language : 'en';
-
 
     if (currentLanguage === 'it') {
         const monthMap: { [key: string]: string } = {
@@ -125,11 +141,14 @@ export default function ProgressPage() {
 
 
   const handleSaveMeasurement = (measurement: BodyMeasurement) => {
+    let updatedMeasurements;
     if (currentMeasurement?.id) {
-      setBodyMeasurements(bodyMeasurements.map(m => m.id === measurement.id ? measurement : m));
+      updatedMeasurements = bodyMeasurements.map(m => m.id === measurement.id ? measurement : m);
     } else {
-      setBodyMeasurements([...bodyMeasurements, { ...measurement, id: String(Date.now()) }]);
+      updatedMeasurements = [...bodyMeasurements, { ...measurement, id: String(Date.now()) }];
     }
+    setBodyMeasurements(updatedMeasurements);
+    persistMeasurements(updatedMeasurements);
     toast({ title: t('progressPage.measurementSaved') });
     setIsMeasurementDialogOpen(false);
     setCurrentMeasurement(null);
@@ -141,7 +160,9 @@ export default function ProgressPage() {
   };
 
   const handleDeleteMeasurement = (id: string) => {
-    setBodyMeasurements(bodyMeasurements.filter(m => m.id !== id));
+    const updatedMeasurements = bodyMeasurements.filter(m => m.id !== id);
+    setBodyMeasurements(updatedMeasurements);
+    persistMeasurements(updatedMeasurements);
     toast({ title: t('progressPage.measurementDeleted'), variant: 'destructive' });
   };
 
@@ -343,7 +364,6 @@ export default function ProgressPage() {
       
       {/* AI Fitness Advisor Form */}
       <div className="mt-8">
-         {/* Card wrapper for AiSplitForm is now handled within AiSplitForm itself */}
          <AiSplitForm />
       </div>
 
@@ -358,4 +378,3 @@ export default function ProgressPage() {
     </>
   );
 }
-

@@ -8,7 +8,7 @@ import { Progress } from '@/components/ui/progress';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Droplet, RotateCcw, GlassWater, Milk, Bell, Target } from 'lucide-react'; // Added Target, Bell
+import { Droplet, RotateCcw, GlassWater, Milk, Bell, Target } from 'lucide-react';
 import { useLanguage } from '@/context/language-context';
 import { useToast } from '@/hooks/use-toast';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
@@ -17,6 +17,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 const DEFAULT_DAILY_WATER_GOAL_ML = 2500;
 const WATER_INCREMENT_ML = 250;
 type ReminderFrequency = 'off' | 'hourly' | 'daily';
+const WATER_GOAL_STORAGE_KEY = 'sickfit-pro-userWaterGoal';
 
 
 export default function WaterIntakeCard() {
@@ -31,8 +32,29 @@ export default function WaterIntakeCard() {
 
   useEffect(() => {
     setIsClient(true);
-    setInputGoal(dailyWaterGoal.toString());
-  }, [dailyWaterGoal]);
+    if (typeof window !== 'undefined') {
+        const storedGoal = localStorage.getItem(WATER_GOAL_STORAGE_KEY);
+        if (storedGoal) {
+            const goalNum = parseInt(storedGoal, 10);
+            if (!isNaN(goalNum) && goalNum > 0) {
+                setDailyWaterGoal(goalNum);
+                setInputGoal(goalNum.toString());
+            }
+        } else {
+            setInputGoal(DEFAULT_DAILY_WATER_GOAL_ML.toString());
+        }
+        // TODO: Load currentWaterIntake if persisted daily
+    }
+  }, []);
+
+  useEffect(() => {
+    // This effect ensures inputGoal is updated if dailyWaterGoal changes programmatically elsewhere
+    // (though currently it only changes via handleSaveGoal which also sets inputGoal)
+    if (isClient) {
+        setInputGoal(dailyWaterGoal.toString());
+    }
+  }, [dailyWaterGoal, isClient]);
+
 
   const addWater = (amount: number) => {
     setCurrentWaterIntake(prev => Math.max(0, prev + amount));
@@ -54,6 +76,9 @@ export default function WaterIntakeCard() {
     const newGoal = parseInt(inputGoal, 10);
     if (!isNaN(newGoal) && newGoal > 0) {
       setDailyWaterGoal(newGoal);
+      if (typeof window !== 'undefined') {
+          localStorage.setItem(WATER_GOAL_STORAGE_KEY, newGoal.toString());
+      }
       toast({
         title: t('waterIntakeCard.goalSavedTitle'),
         description: t('waterIntakeCard.goalSavedDescription'),
@@ -117,7 +142,7 @@ export default function WaterIntakeCard() {
              <TooltipProvider>
                 <Tooltip>
                     <TooltipTrigger asChild>
-                        <Select value={reminderFrequency} onValueChange={(value) => setReminderFrequency(value as ReminderFrequency)}>
+                         <Select value={reminderFrequency} onValueChange={(value) => setReminderFrequency(value as ReminderFrequency)}>
                             <SelectTrigger asChild aria-label={t('waterIntakeCard.hydrationReminderSettingsAriaLabel', {default: "Hydration Reminder Settings"})}>
                                 <Button variant="ghost" size="icon">
                                     <Bell className="w-4 h-4" />
@@ -159,7 +184,7 @@ export default function WaterIntakeCard() {
         {isGoalSettingsOpen && (
             <div>
             <Label htmlFor="water-goal" className="text-md font-semibold">
-                {t('waterIntakeCard.setGoalLabel')}
+                {t('waterIntakeCard.setDailyGoalLabel', {default: 'Daily Goal (ml)'})}
             </Label>
             <div className="flex items-center gap-2 mt-1">
                 <Input
