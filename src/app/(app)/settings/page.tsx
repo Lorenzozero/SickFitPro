@@ -2,7 +2,7 @@
 'use client';
 
 import { useState, useEffect, type ChangeEvent } from 'react';
-import Image from 'next/image'; 
+import Image from 'next/image';
 import { PageHeader } from '@/components/shared/page-header';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
@@ -14,12 +14,12 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input'; 
+import { Input } from '@/components/ui/input';
 import { Switch } from '@/components/ui/switch';
 import { Languages, Bell, Save, UserCircle, Shield, Eye, EyeOff } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { useLanguage, type Language } from '@/context/language-context';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'; 
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 
 
 export default function SettingsPage() {
@@ -33,7 +33,7 @@ export default function SettingsPage() {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [profilePictureFile, setProfilePictureFile] = useState<File | null>(null);
   const [name, setName] = useState('');
-  const [email, setEmail] = useState(''); 
+  const [email, setEmail] = useState('');
 
   // New state for password change
   const [currentPassword, setCurrentPassword] = useState('');
@@ -115,7 +115,7 @@ export default function SettingsPage() {
                 description: t('settingsPage.passwordMismatchError'),
                 variant: 'destructive',
             });
-            return; 
+            return;
         }
         // Mock password change logic
         console.log('Attempting to change password...');
@@ -149,7 +149,7 @@ export default function SettingsPage() {
     }
   };
 
-  if (!isClient) { 
+  if (!isClient) {
     return (
       <>
         <PageHeader title={t('settingsPage.title')} />
@@ -218,7 +218,7 @@ export default function SettingsPage() {
                 id="email"
                 type="email"
                 value={email}
-                readOnly 
+                readOnly
                 className="mt-1 bg-muted/50 cursor-not-allowed"
               />
               <CardDescription className="mt-1 text-xs">{t('settingsPage.emailCannotBeChanged')}</CardDescription>
@@ -293,16 +293,14 @@ export default function SettingsPage() {
           </CardHeader>
           <CardContent>
             <div className="flex items-center gap-4">
-                <Label htmlFor="language" className="whitespace-nowrap text-sm font-medium">
-                  {t('settingsPage.language')}
-                </Label>
+                 <Label htmlFor="language" className="whitespace-nowrap text-sm font-medium">{t('settingsPage.language')}</Label>
                 <div className="w-auto">
                     <Select
                         value={languageContextIsClient ? language : 'en'}
                         onValueChange={(value) => setLanguage(value as Language)}
                         disabled={!languageContextIsClient}
                     >
-                        <SelectTrigger id="language" className="min-w-[200px]" aria-label={t('settingsPage.selectLanguage')}>
+                        <SelectTrigger id="language-select" className="min-w-[200px]" aria-label={t('settingsPage.selectLanguage')}>
                             <SelectValue placeholder={t('settingsPage.selectLanguage')} />
                         </SelectTrigger>
                         <SelectContent>
