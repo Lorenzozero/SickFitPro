@@ -3,16 +3,10 @@
 import { z } from 'zod';
 
 export const HealthContextInputSchema = z.object({
-  mealDescription: z
+  userQuery: z
     .string()
     .optional()
-    .describe('Una descrizione testuale opzionale del pasto più recente o di un pasto tipico.'),
-  mealPhotoDataUri: z
-    .string()
-    .optional()
-    .describe(
-      "Una foto opzionale del pasto, come URI dati che deve includere un tipo MIME e utilizzare la codifica Base64. Formato atteso: 'data:<mimetype>;base64,<encoded_data>'."
-    ),
+    .describe('A specific question or request from the user, if any.'),
   userMacroGoalsSummary: z
     .string()
     .optional()
@@ -34,12 +28,9 @@ export const HealthContextInputSchema = z.object({
 export const HealthAdviceOutputSchema = z.object({
   overallAssessment: z
     .string()
-    .describe("Una valutazione generale dei dati sulla salute e degli obiettivi forniti dall'utente."),
+    .describe("Una valutazione generale dei dati sulla salute e degli obiettivi forniti dall'utente, considerando la sua domanda specifica se presente."),
   specificAdvicePoints: z
     .array(z.string())
-    .describe("Un elenco di punti di consulenza specifici e attuabili."),
-  mealSpecificFeedback: z
-    .string()
-    .optional()
-    .describe("Feedback specifico relativo al pasto, se è stato descritto un pasto."),
+    .describe("Un elenco di punti di consulenza specifici e attuabili, pertinenti alla domanda dell'utente e al suo contesto generale."),
 });
+

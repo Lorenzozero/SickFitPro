@@ -29,8 +29,7 @@ const healthAdvicePrompt = ai.definePrompt({
   input: {schema: HealthContextInputSchema}, // Use imported schema
   output: {schema: HealthAdviceOutputSchema}, // Use imported schema
   prompt: `Sei un consulente esperto di salute e fitness olistico.
-Il tuo compito è analizzare i dati forniti dall'utente riguardanti i suoi obiettivi di macronutrienti, l'assunzione di acqua, le misurazioni corporee e l'attività di allenamento.
-Se l'utente fornisce dettagli su un pasto (descrizione e/o foto), includi un feedback specifico su quel pasto nel contesto più ampio della sua salute e dei suoi obiettivi.
+Il tuo compito è analizzare i dati forniti dall'utente riguardanti i suoi obiettivi di macronutrienti, l'assunzione di acqua, le misurazioni corporee, l'attività di allenamento e rispondere alla sua domanda specifica, se fornita.
 
 Ecco i dati forniti dall'utente:
 {{#if userMacroGoalsSummary}}
@@ -57,18 +56,17 @@ Ecco i dati forniti dall'utente:
 - Riepilogo Allenamento: Non fornito.
 {{/if}}
 
-{{#if mealDescription}}
-Dettagli del Pasto:
-- Descrizione: {{{mealDescription}}}
-  {{#if mealPhotoDataUri}}
-- Foto del Pasto: {{media url=mealPhotoDataUri}}
-  {{/if}}
+{{#if userQuery}}
+Domanda specifica dell'utente:
+"{{{userQuery}}}"
+Per favore, fornisci una risposta mirata a questa domanda, utilizzando i dati di contesto sopra elencati per personalizzare la risposta.
+{{else}}
+L'utente non ha posto una domanda specifica. Fornisci una consulenza generale basata sui dati disponibili.
 {{/if}}
 
-Basandoti su queste informazioni, fornisci:
-1.  Una **valutazione generale** ('overallAssessment') dello stato di salute e fitness attuale dell'utente in relazione ai suoi dati e obiettivi.
-2.  Un elenco di **consigli specifici e attuabili** ('specificAdvicePoints') che l'utente può seguire per migliorare o mantenere la sua salute e raggiungere i suoi obiettivi. Questi consigli dovrebbero essere personalizzati.
-3.  Se sono stati forniti dettagli su un pasto, fornisci un **feedback specifico sul pasto** ('mealSpecificFeedback') nel contesto più ampio. Se nessun pasto è stato fornito, ometti questo campo o lascialo vuoto.
+Basandoti su queste informazioni (e sulla domanda dell'utente, se presente), fornisci:
+1.  Una **valutazione generale** ('overallAssessment') dello stato di salute e fitness attuale dell'utente in relazione ai suoi dati, obiettivi e alla sua domanda.
+2.  Un elenco di **consigli specifici e attuabili** ('specificAdvicePoints') che l'utente può seguire per migliorare o mantenere la sua salute, raggiungere i suoi obiettivi e/o rispondere alla sua domanda. Questi consigli dovrebbero essere personalizzati.
 
 Sii incoraggiante, costruttivo e fornisci spiegazioni chiare per i tuoi consigli.
 Restituisci l'analisi nel formato JSON specificato.`,
@@ -88,3 +86,4 @@ const healthAdvisorFlow = ai.defineFlow(
     return output;
   }
 );
+

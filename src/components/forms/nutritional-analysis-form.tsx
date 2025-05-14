@@ -4,12 +4,11 @@
 import { useState, type ChangeEvent, useEffect } from 'react';
 import { useForm, type SubmitHandler } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import Image from 'next/image';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Loader2, Wand2, UploadCloud, XCircle, Info } from 'lucide-react';
+import { Textarea } from '@/components/ui/textarea'; // Added Textarea
+import { Loader2, Wand2, Info } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { useLanguage } from '@/context/language-context';
 import { getHealthAdvice, type HealthContextInput, type HealthAdviceOutput } from '@/ai/flows/analyze-meal-flow';
@@ -20,10 +19,13 @@ import { mockGetUserTrainingData, formatTrainingDataToString } from '@/component
 import { z } from 'zod';
 
 
-// Zod schema for form validation (only for fields user directly interacts with)
-// Only mealPhotoDataUri is left as a direct user input for the form.
-const formValidationSchema = HealthContextInputSchema.pick({ 
-  mealPhotoDataUri: true,    
+// Zod schema for form validation - only for fields user directly interacts with.
+// Now it's only userQuery.
+const formValidationSchema = z.object({
+  userQuery: z
+    .string()
+    .min(10, { message: "aiHealthAdvisor.userQueryMinError" }) // Example validation
+    .optional(), // Making it optional if user just wants general advice based on auto-collected data
 });
 
 // Type for the fields managed by react-hook-form
@@ -34,53 +36,18 @@ export default function AiHealthAdvisorForm() {
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
   const [adviceResult, setAdviceResult] = useState<HealthAdviceOutput | null>(null);
-  const [photoPreview, setPhotoPreview] = useState<string | null>(null);
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const [photoFile, setPhotoFile] = useState<File | null>(null);
-
+  
   const form = useForm<UserEditableFormValues>({
     resolver: zodResolver(formValidationSchema),
     defaultValues: {
-      mealPhotoDataUri: undefined,
+      userQuery: '',
     },
   });
   
   useEffect(() => {
-    // Trigger validation if language changes and form has errors
-    // This can be useful if error messages are translated
     form.trigger(); 
   }, [t, form]);
 
-  const handlePhotoChange = (event: ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (file) {
-      if (file.size > 2 * 1024 * 1024) { // 2MB limit
-        toast({
-            title: t('nutritionalAnalysis.errorTitle'),
-            description: t('settingsPage.photoSizeError'),
-            variant: "destructive"
-        });
-        return;
-      }
-      setPhotoFile(file);
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setPhotoPreview(reader.result as string);
-        form.setValue('mealPhotoDataUri', reader.result as string);
-      };
-      reader.readAsDataURL(file);
-    }
-  };
-
-  const removePhoto = () => {
-    setPhotoFile(null);
-    setPhotoPreview(null);
-    form.setValue('mealPhotoDataUri', undefined);
-    const photoInput = document.getElementById('mealPhotoForAdvisor') as HTMLInputElement | null;
-    if (photoInput) {
-        photoInput.value = '';
-    }
-  };
 
   const onSubmit: SubmitHandler<UserEditableFormValues> = async (formData) => {
     setIsLoading(true);
@@ -127,8 +94,7 @@ export default function AiHealthAdvisorForm() {
     }
 
     const inputData: HealthContextInput = {
-      // mealDescription is removed as it's no longer part of the form or UserEditableFormValues
-      mealPhotoDataUri: formData.mealPhotoDataUri,
+      userQuery: formData.userQuery || undefined, // Pass userQuery if provided
       userMacroGoalsSummary,
       userWaterGoalMl,
       userBodyMeasurementsSummary,
@@ -171,43 +137,24 @@ export default function AiHealthAdvisorForm() {
         </div>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-            {/* Meal Description Field Removed */}
-
-            <FormItem>
-              <FormLabel>{t('aiHealthAdvisor.mealPhotoLabel')}</FormLabel>
-              <FormControl>
-                <Input 
-                    id="mealPhotoForAdvisor" 
-                    type="file" 
-                    accept="image/*" 
-                    onChange={handlePhotoChange} 
-                    className="file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-primary file:text-primary-foreground hover:file:bg-primary/90"
-                />
-              </FormControl>
-              {photoPreview && (
-                <div className="mt-4 relative w-full max-w-xs aspect-video border rounded-md overflow-hidden group">
-                  <Image src={photoPreview} alt={t('nutritionalAnalysis.photoPreviewAlt')} layout="fill" objectFit="cover" data-ai-hint="food meal context" />
-                   <Button 
-                        type="button" 
-                        variant="destructive" 
-                        size="icon" 
-                        onClick={removePhoto}
-                        className="absolute top-1 right-1 h-6 w-6 opacity-70 group-hover:opacity-100 transition-opacity"
-                        aria-label={t('nutritionalAnalysis.removePhoto')}
-                    >
-                        <XCircle className="h-4 w-4" />
-                    </Button>
-                </div>
+            <FormField
+              control={form.control}
+              name="userQuery"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>{t('aiHealthAdvisor.userQueryLabel')}</FormLabel>
+                  <FormControl>
+                    <Textarea
+                      placeholder={t('aiHealthAdvisor.userQueryPlaceholder')}
+                      className="min-h-[100px]"
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormDescription>{t('aiHealthAdvisor.userQueryDescription')}</FormDescription>
+                  <FormMessage />
+                </FormItem>
               )}
-               {!photoPreview && (
-                <div className="mt-2 flex flex-col items-center justify-center w-full h-24 border-2 border-dashed rounded-lg border-border bg-muted/50">
-                    <UploadCloud className="w-8 h-8 text-muted-foreground" />
-                    <p className="mt-1 text-xs text-muted-foreground">{t('nutritionalAnalysis.noPhotoSelected')}</p>
-                </div>
-              )}
-              <FormDescription>{t('aiHealthAdvisor.mealContextInfoPhoto')}</FormDescription>
-              <FormMessage /> {/* This will show validation errors for mealPhotoDataUri if any */}
-            </FormItem>
+            />
             
             <div className="flex justify-center">
                 <Button type="submit" disabled={isLoading} className="w-full md:w-auto">
@@ -251,18 +198,10 @@ export default function AiHealthAdvisorForm() {
                     </ul>
                 </CardContent>
             </Card>
-            
-            {adviceResult.mealSpecificFeedback && (
-                 <Card className="bg-secondary/30">
-                    <CardHeader><CardTitle className="text-lg">{t('aiHealthAdvisor.mealFeedback')}</CardTitle></CardHeader>
-                    <CardContent>
-                        <p className="whitespace-pre-line text-sm">{adviceResult.mealSpecificFeedback}</p>
-                    </CardContent>
-                </Card>
-            )}
           </div>
         )}
       </CardContent>
     </Card>
   );
 }
+

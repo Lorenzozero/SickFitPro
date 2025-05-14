@@ -1,3 +1,4 @@
+
 // src/context/language-context.tsx
 'use client';
 
@@ -91,21 +92,13 @@ const translations: Record<Language, Translations> = {
         macroReminderSettingsAriaLabel: "Macro Reminder Settings",
         macroReminderTooltip: "Set macro logging reminder",
     },
-    nutritionalAnalysis: { // Will be largely replaced by aiHealthAdvisor but keeping some for shared terms
-        errorTitle: "Analysis Error",
-        photoPreviewAlt: "Meal photo preview",
-        removePhoto: "Remove Photo",
-        noPhotoSelected: "No photo selected",
-    },
     aiHealthAdvisor: {
         cardTitle: "AI Health Advisor",
-        dataUsageInfo: "Your stored macro goals, water intake goal, body measurements, and training summary will be automatically used by the AI to provide more personalized advice. You can optionally describe a meal for specific feedback.",
-        // mealDescriptionLabel: "Meal Description (Optional Context)", // Removed
-        // mealDescriptionPlaceholder: "e.g., Grilled chicken breast with quinoa and steamed broccoli.", // Removed
-        // mealDescriptionMinError: "If providing meal details, describe it with at least 5 characters.", // Removed
-        mealPhotoLabel: "Meal Photo (Optional Context)",
-        // mealContextInfo: "Providing details about a recent or typical meal can help the AI give more targeted nutritional feedback in its overall advice.", // Removed
-        mealContextInfoPhoto: "A photo can help the AI better understand the meal context if you wish to provide one.", // Adjusted
+        dataUsageInfo: "Your stored macro goals, water intake goal, body measurements, and training summary will be automatically used by the AI to provide personalized advice. You can also ask a specific question below.",
+        userQueryLabel: "Your Specific Question (Optional)",
+        userQueryPlaceholder: "e.g., How can I improve my sleep? or What are some good exercises for lower back pain?",
+        userQueryDescription: "Ask a specific question or leave blank for general advice based on your data.",
+        userQueryMinError: "If asking a question, please provide at least 10 characters.",
         getAdviceButton: "Get AI Health Advice",
         adviceReadyTitle: "Health Advice Ready!",
         adviceReadyDescription: "AI has generated health advice for you.",
@@ -114,7 +107,6 @@ const translations: Record<Language, Translations> = {
         resultsTitle: "AI Health Advisor Results",
         overallAssessment: "Overall Assessment",
         specificAdvice: "Specific Advice",
-        mealFeedback: "Meal-Specific Feedback",
     },
     settingsPage: {
       title: 'Settings',
@@ -483,21 +475,13 @@ const translations: Record<Language, Translations> = {
         macroReminderSettingsAriaLabel: "Impostazioni Promemoria Macro",
         macroReminderTooltip: "Imposta promemoria registrazione macro",
     },
-    nutritionalAnalysis: { // Mantenuto per termini condivisi
-        errorTitle: "Errore Analisi",
-        photoPreviewAlt: "Anteprima foto pasto",
-        removePhoto: "Rimuovi Foto",
-        noPhotoSelected: "Nessuna foto selezionata",
-    },
-    aiHealthAdvisor: {
+     aiHealthAdvisor: {
         cardTitle: "Consulente Salute AI",
-        dataUsageInfo: "I tuoi obiettivi macro, l'obiettivo di assunzione di acqua, le misurazioni corporee e il riepilogo degli allenamenti memorizzati verranno utilizzati automaticamente dall'AI per fornire consigli più personalizzati. Puoi facoltativamente caricare una foto di un pasto per un contesto aggiuntivo.",
-        // mealDescriptionLabel: "Descrizione Pasto (Contesto Opzionale)", // Removed
-        // mealDescriptionPlaceholder: "es. Petto di pollo alla griglia con quinoa e broccoli al vapore.", // Removed
-        // mealDescriptionMinError: "Se fornisci dettagli sul pasto, descrivilo con almeno 5 caratteri.", // Removed
-        mealPhotoLabel: "Foto Pasto (Contesto Opzionale)",
-        // mealContextInfo: "Fornire dettagli su un pasto recente o tipico può aiutare l'AI a dare un feedback nutrizionale più mirato nella sua consulenza generale.", // Removed
-        mealContextInfoPhoto: "Una foto può aiutare l'AI a comprendere meglio il contesto del pasto, se desideri fornirne una.", // Adjusted
+        dataUsageInfo: "I tuoi obiettivi macro, l'obiettivo di assunzione di acqua, le misurazioni corporee e il riepilogo degli allenamenti memorizzati verranno utilizzati automaticamente dall'AI per fornire consigli più personalizzati. Puoi anche porre una domanda specifica qui sotto.",
+        userQueryLabel: "La Tua Domanda Specifica (Opzionale)",
+        userQueryPlaceholder: "es. Come posso migliorare il sonno? o Quali sono degli esercizi per il mal di schiena?",
+        userQueryDescription: "Poni una domanda specifica o lascia vuoto per consigli generali basati sui tuoi dati.",
+        userQueryMinError: "Se poni una domanda, fornisci almeno 10 caratteri.",
         getAdviceButton: "Ottieni Consulenza Salute AI",
         adviceReadyTitle: "Consulenza Salute Pronta!",
         adviceReadyDescription: "L'AI ha generato una consulenza sulla salute per te.",
@@ -506,7 +490,6 @@ const translations: Record<Language, Translations> = {
         resultsTitle: "Risultati Consulente Salute AI",
         overallAssessment: "Valutazione Generale",
         specificAdvice: "Consigli Specifici",
-        mealFeedback: "Feedback Specifico sul Pasto",
     },
     settingsPage: {
       title: 'Impostazioni',
@@ -916,21 +899,13 @@ const translations: Record<Language, Translations> = {
         macroReminderSettingsAriaLabel: "Configuración de Recordatorio de Macros",
         macroReminderTooltip: "Establecer recordatorio de registro de macros",
     },
-    nutritionalAnalysis: {
-        errorTitle: "Error de Análisis",
-        photoPreviewAlt: "Vista previa de la foto de la comida",
-        removePhoto: "Quitar Foto",
-        noPhotoSelected: "Ninguna foto seleccionada",
-    },
     aiHealthAdvisor: {
         cardTitle: "Asesor de Salud IA",
-        dataUsageInfo: "Tus metas de macronutrientes, meta de ingesta de agua, mediciones corporales y resumen de entrenamiento almacenados se utilizarán automáticamente por la IA para proporcionar consejos más personalizados. Opcionalmente, puedes cargar una foto de una comida para contexto adicional.",
-        // mealDescriptionLabel: "Descripción de la Comida (Contexto Opcional)", // Removed
-        // mealDescriptionPlaceholder: "Ej: Pechuga de pollo a la parrilla con quinoa y brócoli al vapor.", // Removed
-        // mealDescriptionMinError: "Si proporcionas detalles de la comida, descríbela con al menos 5 caracteres.", // Removed
-        mealPhotoLabel: "Foto de la Comida (Contexto Opcional)",
-        // mealContextInfo: "Proporcionar detalles sobre una comida reciente o típica puede ayudar a la IA a dar comentarios nutricionales más específicos en su consejo general.", // Removed
-        mealContextInfoPhoto: "Una foto puede ayudar a la IA a comprender mejor el contexto de la comida, si deseas proporcionar una.", // Adjusted
+        dataUsageInfo: "Tus metas de macronutrientes, meta de ingesta de agua, mediciones corporales y resumen de entrenamiento almacenados se utilizarán automáticamente por la IA para proporcionar consejos más personalizados. También puedes hacer una pregunta específica a continuación.",
+        userQueryLabel: "Tu Pregunta Específica (Opcional)",
+        userQueryPlaceholder: "Ej: ¿Cómo puedo mejorar mi sueño? o ¿Cuáles son buenos ejercicios para el dolor lumbar?",
+        userQueryDescription: "Haz una pregunta específica o déjalo en blanco para obtener consejos generales basados en tus datos.",
+        userQueryMinError: "Si haces una pregunta, proporciona al menos 10 caracteres.",
         getAdviceButton: "Obtener Consejo de Salud IA",
         adviceReadyTitle: "¡Consejo de Salud Listo!",
         adviceReadyDescription: "La IA ha generado consejos de salud para ti.",
@@ -939,7 +914,6 @@ const translations: Record<Language, Translations> = {
         resultsTitle: "Resultados del Asesor de Salud IA",
         overallAssessment: "Evaluación General",
         specificAdvice: "Consejos Específicos",
-        mealFeedback: "Comentarios Específicos sobre la Comida",
     },
     dietPage: {
         title: "Seguimiento de Dieta",
@@ -1296,21 +1270,13 @@ const translations: Record<Language, Translations> = {
         macroReminderSettingsAriaLabel: "Paramètres du Rappel des Macros",
         macroReminderTooltip: "Définir le rappel de saisie des macros",
     },
-    nutritionalAnalysis: {
-        errorTitle: "Erreur d'Analyse",
-        photoPreviewAlt: "Aperçu de la photo du repas",
-        removePhoto: "Supprimer Photo",
-        noPhotoSelected: "Aucune photo sélectionnée",
-    },
      aiHealthAdvisor: {
         cardTitle: "Conseiller Santé IA",
-        dataUsageInfo: "Vos objectifs macro, votre objectif d'apport en eau, vos mesures corporelles et votre résumé d'entraînement stockés seront automatiquement utilisés par l'IA pour fournir des conseils plus personnalisés. Vous pouvez éventuellement charger une photo d'un repas pour un contexte supplémentaire.",
-        // mealDescriptionLabel: "Description du Repas (Contexte Optionnel)", // Removed
-        // mealDescriptionPlaceholder: "Ex: Poitrine de poulet grillée avec quinoa et brocoli vapeur.", // Removed
-        // mealDescriptionMinError: "Si vous fournissez des détails sur le repas, décrivez-le avec au moins 5 caractères.", // Removed
-        mealPhotoLabel: "Photo du Repas (Contexte Optionnel)",
-        // mealContextInfo: "Fournir des détails sur un repas récent ou typique peut aider l'IA à donner un retour nutritionnel plus ciblé dans ses conseils généraux.", // Removed
-        mealContextInfoPhoto: "Une photo peut aider l'IA à mieux comprendre le contexte du repas, si vous souhaitez en fournir une.", // Adjusted
+        dataUsageInfo: "Vos objectifs macro, votre objectif d'apport en eau, vos mesures corporelles et votre résumé d'entraînement stockés seront automatiquement utilisés par l'IA pour fournir des conseils plus personnalisés. Vous pouvez également poser une question spécifique ci-dessous.",
+        userQueryLabel: "Votre Question Spécifique (Optionnel)",
+        userQueryPlaceholder: "Ex: Comment puis-je améliorer mon sommeil ? ou Quels sont les bons exercices pour le mal de dos ?",
+        userQueryDescription: "Posez une question spécifique ou laissez vide pour des conseils généraux basés sur vos données.",
+        userQueryMinError: "Si vous posez une question, veuillez fournir au moins 10 caractères.",
         getAdviceButton: "Obtenir Conseil Santé IA",
         adviceReadyTitle: "Conseil Santé Prêt !",
         adviceReadyDescription: "L'IA a généré des conseils de santé pour vous.",
@@ -1319,7 +1285,6 @@ const translations: Record<Language, Translations> = {
         resultsTitle: "Résultats Conseiller Santé IA",
         overallAssessment: "Évaluation Globale",
         specificAdvice: "Conseils Spécifiques",
-        mealFeedback: "Retour Spécifique sur le Repas",
     },
     dietPage: {
         title: "Suivi de l'Alimentation",
@@ -1663,3 +1628,4 @@ export function useLanguage() {
   }
   return context;
 }
+
