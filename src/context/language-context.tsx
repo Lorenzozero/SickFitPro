@@ -99,14 +99,13 @@ const translations: Record<Language, Translations> = {
     },
     aiHealthAdvisor: {
         cardTitle: "AI Health Advisor",
-        cardDescription: "Get holistic health advice by providing some context about your goals and optionally, a recent meal.",
         dataUsageInfo: "Your stored macro goals, water intake goal, body measurements, and training summary will be automatically used by the AI to provide more personalized advice. You can optionally describe a meal for specific feedback.",
-        mealDescriptionLabel: "Meal Description (Optional Context)",
-        mealDescriptionPlaceholder: "e.g., Grilled chicken breast with quinoa and steamed broccoli.",
-        mealDescriptionMinError: "If providing meal details, describe it with at least 5 characters.",
+        // mealDescriptionLabel: "Meal Description (Optional Context)", // Removed
+        // mealDescriptionPlaceholder: "e.g., Grilled chicken breast with quinoa and steamed broccoli.", // Removed
+        // mealDescriptionMinError: "If providing meal details, describe it with at least 5 characters.", // Removed
         mealPhotoLabel: "Meal Photo (Optional Context)",
-        mealContextInfo: "Providing details about a recent or typical meal can help the AI give more targeted nutritional feedback in its overall advice.",
-        mealContextInfoPhoto: "A photo can help the AI better understand the meal context.",
+        // mealContextInfo: "Providing details about a recent or typical meal can help the AI give more targeted nutritional feedback in its overall advice.", // Removed
+        mealContextInfoPhoto: "A photo can help the AI better understand the meal context if you wish to provide one.", // Adjusted
         getAdviceButton: "Get AI Health Advice",
         adviceReadyTitle: "Health Advice Ready!",
         adviceReadyDescription: "AI has generated health advice for you.",
@@ -492,14 +491,13 @@ const translations: Record<Language, Translations> = {
     },
     aiHealthAdvisor: {
         cardTitle: "Consulente Salute AI",
-        cardDescription: "Ottieni consigli sulla salute olistici fornendo un contesto sui tuoi obiettivi e, facoltativamente, su un pasto recente.",
-        dataUsageInfo: "I tuoi obiettivi macro, l'obiettivo di assunzione di acqua, le misurazioni corporee e il riepilogo degli allenamenti memorizzati verranno utilizzati automaticamente dall'AI per fornire consigli più personalizzati. Puoi facoltativamente descrivere un pasto per un feedback specifico.",
-        mealDescriptionLabel: "Descrizione Pasto (Contesto Opzionale)",
-        mealDescriptionPlaceholder: "es. Petto di pollo alla griglia con quinoa e broccoli al vapore.",
-        mealDescriptionMinError: "Se fornisci dettagli sul pasto, descrivilo con almeno 5 caratteri.",
+        dataUsageInfo: "I tuoi obiettivi macro, l'obiettivo di assunzione di acqua, le misurazioni corporee e il riepilogo degli allenamenti memorizzati verranno utilizzati automaticamente dall'AI per fornire consigli più personalizzati. Puoi facoltativamente caricare una foto di un pasto per un contesto aggiuntivo.",
+        // mealDescriptionLabel: "Descrizione Pasto (Contesto Opzionale)", // Removed
+        // mealDescriptionPlaceholder: "es. Petto di pollo alla griglia con quinoa e broccoli al vapore.", // Removed
+        // mealDescriptionMinError: "Se fornisci dettagli sul pasto, descrivilo con almeno 5 caratteri.", // Removed
         mealPhotoLabel: "Foto Pasto (Contesto Opzionale)",
-        mealContextInfo: "Fornire dettagli su un pasto recente o tipico può aiutare l'AI a dare un feedback nutrizionale più mirato nella sua consulenza generale.",
-        mealContextInfoPhoto: "Una foto può aiutare l'AI a comprendere meglio il contesto del pasto.",
+        // mealContextInfo: "Fornire dettagli su un pasto recente o tipico può aiutare l'AI a dare un feedback nutrizionale più mirato nella sua consulenza generale.", // Removed
+        mealContextInfoPhoto: "Una foto può aiutare l'AI a comprendere meglio il contesto del pasto, se desideri fornirne una.", // Adjusted
         getAdviceButton: "Ottieni Consulenza Salute AI",
         adviceReadyTitle: "Consulenza Salute Pronta!",
         adviceReadyDescription: "L'AI ha generato una consulenza sulla salute per te.",
@@ -926,14 +924,13 @@ const translations: Record<Language, Translations> = {
     },
     aiHealthAdvisor: {
         cardTitle: "Asesor de Salud IA",
-        cardDescription: "Obtén consejos de salud holísticos proporcionando contexto sobre tus objetivos y, opcionalmente, una comida reciente.",
-        dataUsageInfo: "Tus metas de macronutrientes, meta de ingesta de agua, mediciones corporales y resumen de entrenamiento almacenados se utilizarán automáticamente por la IA para proporcionar consejos más personalizados. Opcionalmente, puedes describir una comida para obtener comentarios específicos.",
-        mealDescriptionLabel: "Descripción de la Comida (Contexto Opcional)",
-        mealDescriptionPlaceholder: "Ej: Pechuga de pollo a la parrilla con quinoa y brócoli al vapor.",
-        mealDescriptionMinError: "Si proporcionas detalles de la comida, descríbela con al menos 5 caracteres.",
+        dataUsageInfo: "Tus metas de macronutrientes, meta de ingesta de agua, mediciones corporales y resumen de entrenamiento almacenados se utilizarán automáticamente por la IA para proporcionar consejos más personalizados. Opcionalmente, puedes cargar una foto de una comida para contexto adicional.",
+        // mealDescriptionLabel: "Descripción de la Comida (Contexto Opcional)", // Removed
+        // mealDescriptionPlaceholder: "Ej: Pechuga de pollo a la parrilla con quinoa y brócoli al vapor.", // Removed
+        // mealDescriptionMinError: "Si proporcionas detalles de la comida, descríbela con al menos 5 caracteres.", // Removed
         mealPhotoLabel: "Foto de la Comida (Contexto Opcional)",
-        mealContextInfo: "Proporcionar detalles sobre una comida reciente o típica puede ayudar a la IA a dar comentarios nutricionales más específicos en su consejo general.",
-        mealContextInfoPhoto: "Una foto puede ayudar a la IA a comprender mejor el contexto de la comida.",
+        // mealContextInfo: "Proporcionar detalles sobre una comida reciente o típica puede ayudar a la IA a dar comentarios nutricionales más específicos en su consejo general.", // Removed
+        mealContextInfoPhoto: "Una foto puede ayudar a la IA a comprender mejor el contexto de la comida, si deseas proporcionar una.", // Adjusted
         getAdviceButton: "Obtener Consejo de Salud IA",
         adviceReadyTitle: "¡Consejo de Salud Listo!",
         adviceReadyDescription: "La IA ha generado consejos de salud para ti.",
@@ -1307,14 +1304,13 @@ const translations: Record<Language, Translations> = {
     },
      aiHealthAdvisor: {
         cardTitle: "Conseiller Santé IA",
-        cardDescription: "Obtenez des conseils de santé holistiques en fournissant un contexte sur vos objectifs et, éventuellement, un repas récent.",
-        dataUsageInfo: "Vos objectifs macro, votre objectif d'apport en eau, vos mesures corporelles et votre résumé d'entraînement stockés seront automatiquement utilisés par l'IA pour fournir des conseils plus personnalisés. Vous pouvez éventuellement décrire un repas pour un retour d'information spécifique.",
-        mealDescriptionLabel: "Description du Repas (Contexte Optionnel)",
-        mealDescriptionPlaceholder: "Ex: Poitrine de poulet grillée avec quinoa et brocoli vapeur.",
-        mealDescriptionMinError: "Si vous fournissez des détails sur le repas, décrivez-le avec au moins 5 caractères.",
+        dataUsageInfo: "Vos objectifs macro, votre objectif d'apport en eau, vos mesures corporelles et votre résumé d'entraînement stockés seront automatiquement utilisés par l'IA pour fournir des conseils plus personnalisés. Vous pouvez éventuellement charger une photo d'un repas pour un contexte supplémentaire.",
+        // mealDescriptionLabel: "Description du Repas (Contexte Optionnel)", // Removed
+        // mealDescriptionPlaceholder: "Ex: Poitrine de poulet grillée avec quinoa et brocoli vapeur.", // Removed
+        // mealDescriptionMinError: "Si vous fournissez des détails sur le repas, décrivez-le avec au moins 5 caractères.", // Removed
         mealPhotoLabel: "Photo du Repas (Contexte Optionnel)",
-        mealContextInfo: "Fournir des détails sur un repas récent ou typique peut aider l'IA à donner un retour nutritionnel plus ciblé dans ses conseils généraux.",
-        mealContextInfoPhoto: "Une photo peut aider l'IA à mieux comprendre le contexte du repas.",
+        // mealContextInfo: "Fournir des détails sur un repas récent ou typique peut aider l'IA à donner un retour nutritionnel plus ciblé dans ses conseils généraux.", // Removed
+        mealContextInfoPhoto: "Une photo peut aider l'IA à mieux comprendre le contexte du repas, si vous souhaitez en fournir une.", // Adjusted
         getAdviceButton: "Obtenir Conseil Santé IA",
         adviceReadyTitle: "Conseil Santé Prêt !",
         adviceReadyDescription: "L'IA a généré des conseils de santé pour vous.",

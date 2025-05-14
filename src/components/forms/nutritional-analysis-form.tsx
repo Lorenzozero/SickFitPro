@@ -5,11 +5,10 @@ import { useState, type ChangeEvent, useEffect } from 'react';
 import { useForm, type SubmitHandler } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import Image from 'next/image';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
 import { Loader2, Wand2, UploadCloud, XCircle, Info } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { useLanguage } from '@/context/language-context';
@@ -22,10 +21,9 @@ import { z } from 'zod';
 
 
 // Zod schema for form validation (only for fields user directly interacts with)
+// Only mealPhotoDataUri is left as a direct user input for the form.
 const formValidationSchema = HealthContextInputSchema.pick({ 
   mealPhotoDataUri: true,    
-}).extend({
-  mealDescription: z.string().min(5, { message: "aiHealthAdvisor.mealDescriptionMinError" }).optional(),
 });
 
 // Type for the fields managed by react-hook-form
@@ -43,20 +41,13 @@ export default function AiHealthAdvisorForm() {
   const form = useForm<UserEditableFormValues>({
     resolver: zodResolver(formValidationSchema),
     defaultValues: {
-      mealDescription: '',
       mealPhotoDataUri: undefined,
     },
   });
   
   useEffect(() => {
-    const currentLang = t('aiHealthAdvisor.mealDescriptionMinError'); 
-    // const updatedSchema = HealthContextInputSchema.pick({
-    //   mealDescription: true,
-    //   mealPhotoDataUri: true,
-    // }).extend({
-    //   mealDescription: z.string().min(5, { message: currentLang }).optional(), // Corrected definition here as well if used
-    // });
-    
+    // Trigger validation if language changes and form has errors
+    // This can be useful if error messages are translated
     form.trigger(); 
   }, [t, form]);
 
@@ -136,7 +127,7 @@ export default function AiHealthAdvisorForm() {
     }
 
     const inputData: HealthContextInput = {
-      mealDescription: formData.mealDescription,
+      // mealDescription is removed as it's no longer part of the form or UserEditableFormValues
       mealPhotoDataUri: formData.mealPhotoDataUri,
       userMacroGoalsSummary,
       userWaterGoalMl,
@@ -170,7 +161,6 @@ export default function AiHealthAdvisorForm() {
           <Wand2 className="w-6 h-6 mr-2 text-primary" />
           {t('aiHealthAdvisor.cardTitle')}
         </CardTitle>
-        {/* <CardDescription>{t('aiHealthAdvisor.cardDescription')}</CardDescription> */}
       </CardHeader>
       <CardContent>
         <div className="p-3 mb-6 text-sm border rounded-md bg-accent/10 text-accent-foreground">
@@ -181,24 +171,7 @@ export default function AiHealthAdvisorForm() {
         </div>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-            <FormField
-              control={form.control}
-              name="mealDescription"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>{t('aiHealthAdvisor.mealDescriptionLabel')}</FormLabel>
-                  <FormControl>
-                    <Textarea
-                      placeholder={t('aiHealthAdvisor.mealDescriptionPlaceholder')}
-                      className="min-h-[80px]"
-                      {...field}
-                    />
-                  </FormControl>
-                  <FormDescription>{t('aiHealthAdvisor.mealContextInfo')}</FormDescription>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+            {/* Meal Description Field Removed */}
 
             <FormItem>
               <FormLabel>{t('aiHealthAdvisor.mealPhotoLabel')}</FormLabel>
@@ -233,7 +206,7 @@ export default function AiHealthAdvisorForm() {
                 </div>
               )}
               <FormDescription>{t('aiHealthAdvisor.mealContextInfoPhoto')}</FormDescription>
-              <FormMessage />
+              <FormMessage /> {/* This will show validation errors for mealPhotoDataUri if any */}
             </FormItem>
             
             <div className="flex justify-center">
@@ -293,4 +266,3 @@ export default function AiHealthAdvisorForm() {
     </Card>
   );
 }
-
