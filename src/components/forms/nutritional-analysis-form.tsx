@@ -1,41 +1,44 @@
 
 'use client';
 
-import { useState, type ChangeEvent, useEffect } from 'react';
+import { useState, type ChangeEvent, useEffect, useMemo } from 'react'; // Added useMemo
 import { useForm, type SubmitHandler } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Button } from '@/components/ui/button';
-import { Textarea } from '@/components/ui/textarea'; // Added Textarea
+import { Textarea } from '@/components/ui/textarea';
 import { Loader2, Wand2, Info } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { useLanguage } from '@/context/language-context';
 import { getHealthAdvice, type HealthContextInput, type HealthAdviceOutput } from '@/ai/flows/analyze-meal-flow';
-import { HealthContextInputSchema } from '@/ai/schemas/health-advisor-schemas'; 
+import { HealthContextInputSchema } from '@/ai/schemas/health-advisor-schemas';
 import { Skeleton } from '@/components/ui/skeleton';
-import type { BodyMeasurement } from '@/app/(app)/progress/page'; 
-import { mockGetUserTrainingData, formatTrainingDataToString } from '@/components/forms/ai-split-form'; 
+import type { BodyMeasurement } from '@/app/(app)/progress/page';
+import { mockGetUserTrainingData, formatTrainingDataToString } from '@/components/forms/ai-split-form';
 import { z } from 'zod';
 
 
-// Zod schema for form validation - only for fields user directly interacts with.
-// Now it's only userQuery.
-const formValidationSchema = HealthContextInputSchema.pick({
-  userQuery: true,
-}).extend({
-   userQuery: z.string().min(10, { message: "aiHealthAdvisor.userQueryMinError" }).optional(),
-});
-
-
-// Type for the fields managed by react-hook-form
-type UserEditableFormValues = z.infer<typeof formValidationSchema>;
+// Type for the fields managed by react-hook-form. User only edits userQuery.
+interface UserEditableFormValues {
+  userQuery?: string;
+}
 
 export default function AiHealthAdvisorForm() {
   const { t } = useLanguage();
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
   const [adviceResult, setAdviceResult] = useState<HealthAdviceOutput | null>(null);
+
+  // Define the form validation schema inside the component using useMemo
+  // so it can access the `t` function and re-create the schema when `t` changes.
+  const formValidationSchema = useMemo(() => {
+    return HealthContextInputSchema.pick({
+      userQuery: true,
+    }).extend({
+      userQuery: z.string().min(10, { message: t('aiHealthAdvisor.userQueryMinError') }).optional(),
+    });
+  }, [t]);
   
   const form = useForm<UserEditableFormValues>({
     resolver: zodResolver(formValidationSchema),
@@ -44,9 +47,10 @@ export default function AiHealthAdvisorForm() {
     },
   });
   
+  // Re-trigger validation if language changes to update messages
   useEffect(() => {
     form.trigger(); 
-  }, [t, form]);
+  }, [t, form, formValidationSchema]); // formValidationSchema is now a dependency
 
 
   const onSubmit: SubmitHandler<UserEditableFormValues> = async (formData) => {
@@ -94,7 +98,7 @@ export default function AiHealthAdvisorForm() {
     }
 
     const inputData: HealthContextInput = {
-      userQuery: formData.userQuery || undefined, // Pass userQuery if provided
+      userQuery: formData.userQuery || undefined, 
       userMacroGoalsSummary,
       userWaterGoalMl,
       userBodyMeasurementsSummary,
@@ -204,4 +208,3 @@ export default function AiHealthAdvisorForm() {
     </Card>
   );
 }
-
