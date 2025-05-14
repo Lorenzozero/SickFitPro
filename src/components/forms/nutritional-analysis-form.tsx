@@ -21,12 +21,12 @@ import { z } from 'zod';
 
 // Zod schema for form validation - only for fields user directly interacts with.
 // Now it's only userQuery.
-const formValidationSchema = z.object({
-  userQuery: z
-    .string()
-    .min(10, { message: "aiHealthAdvisor.userQueryMinError" }) // Example validation
-    .optional(), // Making it optional if user just wants general advice based on auto-collected data
+const formValidationSchema = HealthContextInputSchema.pick({
+  userQuery: true,
+}).extend({
+   userQuery: z.string().min(10, { message: "aiHealthAdvisor.userQueryMinError" }).optional(),
 });
+
 
 // Type for the fields managed by react-hook-form
 type UserEditableFormValues = z.infer<typeof formValidationSchema>;
@@ -142,7 +142,7 @@ export default function AiHealthAdvisorForm() {
               name="userQuery"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>{t('aiHealthAdvisor.userQueryLabel')}</FormLabel>
+                  {/* FormLabel removed as per user request */}
                   <FormControl>
                     <Textarea
                       placeholder={t('aiHealthAdvisor.userQueryPlaceholder')}
