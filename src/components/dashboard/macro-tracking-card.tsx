@@ -1,7 +1,7 @@
 
 'use client';
 
-import { useState, useEffect, type ChangeEvent, useMemo } from 'react';
+import { useState, useEffect, type ChangeEvent, useMemo, useCallback } from 'react'; // Added useCallback
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -248,4 +248,3 @@ export default function MacroTrackingCard() {
     </Card>
   );
 }
-
