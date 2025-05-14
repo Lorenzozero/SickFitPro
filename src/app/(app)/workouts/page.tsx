@@ -6,7 +6,7 @@ import Link from 'next/link';
 import Image from 'next/image'; // Aggiunto import per Image
 import { PageHeader } from '@/components/shared/page-header';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { PlusCircle, Edit2, Trash2, Share2, PlayCircle, ListChecks, Ban } from 'lucide-react';
 import {
   Dialog,
@@ -14,7 +14,8 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-  DialogClose
+  DialogClose,
+  DialogDescription, // Added import
 } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -54,7 +55,7 @@ const initialWorkoutPlans: WorkoutPlan[] = [
       { id: 'e1-1', name: 'Squats', sets: '3', reps: '8-12'},
       { id: 'e1-2', name: 'Bench Press', sets: '3', reps: '8-12'},
     ],
-    muscleGroups: ['Full Body', 'Biceps', 'Triceps', 'Back', 'Chest', 'Shoulders', 'Abs', 'Legs'] 
+    muscleGroups: ['Chest', 'Back', 'Legs', 'Shoulders', 'Biceps', 'Triceps', 'Abs'] 
   },
   { 
     id: '2', 
