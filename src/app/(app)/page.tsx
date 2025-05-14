@@ -47,10 +47,8 @@ export default function DashboardPage() {
   const today = useMemo(() => {
     if (!isMounted) return null;
     const date = new Date();
-    // Sunday is 0 for getDay(), Saturday is 6.
-    // dayKeys: monday = 0, sunday = 6
-    let dayIndex = date.getDay() - 1; // Monday (0) to Saturday (5)
-    if (dayIndex === -1) { // Sunday
+    let dayIndex = date.getDay() - 1; 
+    if (dayIndex === -1) { 
         dayIndex = 6;
     }
     return dayKeys[dayIndex];
@@ -74,8 +72,7 @@ export default function DashboardPage() {
     return dayKeys.reduce((sum, dayKey) => sum + (weeklySchedule[dayKey]?.length || 0), 0);
   }, [scheduleIsClient, weeklySchedule]);
 
-  // Placeholder for actual completed workouts this week.
-  const completedWorkoutsThisWeek = 0;
+  const completedWorkoutsThisWeek = 0; 
 
 
   const stats = [
@@ -99,7 +96,7 @@ export default function DashboardPage() {
         title={t('dashboard.welcomeTitle')}
         description={t('dashboard.welcomeDescription')}
       />
-      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3"> {/* Reduced gap from 6 to 4 */}
         {stats.map((stat) => (
           <Card key={stat.titleKey} className="shadow-lg hover:shadow-xl transition-shadow duration-300">
             <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
@@ -115,7 +112,7 @@ export default function DashboardPage() {
         ))}
       </div>
 
-      <div className="mt-8 grid gap-6 md:grid-cols-1 lg:grid-cols-1">
+      <div className="mt-6 grid gap-4 md:grid-cols-1 lg:grid-cols-1"> {/* Reduced mt-8 to mt-6, gap to 4 */}
         <Card className="shadow-lg">
           <CardHeader>
             <CardTitle>{isMounted ? t('dashboard.todaysFocus') : "Today's Focus"}</CardTitle>
@@ -154,12 +151,12 @@ export default function DashboardPage() {
         </Card>
       </div>
 
-      <Card className="mt-8 shadow-lg">
+      <Card className="mt-6 shadow-lg"> {/* Reduced mt-8 to mt-6 */}
         <CardHeader>
           <CardTitle>{isMounted ? t('dashboard.activityAndHistoryTitle') : "Activity & History"}</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="mb-6 flex justify-center">
+          <div className="mb-4 flex justify-center"> {/* Reduced mb-6 to mb-4 */}
             <Button asChild className="w-full md:w-auto">
               <Link href="/start-workout">
                 <PlayCircle className="w-4 h-4 mr-2"/> {isMounted ? t('dashboard.logNewWorkout') : 'Start Workout'}
@@ -168,11 +165,11 @@ export default function DashboardPage() {
           </div>
 
           {mockWorkoutHistory.length > 0 ? (
-            <ScrollArea className="h-72">
-              <ul className="space-y-3 pr-4">
+            <ScrollArea className="h-64"> {/* Reduced height from h-72 */}
+              <ul className="space-y-2 pr-3"> {/* Reduced space-y-3 to space-y-2, pr-4 to pr-3 */}
                 {mockWorkoutHistory.map((item, index) => (
                   <li key={item.id}>
-                    <div className="flex items-center justify-between p-3 rounded-md bg-secondary/50 hover:bg-secondary transition-colors">
+                    <div className="flex items-center justify-between p-2 rounded-md bg-secondary/50 hover:bg-secondary transition-colors"> {/* Reduced p-3 to p-2 */}
                       <div className="flex-grow">
                         <p className="font-semibold text-secondary-foreground">
                           {isMounted ? t(item.planNameKey, { default: item.defaultPlanName }) : item.defaultPlanName}
@@ -184,7 +181,7 @@ export default function DashboardPage() {
                         <span>{item.duration}</span>
                       </div>
                     </div>
-                    {index < mockWorkoutHistory.length - 1 && <Separator className="my-3" />}
+                    {index < mockWorkoutHistory.length - 1 && <Separator className="my-2" />} {/* Reduced my-3 to my-2 */}
                   </li>
                 ))}
               </ul>
@@ -194,7 +191,7 @@ export default function DashboardPage() {
           )}
         </CardContent>
         {mockWorkoutHistory.length > 0 && (
-            <CardFooter className="justify-center pt-4 border-t">
+            <CardFooter className="justify-center pt-3 border-t"> {/* Reduced pt-4 to pt-3 */}
                  <Button asChild variant="outline" size="sm">
                     <Link href="/progress">{isMounted ? t('dashboard.viewAllHistoryButton') : "View All History"}</Link>
                 </Button>

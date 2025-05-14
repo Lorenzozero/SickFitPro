@@ -3,16 +3,16 @@
 
 import { useState, type FormEvent } from 'react';
 import Link from 'next/link';
-import Image from 'next/image'; // Aggiunto import per Image
+import Image from 'next/image'; 
 import { PageHeader } from '@/components/shared/page-header';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card'; // Rimosso CardHeader, CardTitle qui -> Aggiunto CardHeader
+import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card'; 
 import { PlusCircle, Edit2, Trash2, Share2, PlayCircle, ListChecks, Ban } from 'lucide-react';
 import {
   Dialog,
   DialogContent,
   DialogFooter,
-  DialogHeader as UIDialogHeader, // Renamed to avoid conflict
+  DialogHeader as UIDialogHeader, 
   DialogTitle,
   DialogClose,
   DialogDescription,
@@ -206,8 +206,8 @@ export default function WorkoutPlansPage() {
       />
       {activeWorkoutIsClient && activePlanId && (
           <Card className="mb-6 shadow-md border-destructive bg-destructive/10">
-            <CardHeader className="p-4"> {/* Added CardHeader for consistency */}
-              <h3 className="text-destructive flex items-center font-semibold"> {/* Changed to h3 for semantic consistency */}
+            <CardHeader className="p-4"> 
+              <h3 className="text-destructive flex items-center font-semibold"> 
                 <Ban className="w-5 h-5 mr-2" />
                 {t('activeWorkoutPage.workoutInProgressTitle', { default: 'Workout In Progress' })}
               </h3>
@@ -223,39 +223,39 @@ export default function WorkoutPlansPage() {
           </Card>
         )}
 
-      <div className="space-y-6"> {/* Changed grid to space-y for single column */}
+      <div className="space-y-4"> {/* Reduced space-y-6 to space-y-4 */}
         {plans.map((plan) => (
           <Card key={plan.id} className="flex flex-col shadow-lg hover:shadow-xl transition-shadow duration-300">
             <CardContent className="flex-grow p-4">
               <div className="flex flex-col sm:flex-row items-start gap-4">
                 {/* Left: Image */}
-                <div className="relative w-full sm:w-32 h-48 flex-shrink-0"> 
+                <div className="relative w-full sm:w-32 h-44 flex-shrink-0"> {/* Adjusted image size */}
                   <Image 
-                      src="https://placehold.co/128x192.png" 
+                      src="https://placehold.co/128x176.png" // Adjusted placeholder size to match new h-44
                       alt={t('workoutPlansPage.muscleSilhouetteAlt', {default: 'Muscle groups involved'})} 
                       layout="fill"
-                      objectFit="contain"
+                      objectFit="contain" 
                       className="rounded-sm"
                       data-ai-hint="muscle map human anatomy"
                   />
                 </div>
 
                 {/* Right: Details */}
-                <div className="flex-grow space-y-2">
+                <div className="flex-grow space-y-1.5"> {/* Reduced space-y-2 to space-y-1.5 */}
                   <h3 className="text-xl font-semibold text-primary">{plan.name}</h3>
                   
                   <div className="flex items-center gap-2">
-                    <span className="text-sm font-medium text-muted-foreground">{t('workoutPlansPage.muscleGroupsLabel', {default: 'Muscles'})}:</span>
-                    <MuscleGroupIcons muscleGroups={plan.muscleGroups} iconClassName="w-4 h-4 text-accent" />
+                    <span className="text-xs font-medium text-muted-foreground uppercase tracking-wider">{t('workoutPlansPage.muscleGroupsLabel', {default: 'Muscles'})}:</span>
+                    <MuscleGroupIcons muscleGroups={plan.muscleGroups} iconClassName="w-3.5 h-3.5 text-accent" /> {/* Slightly larger icons */}
                   </div>
                   
                   <p className="text-sm text-muted-foreground">{t('workoutPlansPage.exercisesLabel')}: {plan.exercises}</p>
                   <p className="text-sm text-muted-foreground">{t('workoutPlansPage.estDurationLabel')}: {plan.duration}</p>
                   
                   {plan.exerciseDetails && plan.exerciseDetails.length > 0 && (
-                    <div className="mt-3">
+                    <div className="mt-2"> {/* Reduced mt-3 to mt-2 */}
                         <h4 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1">{t('workoutPlansPage.exercisesLabel')}</h4>
-                        <ScrollArea className="h-24">
+                        <ScrollArea className="h-20"> {/* Reduced h-24 to h-20 */}
                             <ul className="list-disc list-inside text-xs space-y-0.5 pr-2">
                                 {plan.exerciseDetails.map(ex => <li key={ex.id} className="truncate">{ex.name} ({ex.sets}x{ex.reps})</li>)}
                             </ul>
@@ -265,7 +265,7 @@ export default function WorkoutPlansPage() {
                 </div>
               </div>
             </CardContent>
-            <CardFooter className="flex flex-col sm:flex-row justify-between items-center gap-2 pt-4 border-t p-4">
+            <CardFooter className="flex flex-col sm:flex-row justify-between items-center gap-2 pt-3 border-t p-3"> {/* Reduced padding */}
               <Button 
                 variant="default" 
                 size="sm"
@@ -293,7 +293,7 @@ export default function WorkoutPlansPage() {
 
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
         <DialogContent className="sm:max-w-lg">
-          <UIDialogHeader> {/* Renamed to UIDialogHeader */}
+          <UIDialogHeader> 
             <DialogTitle>{currentPlan?.id ? t('workoutPlansPage.dialogEditTitle') : t('workoutPlansPage.dialogCreateTitle')}</DialogTitle>
             <DialogDescription>
               {currentPlan?.id ? t('workoutPlansPage.dialogEditDescription') : t('workoutPlansPage.dialogCreateDescription')}
@@ -330,7 +330,7 @@ export default function WorkoutPlansPage() {
                     onChange={(e) => setCurrentPlan(prev => ({ ...prev, duration: e.target.value }))}
                   />
                 </div>
-                {/* TODO: Aggiungere qui un selettore per i muscleGroups se si vuole renderli modificabili */}
+                
 
                 <Card className="mt-4">
                   <CardHeader className="pb-2 p-4">

@@ -36,7 +36,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { useTheme } from '@/components/theme-provider';
 import { useLanguage } from '@/context/language-context';
-import ResumeWorkoutButton from '@/components/shared/resume-workout-button'; // Added
+import ResumeWorkoutButton from '@/components/shared/resume-workout-button'; 
 
 export default function AppLayout({ children }: { children: ReactNode }) {
   const { theme, setTheme, resolvedTheme } = useTheme();
@@ -77,7 +77,7 @@ export default function AppLayout({ children }: { children: ReactNode }) {
                 </Avatar>
                 <div className="group-data-[collapsible=icon]:hidden">
                   <p className="text-sm font-medium">{isClient ? t('userDropdown.myAccount') : 'My Account'}</p> 
-                  <p className="text-xs text-sidebar-foreground/70">{isClient ? t('userDropdown.settings') : 'Settings'}</p>
+                  {/* Removed settings link from here as it's in dropdown */}
                 </div>
               </Button>
             </DropdownMenuTrigger>
@@ -127,10 +127,10 @@ export default function AppLayout({ children }: { children: ReactNode }) {
             </Button>
           </div>
         </header>
-        <main className="flex-1 p-4 md:p-6 lg:p-8 text-center">
+        <main className="flex-1 p-4 md:p-6 text-center"> {/* Reduced lg padding */}
           {children}
         </main>
-        <ResumeWorkoutButton /> {/* Added floating resume button */}
+        <ResumeWorkoutButton /> 
       </SidebarInset>
     </SidebarProvider>
   );
