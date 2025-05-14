@@ -183,8 +183,8 @@ export default function CalendarPage() {
           </div>
 
           {/* Desktop View */}
-          <div className="hidden md:block"> {/* Removed overflow-x-auto to rely on page scroll if needed */}
-            <Table className="min-w-full md:min-w-0"> {/* Ensured table doesn't force overflow on md unless content demands */}
+          <div className="hidden md:block">
+            <Table className="min-w-full md:min-w-0">
               <TableHeader>
                 <TableRow>
                   {dayKeys.map(dayKey => (
