@@ -1,8 +1,10 @@
+
 'use server';
 /**
  * @fileOverview Un agente AI per consulenza sulla salute e fitness.
  *
  * - getHealthAdvice - Una funzione che gestisce il processo di consulenza.
+ * - HealthContextInputSchema - Lo schema Zod per l'input della funzione getHealthAdvice.
  * - HealthContextInput - Il tipo di input per la funzione getHealthAdvice.
  * - HealthAdviceOutput - Il tipo di ritorno per la funzione getHealthAdvice.
  */
@@ -10,7 +12,7 @@
 import {ai} from '@/ai/genkit';
 import {z} from 'genkit';
 
-const HealthContextInputSchema = z.object({
+export const HealthContextInputSchema = z.object({
   mealDescription: z
     .string()
     .optional()

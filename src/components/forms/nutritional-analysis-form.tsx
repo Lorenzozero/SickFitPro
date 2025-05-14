@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState, type ChangeEvent, useEffect } from 'react';
@@ -12,14 +13,22 @@ import { Textarea } from '@/components/ui/textarea';
 import { Loader2, Wand2, UploadCloud, XCircle, Info } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { useLanguage } from '@/context/language-context';
-import { getHealthAdvice, type HealthContextInput, type HealthAdviceOutput } from '@/ai/flows/analyze-meal-flow'; //  Path remains same, but exported function and types are different
+import { getHealthAdvice, HealthContextInputSchema, type HealthContextInput, type HealthAdviceOutput } from '@/ai/flows/analyze-meal-flow';
 import { Skeleton } from '@/components/ui/skeleton';
-import type { BodyMeasurement } from '@/app/(app)/progress/page'; // Import BodyMeasurement type
-import { mockGetUserTrainingData, formatTrainingDataToString } from '@/components/forms/ai-split-form'; // Re-use for training data
+import type { BodyMeasurement } from '@/app/(app)/progress/page';
+import { mockGetUserTrainingData, formatTrainingDataToString } from '@/components/forms/ai-split-form';
+import { z } from 'zod';
 
-// Schema is now based on HealthContextInput
-const AiHealthAdvisorFormSchema = HealthContextInput.schema;
-type AiHealthAdvisorFormValues = HealthContextInput;
+// Zod schema for form validation (only for fields user directly interacts with)
+const formValidationSchema = HealthContextInputSchema.pick({
+  mealDescription: true,
+  mealPhotoDataUri: true,
+}).extend({
+  mealDescription: HealthContextInputSchema.shape.mealDescription.min(5, { message: "aiHealthAdvisor.mealDescriptionMinError" }).optional(), // Use translation key directly for zod message
+});
+
+// Type for the fields managed by react-hook-form
+type UserEditableFormValues = z.infer<typeof formValidationSchema>;
 
 export default function AiHealthAdvisorForm() {
   const { t } = useLanguage();
@@ -27,19 +36,10 @@ export default function AiHealthAdvisorForm() {
   const [isLoading, setIsLoading] = useState(false);
   const [adviceResult, setAdviceResult] = useState<HealthAdviceOutput | null>(null);
   const [photoPreview, setPhotoPreview] = useState<string | null>(null);
-  const [photoFile, setPhotoFile] = useState<File | null>(null); // Keep for meal photo if provided
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const [photoFile, setPhotoFile] = useState<File | null>(null);
 
-  // Zod schema for form validation (only for fields user directly interacts with if needed)
-  // The main schema is already imported. We only validate what user types here.
-  const formValidationSchema = AiHealthAdvisorFormSchema.pick({ 
-    mealDescription: true, 
-    mealPhotoDataUri: true 
-  }).extend({
-    mealDescription: AiHealthAdvisorFormSchema.shape.mealDescription.min(5, { message: t('aiHealthAdvisor.mealDescriptionMinError') }).optional(),
-  });
-
-
-  const form = useForm<Pick<AiHealthAdvisorFormValues, 'mealDescription' | 'mealPhotoDataUri'>>({
+  const form = useForm<UserEditableFormValues>({
     resolver: zodResolver(formValidationSchema),
     defaultValues: {
       mealDescription: '',
@@ -48,16 +48,28 @@ export default function AiHealthAdvisorForm() {
   });
   
   useEffect(() => {
-    form.trigger();
-  }, [t, form.trigger]);
+    // Update error messages if language changes
+    const newSchema = HealthContextInputSchema.pick({
+      mealDescription: true,
+      mealPhotoDataUri: true,
+    }).extend({
+      mealDescription: HealthContextInputSchema.shape.mealDescription.min(5, { message: t("aiHealthAdvisor.mealDescriptionMinError") }).optional(),
+    });
+    form.trigger(); // Re-trigger validation if language changes
+    // This way of updating resolver on language change might not be straightforward with RHF's zodResolver
+    // A simpler approach for zod messages is to use keys and translate them when displaying the message,
+    // or re-initialize the form on language change if messages are deeply embedded.
+    // For now, direct t() in .min() might not update dynamically with language context.
+    // For simplicity, we'll ensure the key is used and rely on re-render to pick up new `t` function.
+  }, [t, form]);
 
   const handlePhotoChange = (event: ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
       if (file.size > 2 * 1024 * 1024) { // 2MB limit
         toast({
-            title: t('nutritionalAnalysis.errorTitle'), // Can reuse or make specific
-            description: t('settingsPage.photoSizeError'), // Re-use translation
+            title: t('nutritionalAnalysis.errorTitle'),
+            description: t('settingsPage.photoSizeError'),
             variant: "destructive"
         });
         return;
@@ -82,7 +94,7 @@ export default function AiHealthAdvisorForm() {
     }
   };
 
-  const onSubmit: SubmitHandler<Pick<AiHealthAdvisorFormValues, 'mealDescription' | 'mealPhotoDataUri'>> = async (formData) => {
+  const onSubmit: SubmitHandler<UserEditableFormValues> = async (formData) => {
     setIsLoading(true);
     setAdviceResult(null);
 
@@ -92,12 +104,10 @@ export default function AiHealthAdvisorForm() {
     let userTrainingSummary: string | undefined = undefined;
 
     if (typeof window !== 'undefined') {
-        // Macro Goals
         const storedMacroGoals = localStorage.getItem('sickfit-pro-weeklyMacroGoals');
         if (storedMacroGoals) {
             try {
                 const parsedGoals = JSON.parse(storedMacroGoals);
-                // Simple summary, can be improved
                 userMacroGoalsSummary = Object.entries(parsedGoals)
                     .map(([day, goals]: [string, any]) => 
                         `${t(`calendarPage.days.${day}`)}: P ${goals.protein}g, C ${goals.carbs}g, F ${goals.fat}g`
@@ -105,31 +115,28 @@ export default function AiHealthAdvisorForm() {
             } catch (e) { console.error("Error parsing macro goals for AI advisor", e); }
         }
 
-        // Water Goal
         const storedWaterGoal = localStorage.getItem('sickfit-pro-userWaterGoal');
         if (storedWaterGoal) {
             userWaterGoalMl = parseInt(storedWaterGoal, 10);
+            if (isNaN(userWaterGoalMl)) userWaterGoalMl = undefined;
         }
 
-        // Body Measurements
         const storedBodyMeasurements = localStorage.getItem('sickfit-pro-userBodyMeasurements');
         if (storedBodyMeasurements) {
             try {
                 const measurements: BodyMeasurement[] = JSON.parse(storedBodyMeasurements);
                 userBodyMeasurementsSummary = measurements
-                    .slice(-5) // Last 5 measurements for brevity
+                    .slice(-5) 
                     .map(m => `${m.date} - ${m.measurementName}: ${m.value} ${m.unit}`)
                     .join('; ');
             } catch (e) { console.error("Error parsing body measurements for AI advisor", e); }
         }
         
-        // Training Summary (reusing mock logic from AiSplitForm for now)
         try {
-            const rawTrainingData = await mockGetUserTrainingData(); // Replace with actual data source if available
+            const rawTrainingData = await mockGetUserTrainingData();
             userTrainingSummary = formatTrainingDataToString(rawTrainingData);
         } catch (e) { console.error("Error fetching training data for AI advisor", e); }
     }
-
 
     const inputData: HealthContextInput = {
       mealDescription: formData.mealDescription,
