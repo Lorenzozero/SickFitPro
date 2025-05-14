@@ -1,7 +1,9 @@
+
 'use client';
 
 import { useState, type FormEvent } from 'react';
 import Link from 'next/link';
+import Image from 'next/image'; // Aggiunto import per Image
 import { PageHeader } from '@/components/shared/page-header';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
@@ -23,6 +25,7 @@ import { useLanguage } from '@/context/language-context';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { useActiveWorkout } from '@/context/active-workout-context';
 import { useRouter } from 'next/navigation';
+import { MuscleGroupIcons, type MuscleGroup } from '@/components/shared/muscle-group-icons'; // Aggiunto import
 
 interface ExerciseDetail {
   id: string;
@@ -38,17 +41,42 @@ interface WorkoutPlan {
   exercises: number; 
   duration: string; 
   exerciseDetails: ExerciseDetail[];
+  muscleGroups: MuscleGroup[]; // Aggiunto campo muscleGroups
 }
 
 const initialWorkoutPlans: WorkoutPlan[] = [
-  { id: '1', name: 'Full Body Blast', description: 'A comprehensive full-body workout for strength and endurance.', exercises: 2, duration: '60 min', exerciseDetails: [
-    { id: 'e1-1', name: 'Squats', sets: '3', reps: '8-12'},
-    { id: 'e1-2', name: 'Bench Press', sets: '3', reps: '8-12'},
-  ]},
-  { id: '2', name: 'Upper Body Power', description: 'Focus on building strength in your chest, back, and arms.', exercises: 1, duration: '75 min', exerciseDetails: [
-    { id: 'e2-1', name: 'Pull-ups', sets: '4', reps: 'AMRAP'},
-  ]},
-  { id: '3', name: 'Leg Day Domination', description: 'Intense leg workout to build lower body strength and size.', exercises: 0, duration: '90 min', exerciseDetails: [] },
+  { 
+    id: '1', 
+    name: 'Full Body Blast', 
+    description: 'A comprehensive full-body workout for strength and endurance.', 
+    exercises: 2, 
+    duration: '60 min', 
+    exerciseDetails: [
+      { id: 'e1-1', name: 'Squats', sets: '3', reps: '8-12'},
+      { id: 'e1-2', name: 'Bench Press', sets: '3', reps: '8-12'},
+    ],
+    muscleGroups: ['Full Body', 'Legs', 'Chest', 'Back'] // Esempio di gruppi muscolari
+  },
+  { 
+    id: '2', 
+    name: 'Upper Body Power', 
+    description: 'Focus on building strength in your chest, back, and arms.', 
+    exercises: 1, 
+    duration: '75 min', 
+    exerciseDetails: [
+      { id: 'e2-1', name: 'Pull-ups', sets: '4', reps: 'AMRAP'},
+    ],
+    muscleGroups: ['Upper Body', 'Back', 'Biceps', 'Shoulders'] // Esempio
+  },
+  { 
+    id: '3', 
+    name: 'Leg Day Domination', 
+    description: 'Intense leg workout to build lower body strength and size.', 
+    exercises: 0, 
+    duration: '90 min', 
+    exerciseDetails: [],
+    muscleGroups: ['Lower Body', 'Legs', 'Abs'] // Esempio
+  },
 ];
 
 
@@ -59,7 +87,7 @@ export default function WorkoutPlansPage() {
   const [plans, setPlans] = useState<WorkoutPlan[]>(initialWorkoutPlans);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   
-  const [currentPlan, setCurrentPlan] = useState<Partial<WorkoutPlan> & { exerciseDetails: ExerciseDetail[] }>({ name: '', description: '', exerciseDetails: [] });
+  const [currentPlan, setCurrentPlan] = useState<Partial<WorkoutPlan> & { exerciseDetails: ExerciseDetail[], muscleGroups?: MuscleGroup[] }>({ name: '', description: '', exerciseDetails: [], muscleGroups: [] });
   
   const [newExerciseName, setNewExerciseName] = useState('');
   const [newExerciseSets, setNewExerciseSets] = useState('');
@@ -69,9 +97,9 @@ export default function WorkoutPlansPage() {
 
   const openDialog = (plan?: WorkoutPlan) => {
     if (plan) {
-      setCurrentPlan({ ...plan, exerciseDetails: [...(plan.exerciseDetails || [])] });
+      setCurrentPlan({ ...plan, exerciseDetails: [...(plan.exerciseDetails || [])], muscleGroups: [...(plan.muscleGroups || [])] });
     } else {
-      setCurrentPlan({ name: '', description: '', exerciseDetails: [], duration: 'N/A' });
+      setCurrentPlan({ name: '', description: '', exerciseDetails: [], duration: 'N/A', muscleGroups: [] });
     }
     setNewExerciseName('');
     setNewExerciseSets('');
@@ -120,6 +148,7 @@ export default function WorkoutPlansPage() {
       exerciseDetails: currentPlan.exerciseDetails || [],
       exercises: (currentPlan.exerciseDetails || []).length,
       duration: currentPlan.duration || 'N/A', 
+      muscleGroups: currentPlan.muscleGroups || [], // Assicurati che muscleGroups sia salvato
     };
     
     if (currentPlan.id) { 
@@ -136,7 +165,7 @@ export default function WorkoutPlansPage() {
       });
     }
     setIsDialogOpen(false);
-    setCurrentPlan({ name: '', description: '', exerciseDetails: [] }); 
+    setCurrentPlan({ name: '', description: '', exerciseDetails: [], muscleGroups: [] }); 
   };
   
   const handleDeletePlan = (id: string, name: string) => {
@@ -202,9 +231,29 @@ export default function WorkoutPlansPage() {
               <CardTitle>{plan.name}</CardTitle>
               <CardDescription>{plan.description}</CardDescription>
             </CardHeader>
-            <CardContent className="flex-grow">
-              <p className="text-sm text-muted-foreground">{t('workoutPlansPage.exercisesLabel')}: {plan.exercises}</p>
-              <p className="text-sm text-muted-foreground">{t('workoutPlansPage.estDurationLabel')}: {plan.duration}</p>
+            <CardContent className="flex-grow space-y-3">
+              <div>
+                <p className="text-sm text-muted-foreground">{t('workoutPlansPage.exercisesLabel')}: {plan.exercises}</p>
+                <p className="text-sm text-muted-foreground">{t('workoutPlansPage.estDurationLabel')}: {plan.duration}</p>
+              </div>
+              
+              <div className='flex items-start gap-x-2'>
+                <div className='flex-shrink-0'>
+                    <MuscleGroupIcons muscleGroups={plan.muscleGroups} iconClassName="w-4 h-4 text-primary" />
+                </div>
+                <div className="relative w-24 h-40 flex-shrink-0"> 
+                    <Image 
+                        src="https://placehold.co/100x180.png" 
+                        alt={t('workoutPlansPage.muscleSilhouetteAlt', {default: 'Muscle groups involved'})} 
+                        layout="fill"
+                        objectFit="contain"
+                        className="rounded-sm"
+                        data-ai-hint="muscle map human anatomy"
+                    />
+                </div>
+              </div>
+
+
               {plan.exerciseDetails && plan.exerciseDetails.length > 0 && (
                 <div className="mt-2">
                     <h4 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1">{t('workoutPlansPage.exercisesLabel')}</h4>
@@ -281,6 +330,7 @@ export default function WorkoutPlansPage() {
                     onChange={(e) => setCurrentPlan(prev => ({ ...prev, duration: e.target.value }))}
                   />
                 </div>
+                {/* TODO: Aggiungere qui un selettore per i muscleGroups se si vuole renderli modificabili */}
 
                 <Card className="mt-4">
                   <CardHeader className="pb-2">
@@ -346,3 +396,4 @@ export default function WorkoutPlansPage() {
     </>
   );
 }
+

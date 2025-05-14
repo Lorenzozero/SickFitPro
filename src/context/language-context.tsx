@@ -355,7 +355,8 @@ const translations: Record<Language, Translations> = {
         toastPlanDeletedTitle: "Plan Deleted",
         toastPlanDeletedDescription: "\"{planName}\" has been deleted.",
         toastLinkCopiedTitle: "Link Copied!",
-        toastLinkCopiedDescription: "Workout plan link copied to clipboard."
+        toastLinkCopiedDescription: "Workout plan link copied to clipboard.",
+        muscleSilhouetteAlt: "Muscle groups involved in the plan",
     },
      startWorkoutPage: {
       title: "Start New Workout",
@@ -759,7 +760,8 @@ const translations: Record<Language, Translations> = {
         toastPlanDeletedTitle: "Scheda Eliminata",
         toastPlanDeletedDescription: "La scheda \"{planName}\" è stata eliminata.",
         toastLinkCopiedTitle: "Link Copiato!",
-        toastLinkCopiedDescription: "Link della scheda di allenamento copiato negli appunti."
+        toastLinkCopiedDescription: "Link della scheda di allenamento copiato negli appunti.",
+        muscleSilhouetteAlt: "Gruppi muscolari coinvolti nella scheda",
     },
     startWorkoutPage: {
       title: "Inizia Nuovo Allenamento",
@@ -1152,7 +1154,8 @@ const translations: Record<Language, Translations> = {
         toastPlanDeletedTitle: "Plan Eliminado",
         toastPlanDeletedDescription: '"{planName}" ha sido eliminado.',
         toastLinkCopiedTitle: "¡Enlace Copiado!",
-        toastLinkCopiedDescription: "Enlace del plan de entrenamiento copiado al portapapeles."
+        toastLinkCopiedDescription: "Enlace del plan de entrenamiento copiado al portapapeles.",
+        muscleSilhouetteAlt: "Grupos musculares involucrados en el plan",
     },
     startWorkoutPage: {
       title: "Empezar Nuevo Entrenamiento",
@@ -1538,7 +1541,8 @@ const translations: Record<Language, Translations> = {
         toastPlanDeletedTitle: "Programme Supprimé",
         toastPlanDeletedDescription: '"{planName}" a été supprimé.',
         toastLinkCopiedTitle: "Lien Copié !",
-        toastLinkCopiedDescription: "Lien du programme d'entraînement copié dans le presse-papiers."
+        toastLinkCopiedDescription: "Lien du programme d'entraînement copié dans le presse-papiers.",
+        muscleSilhouetteAlt: "Groupes musculaires impliqués dans le programme",
     },
     startWorkoutPage: {
       title: "Commencer un Nouvel Entraînement",
