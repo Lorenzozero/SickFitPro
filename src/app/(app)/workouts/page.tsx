@@ -11,7 +11,6 @@ import { PlusCircle, Edit2, Trash2, Share2, PlayCircle, ListChecks, Ban } from '
 import {
   Dialog,
   DialogContent,
-  DialogDescription,
   DialogFooter,
   DialogHeader,
   DialogTitle,
@@ -25,7 +24,7 @@ import { useLanguage } from '@/context/language-context';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { useActiveWorkout } from '@/context/active-workout-context';
 import { useRouter } from 'next/navigation';
-import { MuscleGroupIcons, type MuscleGroup } from '@/components/shared/muscle-group-icons'; // Aggiunto import
+import { MuscleGroupIcons, type MuscleGroup } from '@/components/shared/muscle-group-icons'; 
 
 interface ExerciseDetail {
   id: string;
@@ -41,7 +40,7 @@ interface WorkoutPlan {
   exercises: number; 
   duration: string; 
   exerciseDetails: ExerciseDetail[];
-  muscleGroups: MuscleGroup[]; // Aggiunto campo muscleGroups
+  muscleGroups: MuscleGroup[]; 
 }
 
 const initialWorkoutPlans: WorkoutPlan[] = [
@@ -55,7 +54,7 @@ const initialWorkoutPlans: WorkoutPlan[] = [
       { id: 'e1-1', name: 'Squats', sets: '3', reps: '8-12'},
       { id: 'e1-2', name: 'Bench Press', sets: '3', reps: '8-12'},
     ],
-    muscleGroups: ['Full Body', 'Legs', 'Chest', 'Back'] // Esempio di gruppi muscolari
+    muscleGroups: ['Full Body', 'Biceps', 'Triceps', 'Back', 'Chest', 'Shoulders', 'Abs', 'Legs'] 
   },
   { 
     id: '2', 
@@ -66,7 +65,7 @@ const initialWorkoutPlans: WorkoutPlan[] = [
     exerciseDetails: [
       { id: 'e2-1', name: 'Pull-ups', sets: '4', reps: 'AMRAP'},
     ],
-    muscleGroups: ['Upper Body', 'Back', 'Biceps', 'Shoulders'] // Esempio
+    muscleGroups: ['Upper Body', 'Back', 'Biceps', 'Shoulders'] 
   },
   { 
     id: '3', 
@@ -75,7 +74,7 @@ const initialWorkoutPlans: WorkoutPlan[] = [
     exercises: 0, 
     duration: '90 min', 
     exerciseDetails: [],
-    muscleGroups: ['Lower Body', 'Legs', 'Abs'] // Esempio
+    muscleGroups: ['Lower Body', 'Legs', 'Abs'] 
   },
 ];
 
@@ -148,7 +147,7 @@ export default function WorkoutPlansPage() {
       exerciseDetails: currentPlan.exerciseDetails || [],
       exercises: (currentPlan.exerciseDetails || []).length,
       duration: currentPlan.duration || 'N/A', 
-      muscleGroups: currentPlan.muscleGroups || [], // Assicurati che muscleGroups sia salvato
+      muscleGroups: currentPlan.muscleGroups || [], 
     };
     
     if (currentPlan.id) { 
@@ -187,7 +186,6 @@ export default function WorkoutPlansPage() {
 
   const handleStartPlanClick = (planId: string, planName: string) => {
     if (activeWorkoutIsClient && activePlanId) {
-      // Button should be disabled anyway
       return;
     }
     contextStartWorkout(planId, planName);
@@ -229,7 +227,7 @@ export default function WorkoutPlansPage() {
           <Card key={plan.id} className="flex flex-col shadow-lg hover:shadow-xl transition-shadow duration-300">
             <CardHeader>
               <CardTitle>{plan.name}</CardTitle>
-              <CardDescription>{plan.description}</CardDescription>
+              {/* CardDescription removed as per request */}
             </CardHeader>
             <CardContent className="flex-grow space-y-3">
               <div>
@@ -252,7 +250,6 @@ export default function WorkoutPlansPage() {
                     />
                 </div>
               </div>
-
 
               {plan.exerciseDetails && plan.exerciseDetails.length > 0 && (
                 <div className="mt-2">
