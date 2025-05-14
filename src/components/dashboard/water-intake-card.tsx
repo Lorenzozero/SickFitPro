@@ -147,9 +147,9 @@ export default function WaterIntakeCard() {
                   onClick={() => addWater(WATER_INCREMENT_ML)} 
                   variant="outline" 
                   aria-label={t('waterIntakeCard.ariaAddGlass', { amount: WATER_INCREMENT_ML })}
-                  className="w-full h-12 sm:h-10 flex flex-col items-center justify-center"
+                  className="w-28 h-16 flex flex-col items-center justify-center mx-auto"
                 >
-                  <GlassWater className="w-5 h-5 mb-0.5" />
+                  <GlassWater className="w-6 h-6 mb-0.5" />
                   <span className="text-xs">+{WATER_INCREMENT_ML}ml</span>
                 </Button>
               </TooltipTrigger>
@@ -164,9 +164,9 @@ export default function WaterIntakeCard() {
                   onClick={() => addWater(WATER_INCREMENT_ML * 2)} 
                   variant="outline" 
                   aria-label={t('waterIntakeCard.ariaAddBottle', { amount: WATER_INCREMENT_ML * 2 })}
-                  className="w-full h-12 sm:h-10 flex flex-col items-center justify-center"
+                  className="w-28 h-16 flex flex-col items-center justify-center mx-auto"
                 >
-                  <Milk className="w-5 h-5 mb-0.5" />
+                  <Milk className="w-6 h-6 mb-0.5" />
                    <span className="text-xs">+{WATER_INCREMENT_ML * 2}ml</span>
                 </Button>
               </TooltipTrigger>

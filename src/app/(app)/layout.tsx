@@ -127,7 +127,7 @@ export default function AppLayout({ children }: { children: ReactNode }) {
             </Button>
           </div>
         </header>
-        <main className="flex-1 p-4 md:p-6 lg:p-8">
+        <main className="flex-1 p-4 md:p-6 lg:p-8 text-center">
           {children}
         </main>
         <ResumeWorkoutButton /> {/* Added floating resume button */}
@@ -135,3 +135,4 @@ export default function AppLayout({ children }: { children: ReactNode }) {
     </SidebarProvider>
   );
 }
+
