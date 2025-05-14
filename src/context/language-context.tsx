@@ -1,4 +1,3 @@
-
 // src/context/language-context.tsx
 'use client';
 
@@ -61,7 +60,8 @@ const translations: Record<Language, Translations> = {
       resetWaterButton: "Reset Water",
       waterResetTitle: "Water Reset",
       waterResetDescription: "Your water intake for the day has been reset.",
-      settingsButtonLabel: "Settings",
+      settingsButtonLabel: "Settings", // Kept for general settings tooltip if needed elsewhere
+      goalSettingsButtonLabel: "Goal Settings", // New specific for Target icon
       ariaAddGlass: "Add glass ({amount}ml)",
       ariaAddBottle: "Add bottle ({amount}ml)",
       tooltipAddAmount: "+{amount}ml",
@@ -70,6 +70,8 @@ const translations: Record<Language, Translations> = {
       reminderOff: "Off",
       reminderDaily: "Daily",
       reminderHourly: "Hourly",
+      hydrationReminderSettingsAriaLabel: "Hydration Reminder Settings",
+      hydrationReminderTooltip: "Set hydration reminder",
     },
     macroTrackingCard: {
         title: "Macro Tracking",
@@ -87,6 +89,8 @@ const translations: Record<Language, Translations> = {
         totalFatMonth: "Total Fat (Month)",
         unitGrams: "g",
         loadingTotals: "Calculating monthly totals...",
+        macroReminderSettingsAriaLabel: "Macro Reminder Settings",
+        macroReminderTooltip: "Set macro logging reminder",
     },
     nutritionalAnalysis: {
         cardTitle: "Nutritional Analysis (AI)",
@@ -449,6 +453,7 @@ const translations: Record<Language, Translations> = {
       waterResetTitle: "Apporto Idrico Azzerato",
       waterResetDescription: "Il tuo apporto idrico giornaliero è stato azzerato.",
       settingsButtonLabel: "Impostazioni",
+      goalSettingsButtonLabel: "Impostazioni Obiettivo",
       ariaAddGlass: "Aggiungi bicchiere ({amount}ml)",
       ariaAddBottle: "Aggiungi bottiglia ({amount}ml)",
       tooltipAddAmount: "+{amount}ml",
@@ -457,6 +462,8 @@ const translations: Record<Language, Translations> = {
       reminderOff: "Spento",
       reminderDaily: "Giornaliero",
       reminderHourly: "Ogni ora",
+      hydrationReminderSettingsAriaLabel: "Impostazioni Promemoria Idratazione",
+      hydrationReminderTooltip: "Imposta promemoria idratazione",
     },
     macroTrackingCard: {
         title: "Monitoraggio Macro",
@@ -474,6 +481,8 @@ const translations: Record<Language, Translations> = {
         totalFatMonth: "Grassi Totali (Mese)",
         unitGrams: "g",
         loadingTotals: "Calcolo totali mensili...",
+        macroReminderSettingsAriaLabel: "Impostazioni Promemoria Macro",
+        macroReminderTooltip: "Imposta promemoria registrazione macro",
     },
     nutritionalAnalysis: {
         cardTitle: "Analisi Nutrizionale (AI)",
@@ -882,9 +891,12 @@ const translations: Record<Language, Translations> = {
       waterResetTitle: "Agua Reiniciada",
       waterResetDescription: "Tu consumo de agua para el día ha sido reiniciado.",
       settingsButtonLabel: "Configuración",
+      goalSettingsButtonLabel: "Configuración de Meta",
       ariaAddGlass: "Añadir vaso ({amount}ml)",
       ariaAddBottle: "Añadir botella ({amount}ml)",
       tooltipAddAmount: "+{amount}ml",
+      hydrationReminderSettingsAriaLabel: "Configuración de Recordatorio de Hidratación",
+      hydrationReminderTooltip: "Establecer recordatorio de hidratación",
     },
     macroTrackingCard: {
         title: "Seguimiento de Macros",
@@ -902,6 +914,8 @@ const translations: Record<Language, Translations> = {
         loadingTotals: "Calculando totales mensuales...",
          goalsSavedTitle: "Metas de Macros Guardadas",
         goalsForDaySaved: "¡Metas para {dayOfWeek} guardadas con éxito!",
+        macroReminderSettingsAriaLabel: "Configuración de Recordatorio de Macros",
+        macroReminderTooltip: "Establecer recordatorio de registro de macros",
     },
     nutritionalAnalysis: {
         cardTitle: "Análisis Nutricional (IA)",
@@ -1255,9 +1269,12 @@ const translations: Record<Language, Translations> = {
       waterResetTitle: "Eau Réinitialisée",
       waterResetDescription: "Votre apport en eau pour la journée a été réinitialisé.",
       settingsButtonLabel: "Paramètres",
+      goalSettingsButtonLabel: "Paramètres de l'Objectif",
       ariaAddGlass: "Ajouter un verre ({amount}ml)",
       ariaAddBottle: "Ajouter une bouteille ({amount}ml)",
       tooltipAddAmount: "+{amount}ml",
+      hydrationReminderSettingsAriaLabel: "Paramètres du Rappel d'Hydratation",
+      hydrationReminderTooltip: "Définir le rappel d'hydratation",
     },
     macroTrackingCard: {
         title: "Suivi des Macros",
@@ -1275,6 +1292,8 @@ const translations: Record<Language, Translations> = {
         loadingTotals: "Calcul des totaux mensuels...",
         goalsSavedTitle: "Objectifs Macros Sauvegardés",
         goalsForDaySaved: "Objectifs pour {dayOfWeek} sauvegardés avec succès !",
+        macroReminderSettingsAriaLabel: "Paramètres du Rappel des Macros",
+        macroReminderTooltip: "Définir le rappel de saisie des macros",
     },
     nutritionalAnalysis: {
         cardTitle: "Analyse Nutritionnelle (IA)",
@@ -1640,4 +1659,3 @@ export function useLanguage() {
   }
   return context;
 }
-

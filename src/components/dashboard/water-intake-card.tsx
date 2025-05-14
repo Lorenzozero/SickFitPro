@@ -2,13 +2,13 @@
 'use client';
 
 import { useState, useEffect, type ChangeEvent } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'; // Removed CardDescription
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Droplet, RotateCcw, GlassWater, Milk, Bell, Settings } from 'lucide-react';
+import { Droplet, RotateCcw, GlassWater, Milk, Bell, Target } from 'lucide-react'; // Added Target, Bell
 import { useLanguage } from '@/context/language-context';
 import { useToast } from '@/hooks/use-toast';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
@@ -115,25 +115,45 @@ export default function WaterIntakeCard() {
               </Tooltip>
             </TooltipProvider>
              <TooltipProvider>
+                <Tooltip>
+                    <TooltipTrigger asChild>
+                        <Select value={reminderFrequency} onValueChange={(value) => setReminderFrequency(value as ReminderFrequency)}>
+                            <SelectTrigger asChild aria-label={t('waterIntakeCard.hydrationReminderSettingsAriaLabel', {default: "Hydration Reminder Settings"})}>
+                                <Button variant="ghost" size="icon">
+                                    <Bell className="w-4 h-4" />
+                                </Button>
+                            </SelectTrigger>
+                            <SelectContent>
+                                <SelectItem value="off">{t('waterIntakeCard.reminderOff')}</SelectItem>
+                                <SelectItem value="hourly">{t('waterIntakeCard.reminderHourly')}</SelectItem>
+                                <SelectItem value="daily">{t('waterIntakeCard.reminderDaily')}</SelectItem>
+                            </SelectContent>
+                        </Select>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                        <p>{t('waterIntakeCard.hydrationReminderTooltip', {default: "Set hydration reminder"})}</p>
+                    </TooltipContent>
+                </Tooltip>
+            </TooltipProvider>
+             <TooltipProvider>
               <Tooltip>
                 <TooltipTrigger asChild>
                   <Button 
                     variant="ghost" 
                     size="icon" 
-                    aria-label={t('waterIntakeCard.settingsButtonLabel', { default: 'Settings' })}
+                    aria-label={t('waterIntakeCard.goalSettingsButtonLabel', { default: 'Goal Settings' })}
                     onClick={() => setIsGoalSettingsOpen(!isGoalSettingsOpen)}
                   >
-                    <Settings className="w-4 h-4" />
+                    <Target className="w-4 h-4" />
                   </Button>
                 </TooltipTrigger>
                 <TooltipContent>
-                  <p>{t('waterIntakeCard.settingsButtonLabel', { default: 'Settings' })}</p>
+                  <p>{t('waterIntakeCard.goalSettingsButtonLabel', { default: 'Goal Settings' })}</p>
                 </TooltipContent>
               </Tooltip>
             </TooltipProvider>
           </div>
         </div>
-        {/* CardDescription removed as per request */}
       </CardHeader>
       <CardContent className="space-y-4">
         {isGoalSettingsOpen && (
@@ -201,24 +221,7 @@ export default function WaterIntakeCard() {
             </Tooltip>
           </div>
         </TooltipProvider>
-         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between pt-4 mt-4 border-t gap-2">
-            <Label htmlFor="water-reminders" className="flex items-center font-normal whitespace-nowrap">
-                <Bell className="w-4 h-4 mr-2" />
-                {t('waterIntakeCard.reminderLabel')}
-            </Label>
-            <Select value={reminderFrequency} onValueChange={(value) => setReminderFrequency(value as ReminderFrequency)}>
-                <SelectTrigger id="water-reminders" className="w-full sm:w-auto min-w-[180px]">
-                    <SelectValue placeholder={t('waterIntakeCard.selectReminderFrequencyPlaceholder')} />
-                </SelectTrigger>
-                <SelectContent>
-                    <SelectItem value="off">{t('waterIntakeCard.reminderOff')}</SelectItem>
-                    <SelectItem value="hourly">{t('waterIntakeCard.reminderHourly')}</SelectItem>
-                    <SelectItem value="daily">{t('waterIntakeCard.reminderDaily')}</SelectItem>
-                </SelectContent>
-            </Select>
-        </div>
       </CardContent>
     </Card>
   );
 }
-
