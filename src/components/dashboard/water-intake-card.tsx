@@ -8,11 +8,11 @@ import { Progress } from '@/components/ui/progress';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Droplet, PlusCircle, MinusCircle, RotateCcw, GlassWater, Milk, Bell } from 'lucide-react';
+import { Droplet, PlusCircle, MinusCircle, RotateCcw, GlassWater, Milk, Bell, Settings } from 'lucide-react'; // Added Settings
 import { useLanguage } from '@/context/language-context';
 import { useToast } from '@/hooks/use-toast';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
-import { Skeleton } from '@/components/ui/skeleton'; // Added import for Skeleton
+import { Skeleton } from '@/components/ui/skeleton';
 
 const DEFAULT_DAILY_WATER_GOAL_ML = 2500;
 const WATER_INCREMENT_ML = 250;
@@ -60,7 +60,7 @@ export default function WaterIntakeCard() {
     } else {
       toast({
         title: t('toastErrorTitle'),
-        description: "Please enter a valid goal.", // Add translation if needed
+        description: t('waterIntakeCard.errorInvalidGoal', { default: "Please enter a valid goal."}),
         variant: "destructive"
       });
       setInputGoal(dailyWaterGoal.toString()); // Reset input to current valid goal
@@ -99,24 +99,40 @@ export default function WaterIntakeCard() {
             <Droplet className="w-5 h-5 mr-2 text-blue-500" />
             {t('waterIntakeCard.title')}
           </CardTitle>
-          <TooltipProvider>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Button variant="ghost" size="icon" onClick={resetWater} aria-label={t('waterIntakeCard.resetWaterButton')}>
-                  <RotateCcw className="w-4 h-4" />
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent>
-                <p>{t('waterIntakeCard.resetWaterButton')}</p>
-              </TooltipContent>
-            </Tooltip>
-          </TooltipProvider>
+          <div className="flex items-center gap-1">
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button variant="ghost" size="icon" onClick={resetWater} aria-label={t('waterIntakeCard.resetWaterButton')}>
+                    <RotateCcw className="w-4 h-4" />
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>{t('waterIntakeCard.resetWaterButton')}</p>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
+             <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button variant="ghost" size="icon" aria-label={t('waterIntakeCard.settingsButtonLabel', { default: 'Settings' })}>
+                    <Settings className="w-4 h-4" />
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>{t('waterIntakeCard.settingsButtonLabel', { default: 'Settings' })}</p>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
+          </div>
         </div>
         <CardDescription>{t('waterIntakeCard.description', { dailyGoal: dailyWaterGoal })}</CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
         <div>
-          <Label htmlFor="water-goal">{t('waterIntakeCard.setGoalLabel')}</Label>
+          <Label htmlFor="water-goal" className="text-md font-semibold"> {/* Made label larger and bolder */}
+            {t('waterIntakeCard.setGoalLabel')}
+          </Label>
           <div className="flex items-center gap-2 mt-1">
             <Input
               id="water-goal"
@@ -140,7 +156,7 @@ export default function WaterIntakeCard() {
           <Progress value={progressPercentage} className="w-full h-2" />
         </div>
         <TooltipProvider>
-          <div className="grid grid-cols-2 gap-2"> {/* Changed from grid-cols-3 to grid-cols-2 */}
+          <div className="grid grid-cols-2 gap-2">
             <Tooltip>
               <TooltipTrigger asChild>
                 <Button 
@@ -174,8 +190,6 @@ export default function WaterIntakeCard() {
                 <p>{t('waterIntakeCard.tooltipAddAmount', { amount: WATER_INCREMENT_ML * 2 })}</p>
               </TooltipContent>
             </Tooltip>
-
-            {/* Removed the -500ml button */}
           </div>
         </TooltipProvider>
          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between pt-4 mt-4 border-t gap-2">
@@ -198,4 +212,3 @@ export default function WaterIntakeCard() {
     </Card>
   );
 }
-

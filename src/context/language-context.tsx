@@ -1,4 +1,3 @@
-
 // src/context/language-context.tsx
 'use client';
 
@@ -52,15 +51,17 @@ const translations: Record<Language, Translations> = {
     },
     waterIntakeCard: {
       title: "Water Intake",
-      description: "Stay hydrated! Your goal: {dailyGoal} ml.",
+      description: "Stay hydrated! Your current goal: {dailyGoal} ml.",
       currentIntakeLabel: "Current: {current}ml / {dailyGoal}ml",
-      setGoalLabel: "Set Daily Goal (ml)",
+      setGoalLabel: "Daily Goal (ml)", // Changed from "Set Daily Goal (ml)"
       saveGoalButton: "Save Goal",
       goalSavedTitle: "Goal Saved",
       goalSavedDescription: "Your daily water intake goal has been updated.",
+      errorInvalidGoal: "Please enter a valid goal.",
       resetWaterButton: "Reset Water",
       waterResetTitle: "Water Reset",
       waterResetDescription: "Your water intake for the day has been reset.",
+      settingsButtonLabel: "Settings",
       ariaAddGlass: "Add glass ({amount}ml)",
       ariaAddBottle: "Add bottle ({amount}ml)",
       ariaRemoveGenericAmount: "Remove {amount}ml",
@@ -318,6 +319,7 @@ const translations: Record<Language, Translations> = {
         createNewPlanButton: "Create New Plan",
         estDurationLabel: "Est. Duration", 
         exercisesLabel: "Exercises",
+        involvedMusclesLabel: "Muscles Involved:",
         startButton: "Start",
         dialogEditTitle: "Edit Workout Plan",
         dialogEditDescription: "Update the details of your workout plan.",
@@ -344,7 +346,6 @@ const translations: Record<Language, Translations> = {
         toastLinkCopiedTitle: "Link Copied!",
         toastLinkCopiedDescription: "Workout plan link copied to clipboard.",
         muscleSilhouetteAlt: "Muscle groups involved in the plan",
-        involvedMusclesLabel: "Muscles Involved:",
         noMuscleGroupsSpecified: "N/A"
     },
      startWorkoutPage: {
@@ -446,15 +447,17 @@ const translations: Record<Language, Translations> = {
     },
     waterIntakeCard: {
       title: "Apporto Idrico",
-      description: "Rimani idratato! Il tuo obiettivo giornaliero: {dailyGoal} ml.",
+      description: "Rimani idratato! Il tuo obiettivo attuale: {dailyGoal} ml.",
       currentIntakeLabel: "Attuale: {current}ml / {dailyGoal}ml",
-      setGoalLabel: "Imposta Obiettivo Giornaliero (ml)",
+      setGoalLabel: "Obiettivo Giornaliero (ml)", // Modificato
       saveGoalButton: "Salva Obiettivo",
       goalSavedTitle: "Obiettivo Salvato",
       goalSavedDescription: "Il tuo obiettivo di apporto idrico giornaliero è stato aggiornato.",
+      errorInvalidGoal: "Inserisci un obiettivo valido.",
       resetWaterButton: "Resetta Acqua",
       waterResetTitle: "Apporto Idrico Azzerato",
       waterResetDescription: "Il tuo apporto idrico giornaliero è stato azzerato.",
+      settingsButtonLabel: "Impostazioni",
       ariaAddGlass: "Aggiungi bicchiere ({amount}ml)",
       ariaAddBottle: "Aggiungi bottiglia ({amount}ml)",
       ariaRemoveGenericAmount: "Rimuovi {amount}ml",
@@ -712,6 +715,7 @@ const translations: Record<Language, Translations> = {
         createNewPlanButton: "Crea Nuova Scheda",
         estDurationLabel: "Durata Stimata",
         exercisesLabel: "Esercizi",
+        involvedMusclesLabel: "Muscoli Coinvolti:",
         startButton: "Inizia",
         dialogEditTitle: "Modifica Scheda Allenamento",
         dialogEditDescription: "Aggiorna i dettagli della tua scheda di allenamento.",
@@ -738,7 +742,6 @@ const translations: Record<Language, Translations> = {
         toastLinkCopiedTitle: "Link Copiato!",
         toastLinkCopiedDescription: "Link della scheda di allenamento copiato negli appunti.",
         muscleSilhouetteAlt: "Gruppi muscolari coinvolti nella scheda",
-        involvedMusclesLabel: "Muscoli Coinvolti:",
         noMuscleGroupsSpecified: "N/D"
     },
     startWorkoutPage: {
@@ -881,9 +884,9 @@ const translations: Record<Language, Translations> = {
     toastErrorTitle: "Error",
     waterIntakeCard: {
       title: "Consumo de Agua",
-      description: "¡Mantente hidratado! Tu meta: {dailyGoal} ml.",
+      description: "¡Mantente hidratado! Tu meta actual: {dailyGoal} ml.",
       currentIntakeLabel: "Actual: {current}ml / {dailyGoal}ml",
-      setGoalLabel: "Establecer Meta Diaria (ml)",
+      setGoalLabel: "Meta Diaria (ml)", // Changed
       saveGoalButton: "Guardar Meta",
       reminderLabel: "Recordatorio de Hidratación",
       selectReminderFrequencyPlaceholder: "Frecuencia",
@@ -892,9 +895,11 @@ const translations: Record<Language, Translations> = {
       reminderHourly: "Cada Hora",
        goalSavedTitle: "Meta Guardada",
       goalSavedDescription: "Tu meta diaria de consumo de agua ha sido actualizada.",
+      errorInvalidGoal: "Por favor, introduce una meta válida.",
       resetWaterButton: "Reiniciar Agua",
       waterResetTitle: "Agua Reiniciada",
       waterResetDescription: "Tu consumo de agua para el día ha sido reiniciado.",
+      settingsButtonLabel: "Configuración",
       ariaAddGlass: "Añadir vaso ({amount}ml)",
       ariaAddBottle: "Añadir botella ({amount}ml)",
       tooltipAddAmount: "+{amount}ml",
@@ -1102,6 +1107,7 @@ const translations: Record<Language, Translations> = {
         createNewPlanButton: "Crear Nuevo Plan",
         estDurationLabel: "Duración Estimada",
         exercisesLabel: "Ejercicios",
+        involvedMusclesLabel: "Músculos Involucrados:",
         startButton: "Empezar",
         dialogEditTitle: "Editar Plan de Entrenamiento",
         dialogEditDescription: "Actualiza los detalles de tu plan de entrenamiento.",
@@ -1126,7 +1132,6 @@ const translations: Record<Language, Translations> = {
         toastLinkCopiedTitle: "¡Enlace Copiado!",
         toastLinkCopiedDescription: "Enlace del plan de entrenamiento copiado al portapapeles.",
         muscleSilhouetteAlt: "Grupos musculares involucrados en el plan",
-        involvedMusclesLabel: "Músculos Involucrados:",
         noMuscleGroupsSpecified: "N/A"
     },
     startWorkoutPage: {
@@ -1262,9 +1267,9 @@ const translations: Record<Language, Translations> = {
     toastErrorTitle: "Erreur",
     waterIntakeCard: {
       title: "Apport en Eau",
-      description: "Restez hydraté ! Votre objectif : {dailyGoal} ml.",
+      description: "Restez hydraté ! Votre objectif actuel : {dailyGoal} ml.",
       currentIntakeLabel: "Actuel: {current}ml / {dailyGoal}ml",
-      setGoalLabel: "Définir l'Objectif Quotidien (ml)",
+      setGoalLabel: "Objectif Quotidien (ml)", // Changed
       saveGoalButton: "Sauvegarder",
       reminderLabel: "Rappel d'Hydratation",
       selectReminderFrequencyPlaceholder: "Fréquence",
@@ -1273,9 +1278,11 @@ const translations: Record<Language, Translations> = {
       reminderHourly: "Toutes les heures",
       goalSavedTitle: "Objectif Sauvegardé",
       goalSavedDescription: "Votre objectif quotidien d'apport en eau a été mis à jour.",
+      errorInvalidGoal: "Veuillez entrer un objectif valide.",
       resetWaterButton: "Réinitialiser l'Eau",
       waterResetTitle: "Eau Réinitialisée",
       waterResetDescription: "Votre apport en eau pour la journée a été réinitialisé.",
+      settingsButtonLabel: "Paramètres",
       ariaAddGlass: "Ajouter un verre ({amount}ml)",
       ariaAddBottle: "Ajouter une bouteille ({amount}ml)",
       tooltipAddAmount: "+{amount}ml",
@@ -1483,6 +1490,7 @@ const translations: Record<Language, Translations> = {
         createNewPlanButton: "Créer un Nouveau Programme",
         estDurationLabel: "Durée Estimée",
         exercisesLabel: "Exercices",
+        involvedMusclesLabel: "Muscles Impliqués :",
         startButton: "Commencer",
         dialogEditTitle: "Modifier le Programme d'Entraînement",
         dialogEditDescription: "Mettez à jour les détails de votre programme d'entraînement.",
@@ -1507,7 +1515,6 @@ const translations: Record<Language, Translations> = {
         toastLinkCopiedTitle: "Lien Copié !",
         toastLinkCopiedDescription: "Lien du programme d'entraînement copié dans le presse-papiers.",
         muscleSilhouetteAlt: "Groupes musculaires impliqués dans le programme",
-        involvedMusclesLabel: "Muscles Impliqués :",
         noMuscleGroupsSpecified: "N/A"
     },
     startWorkoutPage: {
