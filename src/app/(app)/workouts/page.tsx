@@ -6,13 +6,13 @@ import Link from 'next/link';
 import Image from 'next/image'; // Aggiunto import per Image
 import { PageHeader } from '@/components/shared/page-header';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardFooter } from '@/components/ui/card'; // Rimosso CardHeader, CardTitle qui
+import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card'; // Rimosso CardHeader, CardTitle qui -> Aggiunto CardHeader
 import { PlusCircle, Edit2, Trash2, Share2, PlayCircle, ListChecks, Ban } from 'lucide-react';
 import {
   Dialog,
   DialogContent,
   DialogFooter,
-  DialogHeader,
+  DialogHeader as UIDialogHeader, // Renamed to avoid conflict
   DialogTitle,
   DialogClose,
   DialogDescription,
@@ -226,8 +226,7 @@ export default function WorkoutPlansPage() {
       <div className="space-y-6"> {/* Changed grid to space-y for single column */}
         {plans.map((plan) => (
           <Card key={plan.id} className="flex flex-col shadow-lg hover:shadow-xl transition-shadow duration-300">
-            {/* CardHeader removed as per new layout requirement */}
-            <CardContent className="flex-grow p-4"> {/* Added padding to CardContent */}
+            <CardContent className="flex-grow p-4">
               <div className="flex flex-col sm:flex-row items-start gap-4">
                 {/* Left: Image */}
                 <div className="relative w-full sm:w-32 h-48 flex-shrink-0"> 
@@ -266,7 +265,7 @@ export default function WorkoutPlansPage() {
                 </div>
               </div>
             </CardContent>
-            <CardFooter className="flex flex-col sm:flex-row justify-between items-center gap-2 pt-4 border-t p-4"> {/* Added padding to CardFooter */}
+            <CardFooter className="flex flex-col sm:flex-row justify-between items-center gap-2 pt-4 border-t p-4">
               <Button 
                 variant="default" 
                 size="sm"
@@ -294,12 +293,12 @@ export default function WorkoutPlansPage() {
 
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
         <DialogContent className="sm:max-w-lg">
-          <DialogHeader>
+          <UIDialogHeader> {/* Renamed to UIDialogHeader */}
             <DialogTitle>{currentPlan?.id ? t('workoutPlansPage.dialogEditTitle') : t('workoutPlansPage.dialogCreateTitle')}</DialogTitle>
             <DialogDescription>
               {currentPlan?.id ? t('workoutPlansPage.dialogEditDescription') : t('workoutPlansPage.dialogCreateDescription')}
             </DialogDescription>
-          </DialogHeader>
+          </UIDialogHeader>
           <form onSubmit={handleSavePlan}>
             <ScrollArea className="max-h-[calc(100vh-20rem)]">
               <div className="grid gap-4 py-4 px-1"> 
@@ -334,13 +333,13 @@ export default function WorkoutPlansPage() {
                 {/* TODO: Aggiungere qui un selettore per i muscleGroups se si vuole renderli modificabili */}
 
                 <Card className="mt-4">
-                  <CardHeader className="pb-2 p-4"> {/* Added padding to CardHeader */}
-                    <h4 className="text-base flex items-center font-semibold"> {/* Changed to h4 */}
+                  <CardHeader className="pb-2 p-4">
+                    <h4 className="text-base flex items-center font-semibold">
                         <ListChecks className="w-4 h-4 mr-2" />
                         {t('workoutPlansPage.addExerciseButton')}
                     </h4>
                   </CardHeader>
-                  <CardContent className="space-y-3 p-4"> {/* Added padding to CardContent */}
+                  <CardContent className="space-y-3 p-4">
                     <div>
                       <Label htmlFor="newExerciseName">{t('workoutPlansPage.exerciseNameLabel')}</Label>
                       <Input id="newExerciseName" value={newExerciseName} onChange={(e) => setNewExerciseName(e.target.value)} placeholder="es. Squat" />
