@@ -8,7 +8,7 @@ import { Progress } from '@/components/ui/progress';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Droplet, PlusCircle, MinusCircle, RotateCcw, GlassWater, Milk, Bell, Settings } from 'lucide-react'; // Added Settings
+import { Droplet, PlusCircle, MinusCircle, RotateCcw, GlassWater, Milk, Bell, Settings } from 'lucide-react';
 import { useLanguage } from '@/context/language-context';
 import { useToast } from '@/hooks/use-toast';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
@@ -27,11 +27,14 @@ export default function WaterIntakeCard() {
   const [inputGoal, setInputGoal] = useState(DEFAULT_DAILY_WATER_GOAL_ML.toString());
   const [reminderFrequency, setReminderFrequency] = useState<ReminderFrequency>('off');
   const [isClient, setIsClient] = useState(false);
+  const [isGoalSettingsOpen, setIsGoalSettingsOpen] = useState(false); // New state
 
   useEffect(() => {
     setIsClient(true);
     // In a real app, load dailyWaterGoal and reminderFrequency from localStorage or backend
-  }, []);
+    // For now, also load inputGoal from dailyWaterGoal if it changes from an external source
+    setInputGoal(dailyWaterGoal.toString());
+  }, [dailyWaterGoal]); // Added dailyWaterGoal as dependency
 
   const addWater = (amount: number) => {
     setCurrentWaterIntake(prev => Math.max(0, prev + amount));
@@ -57,6 +60,7 @@ export default function WaterIntakeCard() {
         title: t('waterIntakeCard.goalSavedTitle'),
         description: t('waterIntakeCard.goalSavedDescription'),
       });
+      setIsGoalSettingsOpen(false); // Close settings after saving
     } else {
       toast({
         title: t('toastErrorTitle'),
@@ -115,7 +119,12 @@ export default function WaterIntakeCard() {
              <TooltipProvider>
               <Tooltip>
                 <TooltipTrigger asChild>
-                  <Button variant="ghost" size="icon" aria-label={t('waterIntakeCard.settingsButtonLabel', { default: 'Settings' })}>
+                  <Button 
+                    variant="ghost" 
+                    size="icon" 
+                    aria-label={t('waterIntakeCard.settingsButtonLabel', { default: 'Settings' })}
+                    onClick={() => setIsGoalSettingsOpen(!isGoalSettingsOpen)} // Toggle settings visibility
+                  >
                     <Settings className="w-4 h-4" />
                   </Button>
                 </TooltipTrigger>
@@ -129,22 +138,24 @@ export default function WaterIntakeCard() {
         <CardDescription>{t('waterIntakeCard.description', { dailyGoal: dailyWaterGoal })}</CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
-        <div>
-          <Label htmlFor="water-goal" className="text-md font-semibold"> {/* Made label larger and bolder */}
-            {t('waterIntakeCard.setGoalLabel')}
-          </Label>
-          <div className="flex items-center gap-2 mt-1">
-            <Input
-              id="water-goal"
-              type="number"
-              value={inputGoal}
-              onChange={handleGoalInputChange}
-              min="1"
-              className="w-full"
-            />
-            <Button onClick={handleSaveGoal} size="sm">{t('waterIntakeCard.saveGoalButton')}</Button>
-          </div>
-        </div>
+        {isGoalSettingsOpen && ( // Conditionally render goal settings
+            <div>
+            <Label htmlFor="water-goal" className="text-md font-semibold">
+                {t('waterIntakeCard.setGoalLabel')}
+            </Label>
+            <div className="flex items-center gap-2 mt-1">
+                <Input
+                id="water-goal"
+                type="number"
+                value={inputGoal}
+                onChange={handleGoalInputChange}
+                min="1"
+                className="w-full"
+                />
+                <Button onClick={handleSaveGoal} size="sm">{t('waterIntakeCard.saveGoalButton')}</Button>
+            </div>
+            </div>
+        )}
         
         <div>
           <div className="flex justify-between items-center mb-1">
