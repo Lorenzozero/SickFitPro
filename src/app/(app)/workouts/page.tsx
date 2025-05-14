@@ -6,7 +6,7 @@ import Link from 'next/link';
 import Image from 'next/image'; // Aggiunto import per Image
 import { PageHeader } from '@/components/shared/page-header';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardFooter } from '@/components/ui/card'; // Rimosso CardHeader, CardTitle qui
 import { PlusCircle, Edit2, Trash2, Share2, PlayCircle, ListChecks, Ban } from 'lucide-react';
 import {
   Dialog,
@@ -15,7 +15,7 @@ import {
   DialogHeader,
   DialogTitle,
   DialogClose,
-  DialogDescription, // Added import
+  DialogDescription,
 } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -206,11 +206,11 @@ export default function WorkoutPlansPage() {
       />
       {activeWorkoutIsClient && activePlanId && (
           <Card className="mb-6 shadow-md border-destructive bg-destructive/10">
-            <CardHeader>
-              <CardTitle className="text-destructive flex items-center">
+            <CardHeader className="p-4"> {/* Added CardHeader for consistency */}
+              <h3 className="text-destructive flex items-center font-semibold"> {/* Changed to h3 for semantic consistency */}
                 <Ban className="w-5 h-5 mr-2" />
                 {t('activeWorkoutPage.workoutInProgressTitle', { default: 'Workout In Progress' })}
-              </CardTitle>
+              </h3>
             </CardHeader>
             <CardContent>
               <p className="text-sm text-destructive-foreground">
@@ -223,53 +223,56 @@ export default function WorkoutPlansPage() {
           </Card>
         )}
 
-      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+      <div className="space-y-6"> {/* Changed grid to space-y for single column */}
         {plans.map((plan) => (
           <Card key={plan.id} className="flex flex-col shadow-lg hover:shadow-xl transition-shadow duration-300">
-            <CardHeader>
-              <CardTitle>{plan.name}</CardTitle>
-              {/* CardDescription removed as per request */}
-            </CardHeader>
-            <CardContent className="flex-grow space-y-3">
-              <div>
-                <p className="text-sm text-muted-foreground">{t('workoutPlansPage.exercisesLabel')}: {plan.exercises}</p>
-                <p className="text-sm text-muted-foreground">{t('workoutPlansPage.estDurationLabel')}: {plan.duration}</p>
-              </div>
-              
-              <div className='flex items-start gap-x-2'>
-                <div className='flex-shrink-0'>
-                    <MuscleGroupIcons muscleGroups={plan.muscleGroups} iconClassName="w-4 h-4 text-primary" />
+            {/* CardHeader removed as per new layout requirement */}
+            <CardContent className="flex-grow p-4"> {/* Added padding to CardContent */}
+              <div className="flex flex-col sm:flex-row items-start gap-4">
+                {/* Left: Image */}
+                <div className="relative w-full sm:w-32 h-48 flex-shrink-0"> 
+                  <Image 
+                      src="https://placehold.co/128x192.png" 
+                      alt={t('workoutPlansPage.muscleSilhouetteAlt', {default: 'Muscle groups involved'})} 
+                      layout="fill"
+                      objectFit="contain"
+                      className="rounded-sm"
+                      data-ai-hint="muscle map human anatomy"
+                  />
                 </div>
-                <div className="relative w-24 h-40 flex-shrink-0"> 
-                    <Image 
-                        src="https://placehold.co/100x180.png" 
-                        alt={t('workoutPlansPage.muscleSilhouetteAlt', {default: 'Muscle groups involved'})} 
-                        layout="fill"
-                        objectFit="contain"
-                        className="rounded-sm"
-                        data-ai-hint="muscle map human anatomy"
-                    />
-                </div>
-              </div>
 
-              {plan.exerciseDetails && plan.exerciseDetails.length > 0 && (
-                <div className="mt-2">
-                    <h4 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1">{t('workoutPlansPage.exercisesLabel')}</h4>
-                    <ScrollArea className="h-20">
-                        <ul className="list-disc list-inside text-xs space-y-0.5">
-                            {plan.exerciseDetails.slice(0,3).map(ex => <li key={ex.id} className="truncate">{ex.name} ({ex.sets}x{ex.reps})</li>)}
-                            {plan.exerciseDetails.length > 3 && <li className="text-muted-foreground text-xs">...e altri {plan.exerciseDetails.length - 3}</li>}
-                        </ul>
-                    </ScrollArea>
+                {/* Right: Details */}
+                <div className="flex-grow space-y-2">
+                  <h3 className="text-xl font-semibold text-primary">{plan.name}</h3>
+                  
+                  <div className="flex items-center gap-2">
+                    <span className="text-sm font-medium text-muted-foreground">{t('workoutPlansPage.muscleGroupsLabel', {default: 'Muscles'})}:</span>
+                    <MuscleGroupIcons muscleGroups={plan.muscleGroups} iconClassName="w-4 h-4 text-accent" />
+                  </div>
+                  
+                  <p className="text-sm text-muted-foreground">{t('workoutPlansPage.exercisesLabel')}: {plan.exercises}</p>
+                  <p className="text-sm text-muted-foreground">{t('workoutPlansPage.estDurationLabel')}: {plan.duration}</p>
+                  
+                  {plan.exerciseDetails && plan.exerciseDetails.length > 0 && (
+                    <div className="mt-3">
+                        <h4 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1">{t('workoutPlansPage.exercisesLabel')}</h4>
+                        <ScrollArea className="h-24">
+                            <ul className="list-disc list-inside text-xs space-y-0.5 pr-2">
+                                {plan.exerciseDetails.map(ex => <li key={ex.id} className="truncate">{ex.name} ({ex.sets}x{ex.reps})</li>)}
+                            </ul>
+                        </ScrollArea>
+                    </div>
+                  )}
                 </div>
-              )}
+              </div>
             </CardContent>
-            <CardFooter className="flex justify-between items-center gap-2 pt-4 border-t">
+            <CardFooter className="flex flex-col sm:flex-row justify-between items-center gap-2 pt-4 border-t p-4"> {/* Added padding to CardFooter */}
               <Button 
                 variant="default" 
                 size="sm"
                 disabled={!!(activeWorkoutIsClient && activePlanId)}
                 onClick={() => handleStartPlanClick(plan.id, plan.name)}
+                className="w-full sm:w-auto"
               >
                 <PlayCircle className="w-4 h-4 mr-2" /> {t('workoutPlansPage.startButton')}
               </Button>
@@ -331,13 +334,13 @@ export default function WorkoutPlansPage() {
                 {/* TODO: Aggiungere qui un selettore per i muscleGroups se si vuole renderli modificabili */}
 
                 <Card className="mt-4">
-                  <CardHeader className="pb-2">
-                    <CardTitle className="text-base flex items-center">
+                  <CardHeader className="pb-2 p-4"> {/* Added padding to CardHeader */}
+                    <h4 className="text-base flex items-center font-semibold"> {/* Changed to h4 */}
                         <ListChecks className="w-4 h-4 mr-2" />
                         {t('workoutPlansPage.addExerciseButton')}
-                    </CardTitle>
+                    </h4>
                   </CardHeader>
-                  <CardContent className="space-y-3">
+                  <CardContent className="space-y-3 p-4"> {/* Added padding to CardContent */}
                     <div>
                       <Label htmlFor="newExerciseName">{t('workoutPlansPage.exerciseNameLabel')}</Label>
                       <Input id="newExerciseName" value={newExerciseName} onChange={(e) => setNewExerciseName(e.target.value)} placeholder="es. Squat" />

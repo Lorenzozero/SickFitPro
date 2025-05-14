@@ -357,6 +357,7 @@ const translations: Record<Language, Translations> = {
         toastLinkCopiedTitle: "Link Copied!",
         toastLinkCopiedDescription: "Workout plan link copied to clipboard.",
         muscleSilhouetteAlt: "Muscle groups involved in the plan",
+        muscleGroupsLabel: "Muscle Groups",
     },
      startWorkoutPage: {
       title: "Start New Workout",
@@ -421,9 +422,9 @@ const translations: Record<Language, Translations> = {
   },
   it: {
     nav: {
-      dashboard: 'Home', // Modificato da Cruscotto
+      dashboard: 'Home', 
       exercises: 'Esercizi',
-      workoutPlans: 'Schede', // Modificato da Piani di Allenamento
+      workoutPlans: 'Schede', 
       calendar: 'Calendario',
       progress: 'Progressi',
       diet: 'Dieta',
@@ -762,6 +763,7 @@ const translations: Record<Language, Translations> = {
         toastLinkCopiedTitle: "Link Copiato!",
         toastLinkCopiedDescription: "Link della scheda di allenamento copiato negli appunti.",
         muscleSilhouetteAlt: "Gruppi muscolari coinvolti nella scheda",
+        muscleGroupsLabel: "Gruppi Muscolari",
     },
     startWorkoutPage: {
       title: "Inizia Nuovo Allenamento",
@@ -1156,6 +1158,7 @@ const translations: Record<Language, Translations> = {
         toastLinkCopiedTitle: "¡Enlace Copiado!",
         toastLinkCopiedDescription: "Enlace del plan de entrenamiento copiado al portapapeles.",
         muscleSilhouetteAlt: "Grupos musculares involucrados en el plan",
+        muscleGroupsLabel: "Grupos Musculares",
     },
     startWorkoutPage: {
       title: "Empezar Nuevo Entrenamiento",
@@ -1543,6 +1546,7 @@ const translations: Record<Language, Translations> = {
         toastLinkCopiedTitle: "Lien Copié !",
         toastLinkCopiedDescription: "Lien du programme d'entraînement copié dans le presse-papiers.",
         muscleSilhouetteAlt: "Groupes musculaires impliqués dans le programme",
+        muscleGroupsLabel: "Groupes Musculaires",
     },
     startWorkoutPage: {
       title: "Commencer un Nouvel Entraînement",
@@ -1673,14 +1677,15 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
 
     if (typeof result === 'string' && replacements) {
       const actualReplacements = { ...replacements };
-      delete actualReplacements.default;
+      delete actualReplacements.default; // Don't replace the 'default' key itself
 
       return Object.entries(actualReplacements).reduce((acc, [placeholder, value]) => {
         const replacementValue = (typeof value === 'string' || typeof value === 'number') ? String(value) : '';
         return acc.replace(new RegExp(`{${placeholder}}`, 'g'), replacementValue);
       }, result);
     }
-
+    
+    // Return the default from replacements if provided and result is not a string, or the key itself
     return typeof result === 'string' ? result : (replacements?.default?.toString() || key) ;
   }, [language, isClient]);
 
