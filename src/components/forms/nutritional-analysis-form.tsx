@@ -23,7 +23,6 @@ import { z } from 'zod';
 
 // Zod schema for form validation (only for fields user directly interacts with)
 const formValidationSchema = HealthContextInputSchema.pick({ 
-  // mealDescription: true, // Will be overridden by extend
   mealPhotoDataUri: true,    
 }).extend({
   mealDescription: z.string().min(5, { message: "aiHealthAdvisor.mealDescriptionMinError" }).optional(),
@@ -171,7 +170,7 @@ export default function AiHealthAdvisorForm() {
           <Wand2 className="w-6 h-6 mr-2 text-primary" />
           {t('aiHealthAdvisor.cardTitle')}
         </CardTitle>
-        <CardDescription>{t('aiHealthAdvisor.cardDescription')}</CardDescription>
+        {/* <CardDescription>{t('aiHealthAdvisor.cardDescription')}</CardDescription> */}
       </CardHeader>
       <CardContent>
         <div className="p-3 mb-6 text-sm border rounded-md bg-accent/10 text-accent-foreground">
