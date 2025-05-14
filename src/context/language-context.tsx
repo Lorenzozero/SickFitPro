@@ -1,3 +1,4 @@
+
 // src/context/language-context.tsx
 'use client';
 
@@ -51,9 +52,8 @@ const translations: Record<Language, Translations> = {
     },
     waterIntakeCard: {
       title: "Water Intake",
-      description: "Stay hydrated! Your current goal: {dailyGoal} ml.",
       currentIntakeLabel: "Current: {current}ml / {dailyGoal}ml",
-      setGoalLabel: "Daily Goal (ml)", // Changed from "Set Daily Goal (ml)"
+      setGoalLabel: "Daily Goal (ml)",
       saveGoalButton: "Save Goal",
       goalSavedTitle: "Goal Saved",
       goalSavedDescription: "Your daily water intake goal has been updated.",
@@ -64,9 +64,7 @@ const translations: Record<Language, Translations> = {
       settingsButtonLabel: "Settings",
       ariaAddGlass: "Add glass ({amount}ml)",
       ariaAddBottle: "Add bottle ({amount}ml)",
-      ariaRemoveGenericAmount: "Remove {amount}ml",
       tooltipAddAmount: "+{amount}ml",
-      tooltipRemoveAmount: "-{amount}ml",
       reminderLabel: "Hydration Reminder",
       selectReminderFrequencyPlaceholder: "Set reminder frequency",
       reminderOff: "Off",
@@ -75,7 +73,6 @@ const translations: Record<Language, Translations> = {
     },
     macroTrackingCard: {
         title: "Macro Tracking",
-        descriptionWeekly: "Plan your weekly macronutrient targets and see monthly estimates.",
         proteinLabel: "Protein",
         carbsLabel: "Carbs",
         fatLabel: "Fat",
@@ -95,6 +92,7 @@ const translations: Record<Language, Translations> = {
         totalFatMonth: "Total Fat (Month)",
         unitGrams: "g",
         loadingTotals: "Calculating monthly totals...",
+        reminderSettingsAriaLabel: "Macro reminder settings",
     },
     nutritionalAnalysis: {
         cardTitle: "Nutritional Analysis (AI)",
@@ -411,7 +409,7 @@ const translations: Record<Language, Translations> = {
   },
   it: {
     nav: {
-      home: 'Home', // Modificato da "Cruscotto" a "Home"
+      home: 'Home',
       exercises: 'Esercizi',
       workoutPlans: 'Schede', 
       calendar: 'Calendario',
@@ -447,9 +445,8 @@ const translations: Record<Language, Translations> = {
     },
     waterIntakeCard: {
       title: "Apporto Idrico",
-      description: "Rimani idratato! Il tuo obiettivo attuale: {dailyGoal} ml.",
       currentIntakeLabel: "Attuale: {current}ml / {dailyGoal}ml",
-      setGoalLabel: "Obiettivo Giornaliero (ml)", // Modificato
+      setGoalLabel: "Obiettivo Giornaliero (ml)",
       saveGoalButton: "Salva Obiettivo",
       goalSavedTitle: "Obiettivo Salvato",
       goalSavedDescription: "Il tuo obiettivo di apporto idrico giornaliero è stato aggiornato.",
@@ -460,9 +457,7 @@ const translations: Record<Language, Translations> = {
       settingsButtonLabel: "Impostazioni",
       ariaAddGlass: "Aggiungi bicchiere ({amount}ml)",
       ariaAddBottle: "Aggiungi bottiglia ({amount}ml)",
-      ariaRemoveGenericAmount: "Rimuovi {amount}ml",
       tooltipAddAmount: "+{amount}ml",
-      tooltipRemoveAmount: "-{amount}ml",
       reminderLabel: "Promemoria Idratazione",
       selectReminderFrequencyPlaceholder: "Imposta frequenza promemoria",
       reminderOff: "Spento",
@@ -471,7 +466,6 @@ const translations: Record<Language, Translations> = {
     },
     macroTrackingCard: {
         title: "Monitoraggio Macro",
-        descriptionWeekly: "Pianifica i tuoi obiettivi di macronutrienti settimanali e visualizza le stime mensili.",
         proteinLabel: "Proteine",
         carbsLabel: "Carboidrati",
         fatLabel: "Grassi",
@@ -491,6 +485,7 @@ const translations: Record<Language, Translations> = {
         totalFatMonth: "Grassi Totali (Mese)",
         unitGrams: "g",
         loadingTotals: "Calcolo totali mensili...",
+        reminderSettingsAriaLabel: "Impostazioni promemoria macro",
     },
     nutritionalAnalysis: {
         cardTitle: "Analisi Nutrizionale (AI)",
@@ -884,9 +879,8 @@ const translations: Record<Language, Translations> = {
     toastErrorTitle: "Error",
     waterIntakeCard: {
       title: "Consumo de Agua",
-      description: "¡Mantente hidratado! Tu meta actual: {dailyGoal} ml.",
       currentIntakeLabel: "Actual: {current}ml / {dailyGoal}ml",
-      setGoalLabel: "Meta Diaria (ml)", // Changed
+      setGoalLabel: "Meta Diaria (ml)",
       saveGoalButton: "Guardar Meta",
       reminderLabel: "Recordatorio de Hidratación",
       selectReminderFrequencyPlaceholder: "Frecuencia",
@@ -906,7 +900,6 @@ const translations: Record<Language, Translations> = {
     },
     macroTrackingCard: {
         title: "Seguimiento de Macros",
-        descriptionWeekly: "Planifica tus objetivos de macronutrientes semanales y visualiza las estimaciones mensuales.",
         proteinLabel: "Proteína",
         carbsLabel: "Carbohidratos",
         fatLabel: "Grasa",
@@ -919,16 +912,14 @@ const translations: Record<Language, Translations> = {
         reminderDaily: "Diario",
         reminderMealtime: "Alrededor de Comidas",
          goalsSavedTitle: "Metas de Macros Guardadas",
-        goalsSavedDescription: "Tus metas diarias de macronutrientes han sido actualizadas.",
         goalsForDaySaved: "¡Metas para {dayOfWeek} guardadas con éxito!",
-        intakeSavedTitle: "Ingesta de Macros Guardada",
-        intakeSavedDescription: "Tu ingesta diaria de macronutrientes ha sido registrada.",
         monthlyTotalsTitle: "Totales Mensuales Estimados",
         totalProteinMonth: "Proteína Total (Mes)",
         totalCarbsMonth: "Carbohidratos Totales (Mes)",
         totalFatMonth: "Grasa Total (Mes)",
         unitGrams: "g",
         loadingTotals: "Calculando totales mensuales...",
+        reminderSettingsAriaLabel: "Configuración de recordatorio de macros",
     },
     nutritionalAnalysis: {
         cardTitle: "Análisis Nutricional (IA)",
@@ -1267,9 +1258,8 @@ const translations: Record<Language, Translations> = {
     toastErrorTitle: "Erreur",
     waterIntakeCard: {
       title: "Apport en Eau",
-      description: "Restez hydraté ! Votre objectif actuel : {dailyGoal} ml.",
       currentIntakeLabel: "Actuel: {current}ml / {dailyGoal}ml",
-      setGoalLabel: "Objectif Quotidien (ml)", // Changed
+      setGoalLabel: "Objectif Quotidien (ml)",
       saveGoalButton: "Sauvegarder",
       reminderLabel: "Rappel d'Hydratation",
       selectReminderFrequencyPlaceholder: "Fréquence",
@@ -1289,7 +1279,6 @@ const translations: Record<Language, Translations> = {
     },
     macroTrackingCard: {
         title: "Suivi des Macros",
-        descriptionWeekly: "Planifiez vos objectifs hebdomadaires de macronutriments et consultez les estimations mensuelles.",
         proteinLabel: "Protéines",
         carbsLabel: "Glucides",
         fatLabel: "Lipides",
@@ -1302,16 +1291,14 @@ const translations: Record<Language, Translations> = {
         reminderDaily: "Quotidien",
         reminderMealtime: "Autour des Repas",
         goalsSavedTitle: "Objectifs Macros Sauvegardés",
-        goalsSavedDescription: "Vos objectifs quotidiens en macronutriments ont été mis à jour.",
         goalsForDaySaved: "Objectifs pour {dayOfWeek} sauvegardés avec succès !",
-        intakeSavedTitle: "Apport Macros Sauvegardé",
-        intakeSavedDescription: "Votre apport quotidien en macronutriments a été enregistré.",
         monthlyTotalsTitle: "Totaux Mensuels Estimés",
         totalProteinMonth: "Protéines Totales (Mois)",
         totalCarbsMonth: "Glucides Totals (Mois)",
         totalFatMonth: "Lipides Totals (Mois)",
         unitGrams: "g",
         loadingTotals: "Calcul des totaux mensuels...",
+        reminderSettingsAriaLabel: "Paramètres de rappel des macros",
     },
     nutritionalAnalysis: {
         cardTitle: "Analyse Nutritionnelle (IA)",
@@ -1631,7 +1618,6 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
     for (const k of keys) {
       result = result?.[k];
       if (result === undefined) {
-        // Fallback to default language if key not found in current language
         let fallbackResult: any = translations[DEFAULT_LANGUAGE];
         for (const fk of keys) {
             fallbackResult = fallbackResult?.[fk];
@@ -1646,7 +1632,7 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
 
     if (typeof result === 'string' && replacements) {
       const actualReplacements = { ...replacements };
-      delete actualReplacements.default; // Don't replace the 'default' key itself
+      delete actualReplacements.default;
 
       return Object.entries(actualReplacements).reduce((acc, [placeholder, value]) => {
         const replacementValue = (typeof value === 'string' || typeof value === 'number') ? String(value) : '';
@@ -1654,7 +1640,6 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
       }, result);
     }
     
-    // Return the default from replacements if provided and result is not a string, or the key itself
     return typeof result === 'string' ? result : (replacements?.default?.toString() || key) ;
   }, [language, isClient]);
 
