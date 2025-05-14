@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState, type ChangeEvent, useEffect } from 'react';
@@ -197,7 +198,7 @@ export default function ProgressPage() {
               <LucideLineChart className="w-5 h-5 mr-2 text-primary" />
               {t('progressPage.performanceMetricsCardTitle')}
             </CardTitle>
-            <CardDescription>{t('progressPage.performanceMetricsCardDescription')}</CardDescription>
+            
           </CardHeader>
           <CardContent>
             <ChartContainer config={chartConfig} className="h-[300px] w-full">
@@ -378,3 +379,4 @@ export default function ProgressPage() {
     </>
   );
 }
+
