@@ -14,11 +14,11 @@ import { Loader2, Wand2 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { useLanguage } from '@/context/language-context';
 import { Skeleton } from '@/components/ui/skeleton';
-import { Input } from '@/components/ui/input'; // Added import
+import { Input } from '@/components/ui/input'; 
 
 // Mock functions for fetching and formatting user training data
 // In a real application, these would interact with your backend or state management
-const mockGetUserTrainingData = async (): Promise<Array<{ date: string; exercise: string; sets: Array<{ reps: number; weight: number }> }>> => {
+export const mockGetUserTrainingData = async (): Promise<Array<{ date: string; exercise: string; sets: Array<{ reps: number; weight: number }> }>> => {
   // Simulate API call delay
   await new Promise(resolve => setTimeout(resolve, 1000));
   // Return some mock data. This should be replaced with actual data fetching.
@@ -32,7 +32,7 @@ const mockGetUserTrainingData = async (): Promise<Array<{ date: string; exercise
   // To simulate no data: return [];
 };
 
-const formatTrainingDataToString = (data: Array<{ date: string; exercise: string; sets: Array<{ reps: number; weight: number }> }>): string => {
+export const formatTrainingDataToString = (data: Array<{ date: string; exercise: string; sets: Array<{ reps: number; weight: number }> }>): string => {
   if (!data || data.length === 0) return "Nessuno storico allenamenti disponibile.";
   return data.map(log =>
     `Data: ${log.date}, Esercizio: ${log.exercise}, Serie: ${log.sets.map(s => `${s.reps} ripetizioni con ${s.weight}kg`).join('; ')}`
@@ -71,7 +71,7 @@ export function AiSplitForm() {
         form.setValue('trainingHistory', formattedHistory, { shouldValidate: true });
       } catch (error) {
         console.error("Error fetching user training data:", error);
-        form.setValue('trainingHistory', "Errore nel recupero dello storico allenamenti.");
+        form.setValue('trainingHistory', t('aiSplitForm.errorFetchingHistory', {default: "Error fetching training history."}) );
         toast({
           title: t('aiSplitForm.toastErrorTitle'),
           description: t('aiSplitForm.errorFetchingHistory'),
