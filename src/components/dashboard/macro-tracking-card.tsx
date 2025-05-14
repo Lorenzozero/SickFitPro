@@ -5,7 +5,7 @@ import { useState, useEffect, type ChangeEvent, useCallback } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Utensils, Drumstick, Wheat, Fish, LineChart, Target } from 'lucide-react'; // Added Target
+import { Utensils, Drumstick, Wheat, Fish, LineChart, Target } from 'lucide-react';
 import { useLanguage } from '@/context/language-context';
 import { Button } from '../ui/button';
 import { useToast } from '@/hooks/use-toast';
@@ -17,7 +17,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ChartContainer, ChartTooltip, ChartTooltipContent, ChartLegend, ChartLegendContent, type ChartConfig } from "@/components/ui/chart";
 import { Line, CartesianGrid, XAxis, YAxis, Tooltip as RechartsTooltip, ResponsiveContainer, LineChart as RechartsPrimitiveLineChart } from "recharts";
 import { format, subDays, subWeeks, subMonths, startOfWeek, startOfMonth, eachDayOfInterval, getDay, getISOWeek, getMonth } from 'date-fns';
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'; // Added Tooltip imports
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 
 
 interface DailyMacroGoals {
@@ -52,7 +52,7 @@ export default function MacroTrackingCard() {
   const [isClient, setIsClient] = useState(false);
   const [selectedTimeRange, setSelectedTimeRange] = useState<'daily' | 'weekly' | 'monthly'>('weekly');
   const [chartData, setChartData] = useState<ChartDataPoint[]>([]);
-  const [isGoalSettingOpen, setIsGoalSettingOpen] = useState(false); // New state
+  const [isGoalSettingOpen, setIsGoalSettingOpen] = useState(false);
 
   useEffect(() => {
     setIsClient(true);
@@ -100,7 +100,7 @@ export default function MacroTrackingCard() {
         title: t('macroTrackingCard.goalsSavedTitle'),
         description: t('macroTrackingCard.goalsForDaySaved', { dayOfWeek: t(`calendarPage.days.${selectedDayForGoalSetting}`) })
     });
-    setIsGoalSettingOpen(false); // Close after saving
+    setIsGoalSettingOpen(false);
   }
 
   useEffect(() => {
@@ -115,10 +115,8 @@ export default function MacroTrackingCard() {
     if (selectedTimeRange === 'daily') {
       for (let i = 6; i >= 0; i--) {
         const day = subDays(today, i);
-        // getDay() returns 0 for Sunday, 1 for Monday, ..., 6 for Saturday.
-        // appDayKeys is ['monday', ..., 'sunday']
         const dayIndex = getDay(day);
-        const appDayKey = appDayKeys[dayIndex === 0 ? 6 : dayIndex - 1]; // Adjust for Sunday
+        const appDayKey = appDayKeys[dayIndex === 0 ? 6 : dayIndex - 1]; 
         const goalsForDay = weeklyMacroGoals[appDayKey] || { protein: 0, carbs: 0, fat: 0 };
         newChartData.push({
           date: format(day, 'MMM d'),
@@ -129,7 +127,7 @@ export default function MacroTrackingCard() {
       }
     } else if (selectedTimeRange === 'weekly') {
       for (let i = 3; i >= 0; i--) {
-        const weekStart = startOfWeek(subWeeks(today, i), { weekStartsOn: 1 }); // Monday as start
+        const weekStart = startOfWeek(subWeeks(today, i), { weekStartsOn: 1 }); 
         let weeklyProtein = 0;
         let weeklyCarbs = 0;
         let weeklyFat = 0;
@@ -153,7 +151,7 @@ export default function MacroTrackingCard() {
         });
       }
     } else if (selectedTimeRange === 'monthly') {
-      for (let i = 2; i >= 0; i--) { // Show last 3 months
+      for (let i = 2; i >= 0; i--) { 
         const monthStart = startOfMonth(subMonths(today, i));
         const daysInMonth = eachDayOfInterval({ start: monthStart, end: subDays(startOfMonth(subMonths(today, i-1)), 1) });
         
@@ -270,7 +268,7 @@ export default function MacroTrackingCard() {
                   <Input
                     id={`${selectedDayForGoalSetting}-${m.key}-goal`}
                     type="number"
-                    value={String(currentGoalsForSelectedDay[m.key])} // Ensure value is a string
+                    value={String(currentGoalsForSelectedDay[m.key])}
                     onChange={(e: ChangeEvent<HTMLInputElement>) => handleGoalPropertyChange(selectedDayForGoalSetting, m.key, e.target.value)}
                     min="0"
                   />
@@ -285,10 +283,6 @@ export default function MacroTrackingCard() {
         )}
         
         <div>
-            <h3 className="text-md font-semibold mb-3 flex items-center">
-                <LineChart className="w-5 h-5 mr-2 text-primary" />
-                {t('macroTrackingCard.macroTrendChartTitle')}
-            </h3>
             <Tabs value={selectedTimeRange} onValueChange={(value) => setSelectedTimeRange(value as any)} className="w-full">
               <TabsList className="grid w-full grid-cols-3 mb-4">
                 <TabsTrigger value="daily">{t('macroTrackingCard.dailyTab')}</TabsTrigger>
@@ -343,4 +337,3 @@ export default function MacroTrackingCard() {
     </Card>
   );
 }
-
