@@ -1,100 +1,138 @@
+
 'use client';
 
-import { useState, useEffect, type ChangeEvent } from 'react';
+import { useState, useEffect, type ChangeEvent, useMemo } from 'react';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Progress } from '@/components/ui/progress';
-import { Utensils, Zap, Flame, Fish, Wheat, Drumstick, Bell } from 'lucide-react';
+import { Utensils, Bell, Drumstick, Wheat, Fish } from 'lucide-react';
 import { useLanguage } from '@/context/language-context';
 import { Button } from '../ui/button';
 import { useToast } from '@/hooks/use-toast';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Skeleton } from '../ui/skeleton';
+import { dayKeys as appDayKeys } from '@/context/weekly-schedule-context'; // Assuming monday is 0
+import { Separator } from '../ui/separator';
 
-interface Macro {
-  goal: number;
-  current: number;
+interface DailyMacroGoals {
+  protein: number;
+  carbs: number;
+  fat: number;
 }
 
-interface Macros {
-  protein: Macro;
-  carbs: Macro;
-  fat: Macro;
-}
+const initialDailyGoals: DailyMacroGoals = { protein: 150, carbs: 250, fat: 70 };
 
-const initialMacros: Macros = {
-  protein: { goal: 150, current: 0 }, // g
-  carbs: { goal: 250, current: 0 },   // g
-  fat: { goal: 70, current: 0 },      // g
-};
+const initialWeeklyMacroGoals: Record<string, DailyMacroGoals> = appDayKeys.reduce((acc, day) => {
+    acc[day] = { ...initialDailyGoals };
+    return acc;
+}, {} as Record<string, DailyMacroGoals>);
 
-type ReminderFrequency = 'off' | 'daily' | 'mealtime';
+type ReminderFrequency = 'off' | 'daily' | 'mealtime'; // Kept for now, relevance might change
+const MACRO_GOALS_STORAGE_KEY = 'sickfit-pro-weeklyMacroGoals';
 
 export default function MacroTrackingCard() {
-  const { t } = useLanguage();
+  const { t, language, isClient: languageContextIsClient } = useLanguage();
   const { toast } = useToast();
-  const [macros, setMacros] = useState<Macros>(initialMacros);
+  
+  const [weeklyMacroGoals, setWeeklyMacroGoals] = useState<Record<string, DailyMacroGoals>>(initialWeeklyMacroGoals);
+  const [selectedDayForGoalSetting, setSelectedDayForGoalSetting] = useState<string>(appDayKeys[0]);
+  const [currentMonthTotals, setCurrentMonthTotals] = useState<DailyMacroGoals | null>(null);
+  
   const [reminderFrequency, setReminderFrequency] = useState<ReminderFrequency>('off');
   const [isClient, setIsClient] = useState(false);
 
   useEffect(() => {
     setIsClient(true);
-    // In a real app, load macros and reminderFrequency from localStorage or backend
+    if (typeof window !== 'undefined') {
+      const storedGoals = localStorage.getItem(MACRO_GOALS_STORAGE_KEY);
+      if (storedGoals) {
+        try {
+          const parsedGoals = JSON.parse(storedGoals);
+          // Ensure all days are present
+          const fullGoals = appDayKeys.reduce((acc, day) => {
+            acc[day] = parsedGoals[day] || { ...initialDailyGoals };
+            return acc;
+          }, {} as Record<string, DailyMacroGoals>)
+          setWeeklyMacroGoals(fullGoals);
+        } catch (e) {
+          console.error("Error parsing weekly macro goals from localStorage", e);
+          setWeeklyMacroGoals(initialWeeklyMacroGoals);
+        }
+      }
+      // Load reminder frequency if stored
+    }
   }, []);
 
-  const handleGoalChange = (macroKey: keyof Macros, value: string) => {
+  useEffect(() => {
+    if (isClient && typeof window !== 'undefined') {
+      localStorage.setItem(MACRO_GOALS_STORAGE_KEY, JSON.stringify(weeklyMacroGoals));
+    }
+  }, [weeklyMacroGoals, isClient]);
+
+  const handleGoalPropertyChange = (dayKey: string, macroKey: keyof DailyMacroGoals, value: string) => {
     const numValue = parseInt(value, 10);
     if (!isNaN(numValue) && numValue >= 0) {
-      setMacros(prev => ({
+      setWeeklyMacroGoals(prev => ({
         ...prev,
-        [macroKey]: { ...prev[macroKey], goal: numValue },
+        [dayKey]: { ...prev[dayKey], [macroKey]: numValue },
       }));
     } else if (value === '') {
-       setMacros(prev => ({
+       setWeeklyMacroGoals(prev => ({
         ...prev,
-        [macroKey]: { ...prev[macroKey], goal: 0 },
+        [dayKey]: { ...prev[dayKey], [macroKey]: 0 },
       }));
     }
   };
-
-  const handleIntakeChange = (macroKey: keyof Macros, value: string) => {
-    const numValue = parseInt(value, 10);
-    if (!isNaN(numValue) && numValue >= 0) {
-      setMacros(prev => ({
-        ...prev,
-        [macroKey]: { ...prev[macroKey], current: numValue },
-      }));
-    } else if (value === '') {
-       setMacros(prev => ({
-        ...prev,
-        [macroKey]: { ...prev[macroKey], current: 0 },
-      }));
-    }
-  };
-
-  const handleSaveGoals = () => {
-    // Here you would typically save to localStorage or backend
+  
+  const handleSaveDayGoals = () => {
+    // localStorage saving is handled by useEffect on weeklyMacroGoals change.
     toast({
         title: t('macroTrackingCard.goalsSavedTitle'),
-        description: t('macroTrackingCard.goalsSavedDescription')
-    });
-  }
-  
-  const handleSaveIntake = () => {
-    // Here you would typically save to localStorage or backend
-     toast({
-        title: t('macroTrackingCard.intakeSavedTitle'),
-        description: t('macroTrackingCard.intakeSavedDescription')
+        description: t('macroTrackingCard.goalsForDaySaved', { dayOfWeek: t(`calendarPage.days.${selectedDayForGoalSetting}`) })
     });
   }
 
+  const calculateMonthlyTotals = useCallback((year: number, month: number, goals: Record<string, DailyMacroGoals>): DailyMacroGoals => {
+    const totals: DailyMacroGoals = { protein: 0, carbs: 0, fat: 0 };
+    if (Object.keys(goals).length === 0 || Object.values(goals).every(g => !g)) return totals;
 
-  const macroDetails: Array<{ key: keyof Macros; labelKey: string; icon: React.ElementType; unit: string; color: string }> = [
+    const daysInMonth = new Date(year, month + 1, 0).getDate();
+
+    for (let i = 1; i <= daysInMonth; i++) {
+        const currentDate = new Date(year, month, i);
+        const jsDayIndex = currentDate.getDay(); // 0 for Sunday, 1 for Monday, ...
+        
+        // Map JS day index to our appDayKeys order (0 Monday, ..., 6 Sunday)
+        const appDayKey = appDayKeys[jsDayIndex === 0 ? 6 : jsDayIndex - 1];
+        
+        const dailyGoal = goals[appDayKey];
+        if (dailyGoal) {
+            totals.protein += dailyGoal.protein;
+            totals.carbs += dailyGoal.carbs;
+            totals.fat += dailyGoal.fat;
+        }
+    }
+    return totals;
+  }, [appDayKeys]); // appDayKeys is stable
+
+  useEffect(() => {
+    if (isClient && languageContextIsClient) { // Ensure context is ready for dates
+      const now = new Date();
+      const year = now.getFullYear();
+      const month = now.getMonth(); // 0-indexed
+      const totals = calculateMonthlyTotals(year, month, weeklyMacroGoals);
+      setCurrentMonthTotals(totals);
+    }
+  }, [weeklyMacroGoals, isClient, languageContextIsClient, calculateMonthlyTotals]);
+
+
+  const macroDetails: Array<{ key: keyof DailyMacroGoals; labelKey: string; icon: React.ElementType; unit: string; color: string }> = [
     { key: 'protein', labelKey: 'macroTrackingCard.proteinLabel', icon: Drumstick, unit: 'g', color: 'bg-red-500' },
     { key: 'carbs', labelKey: 'macroTrackingCard.carbsLabel', icon: Wheat, unit: 'g', color: 'bg-yellow-500' },
     { key: 'fat', labelKey: 'macroTrackingCard.fatLabel', icon: Fish, unit: 'g', color: 'bg-green-500' },
   ];
+  
+  const currentGoalsForSelectedDay = weeklyMacroGoals[selectedDayForGoalSetting] || initialDailyGoals;
 
   if (!isClient) {
     return (
@@ -107,7 +145,7 @@ export default function MacroTrackingCard() {
         </CardHeader>
         <CardContent>
           <Skeleton className="h-8 w-3/4 mb-4" />
-          {[1,2,3].map(i => <Skeleton key={i} className="h-10 bg-muted rounded-md animate-pulse mb-4" />)}
+          <Skeleton className="h-10 bg-muted rounded-md animate-pulse mb-4" />
           <Skeleton className="h-10 w-1/3" />
         </CardContent>
       </Card>
@@ -121,68 +159,75 @@ export default function MacroTrackingCard() {
           <Utensils className="w-5 h-5 mr-2 text-orange-500" />
           {t('macroTrackingCard.title')}
         </CardTitle>
-        <CardDescription>{t('macroTrackingCard.description')}</CardDescription>
+        <CardDescription>{t('macroTrackingCard.descriptionWeekly')}</CardDescription>
       </CardHeader>
       <CardContent className="space-y-6">
         <div>
-          <h3 className="text-md font-semibold mb-3">{t('macroTrackingCard.setYourDailyGoals')}</h3>
+          <h3 className="text-md font-semibold mb-3">{t('macroTrackingCard.setYourWeeklyGoals')}</h3>
+          
+          <div className="mb-4">
+            <Label htmlFor="select-day-for-goals">{t('macroTrackingCard.selectDay')}</Label>
+            <Select value={selectedDayForGoalSetting} onValueChange={setSelectedDayForGoalSetting}>
+              <SelectTrigger id="select-day-for-goals">
+                <SelectValue placeholder={t('macroTrackingCard.selectDay')} />
+              </SelectTrigger>
+              <SelectContent>
+                {appDayKeys.map(dayKey => (
+                  <SelectItem key={dayKey} value={dayKey}>
+                    {t(`calendarPage.days.${dayKey}`)}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-4">
             {macroDetails.map(m => (
               <div key={m.key}>
-                <Label htmlFor={`${m.key}-goal`} className="flex items-center text-sm font-medium text-muted-foreground mb-1">
+                <Label htmlFor={`${selectedDayForGoalSetting}-${m.key}-goal`} className="flex items-center text-sm font-medium text-muted-foreground mb-1">
                   <m.icon className="w-4 h-4 mr-1.5" /> {t(m.labelKey)} ({m.unit})
                 </Label>
                 <Input
-                  id={`${m.key}-goal`}
+                  id={`${selectedDayForGoalSetting}-${m.key}-goal`}
                   type="number"
-                  value={macros[m.key].goal}
-                  onChange={(e: ChangeEvent<HTMLInputElement>) => handleGoalChange(m.key, e.target.value)}
+                  value={currentGoalsForSelectedDay[m.key]}
+                  onChange={(e: ChangeEvent<HTMLInputElement>) => handleGoalPropertyChange(selectedDayForGoalSetting, m.key, e.target.value)}
                   min="0"
                 />
               </div>
             ))}
           </div>
            <div className="flex justify-center sm:justify-start">
-            <Button onClick={handleSaveGoals} size="sm">{t('macroTrackingCard.saveGoalsButton')}</Button>
+            <Button onClick={handleSaveDayGoals} size="sm">{t('macroTrackingCard.saveGoalsButton')}</Button>
            </div>
         </div>
         
-        <hr className="border-border" />
+        <Separator />
 
         <div>
-            <h3 className="text-md font-semibold mb-3">{t('macroTrackingCard.logYourDailyIntake')}</h3>
-            {macroDetails.map(m => {
-            const progress = m.goal > 0 ? (macros[m.key].current / m.goal) * 100 : 0;
-            const IconComponent = m.icon;
-            return (
-                <div key={m.key} className="mb-4">
-                <div className="flex items-center justify-between mb-1">
-                    <Label htmlFor={`${m.key}-current`} className="flex items-center text-sm font-medium text-muted-foreground">
-                      <IconComponent className="w-4 h-4 mr-1.5" /> {t(m.labelKey)}
-                    </Label>
-                    <span className="text-xs text-muted-foreground">
-                    {macros[m.key].current}{m.unit} / {macros[m.key].goal}{m.unit}
-                    </span>
-                </div>
-                <div className="flex items-center gap-2">
-                    <Input
-                        id={`${m.key}-current`}
-                        type="number"
-                        value={macros[m.key].current}
-                        onChange={(e: ChangeEvent<HTMLInputElement>) => handleIntakeChange(m.key, e.target.value)}
-                        min="0"
-                        className="flex-grow"
-                    />
-                    <span className="text-xs font-medium w-12 text-right">{Math.round(progress)}%</span>
-                </div>
-                <Progress value={progress} className={`w-full h-1.5 mt-1.5 ${m.color}`} />
-                </div>
-            );
-            })}
-            <div className="flex justify-center sm:justify-start">
-                <Button onClick={handleSaveIntake} size="sm" className="mt-2">{t('macroTrackingCard.saveIntakeButton')}</Button>
-            </div>
+            <h3 className="text-md font-semibold mb-3">{t('macroTrackingCard.monthlyTotalsTitle')}</h3>
+            {currentMonthTotals ? (
+                 <Card className="bg-muted/30">
+                    <CardContent className="p-4 space-y-1 text-sm">
+                        <p className="flex justify-between">
+                            <span>{t('macroTrackingCard.totalProteinMonth')}:</span> 
+                            <span className="font-medium">{currentMonthTotals.protein.toLocaleString()} {t('macroTrackingCard.unitGrams')}</span>
+                        </p>
+                        <p className="flex justify-between">
+                            <span>{t('macroTrackingCard.totalCarbsMonth')}:</span>
+                            <span className="font-medium">{currentMonthTotals.carbs.toLocaleString()} {t('macroTrackingCard.unitGrams')}</span>
+                        </p>
+                        <p className="flex justify-between">
+                            <span>{t('macroTrackingCard.totalFatMonth')}:</span>
+                            <span className="font-medium">{currentMonthTotals.fat.toLocaleString()} {t('macroTrackingCard.unitGrams')}</span>
+                        </p>
+                    </CardContent>
+                </Card>
+            ) : (
+                <p className="text-sm text-muted-foreground">{t('macroTrackingCard.loadingTotals')}</p>
+            )}
         </div>
+
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between pt-4 mt-4 border-t gap-2">
             <Label htmlFor="macro-reminders" className="flex items-center font-normal whitespace-nowrap">
                 <Bell className="w-4 h-4 mr-2" />
@@ -203,3 +248,4 @@ export default function MacroTrackingCard() {
     </Card>
   );
 }
+
