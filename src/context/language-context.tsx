@@ -61,7 +61,9 @@ const translations: Record<Language, Translations> = {
       resetWaterButton: "Reset Water",
       waterResetTitle: "Water Reset",
       waterResetDescription: "Your water intake for the day has been reset.",
-      goalSettingsButtonLabel: "Goal Settings",
+      goalSettingsButtonLabel: "Set Daily Goal", // Updated translation key
+      goalSettingsAriaLabel: "Goal Settings", // New
+      goalSettingsTooltip: "Set your daily water goal", // New
       ariaAddGlass: "Add glass ({amount}ml)",
       ariaAddBottle: "Add bottle ({amount}ml)",
       tooltipAddAmount: "+{amount}ml",
@@ -83,17 +85,21 @@ const translations: Record<Language, Translations> = {
         saveGoalsButton: "Save Goals for Day",
         goalsSavedTitle: "Macro Goals Saved",
         goalsForDaySaved: "Goals for {dayOfWeek} saved successfully!",
-        monthlyTotalsTitle: "Estimated Monthly Totals", // Kept for potential future use, not currently displayed
-        totalProteinMonth: "Total Protein (Month)", // Kept for potential future use
-        totalCarbsMonth: "Total Carbs (Month)", // Kept for potential future use
-        totalFatMonth: "Total Fat (Month)", // Kept for potential future use
+        monthlyTotalsTitle: "Estimated Monthly Totals", 
+        totalProteinMonth: "Total Protein (Month)", 
+        totalCarbsMonth: "Total Carbs (Month)", 
+        totalFatMonth: "Total Fat (Month)", 
         unitGrams: "g",
-        loadingTotals: "Calculating monthly totals...", // Kept for potential future use
+        loadingTotals: "Calculating monthly totals...", 
         macroTrendChartTitle: "Macronutrient Goal Trends",
         dailyTab: "Daily",
         weeklyTab: "Weekly",
         monthlyTab: "Monthly",
         weekLabel: "Week {weekNum}",
+        macroReminderSettingsAriaLabel: "Macro reminder settings",
+        macroReminderTooltip: "Set macro logging reminder",
+        goalSettingsButtonAriaLabel: "Macro Goal Settings", // New
+        goalSettingsTooltip: "Set weekly macro goals", // New
     },
     aiHealthAdvisor: {
         cardTitle: "AI Health Advisor",
@@ -447,7 +453,9 @@ const translations: Record<Language, Translations> = {
       resetWaterButton: "Resetta Acqua",
       waterResetTitle: "Apporto Idrico Azzerato",
       waterResetDescription: "Il tuo apporto idrico giornaliero è stato azzerato.",
-      goalSettingsButtonLabel: "Impostazioni Obiettivo",
+      goalSettingsButtonLabel: "Imposta Obiettivo Giornaliero", // Updated
+      goalSettingsAriaLabel: "Impostazioni Obiettivo Idrico", // New
+      goalSettingsTooltip: "Imposta il tuo obiettivo idrico giornaliero", // New
       ariaAddGlass: "Aggiungi bicchiere ({amount}ml)",
       ariaAddBottle: "Aggiungi bottiglia ({amount}ml)",
       tooltipAddAmount: "+{amount}ml",
@@ -480,6 +488,10 @@ const translations: Record<Language, Translations> = {
         weeklyTab: "Settimanale",
         monthlyTab: "Mensile",
         weekLabel: "Sett. {weekNum}",
+        macroReminderSettingsAriaLabel: "Impostazioni promemoria macro",
+        macroReminderTooltip: "Imposta promemoria monitoraggio macro",
+        goalSettingsButtonAriaLabel: "Impostazioni Obiettivi Macro", // New
+        goalSettingsTooltip: "Imposta gli obiettivi macro settimanali", // New
     },
      aiHealthAdvisor: {
         cardTitle: "Consulente Salute AI",
@@ -879,7 +891,9 @@ const translations: Record<Language, Translations> = {
       resetWaterButton: "Reiniciar Agua",
       waterResetTitle: "Agua Reiniciada",
       waterResetDescription: "Tu consumo de agua para el día ha sido reiniciado.",
-      goalSettingsButtonLabel: "Configuración de Meta",
+      goalSettingsButtonLabel: "Establecer Meta Diaria",
+      goalSettingsAriaLabel: "Configuración de Meta de Agua", 
+      goalSettingsTooltip: "Establece tu meta diaria de consumo de agua",
       ariaAddGlass: "Añadir vaso ({amount}ml)",
       ariaAddBottle: "Añadir botella ({amount}ml)",
       tooltipAddAmount: "+{amount}ml",
@@ -907,6 +921,10 @@ const translations: Record<Language, Translations> = {
         weeklyTab: "Semanal",
         monthlyTab: "Mensual",
         weekLabel: "Semana {weekNum}",
+        macroReminderSettingsAriaLabel: "Configuración de recordatorio de macros",
+        macroReminderTooltip: "Establecer recordatorio de registro de macros",
+        goalSettingsButtonAriaLabel: "Configuración de Metas de Macros",
+        goalSettingsTooltip: "Establecer metas semanales de macronutrientes",
     },
     aiHealthAdvisor: {
         cardTitle: "Asesor de Salud IA",
@@ -1253,7 +1271,9 @@ const translations: Record<Language, Translations> = {
       resetWaterButton: "Réinitialiser l'Eau",
       waterResetTitle: "Eau Réinitialisée",
       waterResetDescription: "Votre apport en eau pour la journée a été réinitialisé.",
-      goalSettingsButtonLabel: "Paramètres de l'Objectif",
+      goalSettingsButtonLabel: "Définir l'Objectif Quotidien",
+      goalSettingsAriaLabel: "Paramètres de l'Objectif d'Eau",
+      goalSettingsTooltip: "Définissez votre objectif quotidien d'apport en eau",
       ariaAddGlass: "Ajouter un verre ({amount}ml)",
       ariaAddBottle: "Ajouter une bouteille ({amount}ml)",
       tooltipAddAmount: "+{amount}ml",
@@ -1281,6 +1301,10 @@ const translations: Record<Language, Translations> = {
         weeklyTab: "Hebdomadaire",
         monthlyTab: "Mensuel",
         weekLabel: "Sem. {weekNum}",
+        macroReminderSettingsAriaLabel: "Paramètres de rappel des macros",
+        macroReminderTooltip: "Définir le rappel de suivi des macros",
+        goalSettingsButtonAriaLabel: "Paramètres des Objectifs Macros",
+        goalSettingsTooltip: "Définir les objectifs macros hebdomadaires",
     },
      aiHealthAdvisor: {
         cardTitle: "Conseiller Santé IA",

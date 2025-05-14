@@ -5,7 +5,7 @@ import { useState, useEffect, type ChangeEvent, useCallback } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Utensils, Drumstick, Wheat, Fish, LineChart } from 'lucide-react';
+import { Utensils, Drumstick, Wheat, Fish, LineChart, Target } from 'lucide-react'; // Added Target
 import { useLanguage } from '@/context/language-context';
 import { Button } from '../ui/button';
 import { useToast } from '@/hooks/use-toast';
@@ -17,6 +17,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ChartContainer, ChartTooltip, ChartTooltipContent, ChartLegend, ChartLegendContent, type ChartConfig } from "@/components/ui/chart";
 import { Line, CartesianGrid, XAxis, YAxis, Tooltip as RechartsTooltip, ResponsiveContainer, LineChart as RechartsPrimitiveLineChart } from "recharts";
 import { format, subDays, subWeeks, subMonths, startOfWeek, startOfMonth, eachDayOfInterval, getDay, getISOWeek, getMonth } from 'date-fns';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'; // Added Tooltip imports
 
 
 interface DailyMacroGoals {
@@ -51,6 +52,7 @@ export default function MacroTrackingCard() {
   const [isClient, setIsClient] = useState(false);
   const [selectedTimeRange, setSelectedTimeRange] = useState<'daily' | 'weekly' | 'monthly'>('weekly');
   const [chartData, setChartData] = useState<ChartDataPoint[]>([]);
+  const [isGoalSettingOpen, setIsGoalSettingOpen] = useState(false); // New state
 
   useEffect(() => {
     setIsClient(true);
@@ -98,6 +100,7 @@ export default function MacroTrackingCard() {
         title: t('macroTrackingCard.goalsSavedTitle'),
         description: t('macroTrackingCard.goalsForDaySaved', { dayOfWeek: t(`calendarPage.days.${selectedDayForGoalSetting}`) })
     });
+    setIsGoalSettingOpen(false); // Close after saving
   }
 
   useEffect(() => {
@@ -214,55 +217,73 @@ export default function MacroTrackingCard() {
 
   return (
     <Card className="shadow-lg">
-      <CardHeader>
+      <CardHeader className="flex flex-row items-center justify-between">
         <CardTitle className="flex items-center">
           <Utensils className="w-5 h-5 mr-2 text-orange-500" />
           {t('macroTrackingCard.title')}
         </CardTitle>
+        <TooltipProvider>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button 
+                variant="ghost" 
+                size="icon" 
+                onClick={() => setIsGoalSettingOpen(!isGoalSettingOpen)}
+                aria-label={t('macroTrackingCard.goalSettingsButtonAriaLabel', {default: "Macro Goal Settings"})}
+              >
+                <Target className="w-4 h-4" />
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent>
+              <p>{t('macroTrackingCard.goalSettingsTooltip', {default: "Set weekly macro goals"})}</p>
+            </TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
       </CardHeader>
       <CardContent className="space-y-6">
-        <div>
-          <h3 className="text-md font-semibold mb-3">{t('macroTrackingCard.setYourWeeklyGoals')}</h3>
-          
-          <div className="mb-4">
-            <Label htmlFor="select-day-for-goals">{t('macroTrackingCard.selectDay')}</Label>
-            <Select value={selectedDayForGoalSetting} onValueChange={setSelectedDayForGoalSetting}>
-              <SelectTrigger id="select-day-for-goals">
-                <SelectValue placeholder={t('macroTrackingCard.selectDay')} />
-              </SelectTrigger>
-              <SelectContent>
-                {appDayKeys.map(dayKey => (
-                  <SelectItem key={dayKey} value={dayKey}>
-                    {t(`calendarPage.days.${dayKey}`)}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
+        {isGoalSettingOpen && (
+          <div>
+            <h3 className="text-md font-semibold mb-3">{t('macroTrackingCard.setYourWeeklyGoals')}</h3>
+            
+            <div className="mb-4">
+              <Label htmlFor="select-day-for-goals">{t('macroTrackingCard.selectDay')}</Label>
+              <Select value={selectedDayForGoalSetting} onValueChange={setSelectedDayForGoalSetting}>
+                <SelectTrigger id="select-day-for-goals">
+                  <SelectValue placeholder={t('macroTrackingCard.selectDay')} />
+                </SelectTrigger>
+                <SelectContent>
+                  {appDayKeys.map(dayKey => (
+                    <SelectItem key={dayKey} value={dayKey}>
+                      {t(`calendarPage.days.${dayKey}`)}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-4">
-            {macroDetails.map(m => (
-              <div key={m.key}>
-                <Label htmlFor={`${selectedDayForGoalSetting}-${m.key}-goal`} className="flex items-center text-sm font-medium text-muted-foreground mb-1">
-                  <m.icon className="w-4 h-4 mr-1.5" /> {t(m.labelKey)} ({m.unit})
-                </Label>
-                <Input
-                  id={`${selectedDayForGoalSetting}-${m.key}-goal`}
-                  type="number"
-                  value={String(currentGoalsForSelectedDay[m.key])} // Ensure value is a string
-                  onChange={(e: ChangeEvent<HTMLInputElement>) => handleGoalPropertyChange(selectedDayForGoalSetting, m.key, e.target.value)}
-                  min="0"
-                />
-              </div>
-            ))}
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-4">
+              {macroDetails.map(m => (
+                <div key={m.key}>
+                  <Label htmlFor={`${selectedDayForGoalSetting}-${m.key}-goal`} className="flex items-center text-sm font-medium text-muted-foreground mb-1">
+                    <m.icon className="w-4 h-4 mr-1.5" /> {t(m.labelKey)} ({m.unit})
+                  </Label>
+                  <Input
+                    id={`${selectedDayForGoalSetting}-${m.key}-goal`}
+                    type="number"
+                    value={String(currentGoalsForSelectedDay[m.key])} // Ensure value is a string
+                    onChange={(e: ChangeEvent<HTMLInputElement>) => handleGoalPropertyChange(selectedDayForGoalSetting, m.key, e.target.value)}
+                    min="0"
+                  />
+                </div>
+              ))}
+            </div>
+             <div className="flex justify-center sm:justify-start">
+              <Button onClick={handleSaveDayGoals} size="sm">{t('macroTrackingCard.saveGoalsButton')}</Button>
+             </div>
+             <Separator className="my-6" />
           </div>
-           <div className="flex justify-center sm:justify-start">
-            <Button onClick={handleSaveDayGoals} size="sm">{t('macroTrackingCard.saveGoalsButton')}</Button>
-           </div>
-        </div>
+        )}
         
-        <Separator />
-
         <div>
             <h3 className="text-md font-semibold mb-3 flex items-center">
                 <LineChart className="w-5 h-5 mr-2 text-primary" />
