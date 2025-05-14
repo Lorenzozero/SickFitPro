@@ -1,8 +1,8 @@
 
 'use client';
 
-import { useState, useEffect, type ChangeEvent, useMemo, useCallback } from 'react'; // Added useCallback
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
+import { useState, useEffect, type ChangeEvent, useCallback } from 'react'; // Added useCallback
+import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Utensils, Bell, Drumstick, Wheat, Fish } from 'lucide-react';
@@ -113,7 +113,7 @@ export default function MacroTrackingCard() {
         }
     }
     return totals;
-  }, [appDayKeys]); // appDayKeys is stable
+  }, []); // appDayKeys is stable, no need to include if defined outside component or globally.
 
   useEffect(() => {
     if (isClient && languageContextIsClient) { // Ensure context is ready for dates
@@ -159,7 +159,7 @@ export default function MacroTrackingCard() {
           <Utensils className="w-5 h-5 mr-2 text-orange-500" />
           {t('macroTrackingCard.title')}
         </CardTitle>
-        <CardDescription>{t('macroTrackingCard.descriptionWeekly')}</CardDescription>
+        {/* CardDescription removed as per request */}
       </CardHeader>
       <CardContent className="space-y-6">
         <div>
