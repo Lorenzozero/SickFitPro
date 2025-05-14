@@ -1,11 +1,11 @@
 
 'use client';
 
-import { useState, type ChangeEvent, useEffect, useMemo } from 'react'; // Added useMemo
+import { useState, type ChangeEvent, useEffect, useMemo } from 'react';
 import { useForm, type SubmitHandler } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
+import { Form, FormControl, FormDescription, FormField, FormItem, FormMessage } from '@/components/ui/form';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Loader2, Wand2, Info } from 'lucide-react';
@@ -30,13 +30,18 @@ export default function AiHealthAdvisorForm() {
   const [isLoading, setIsLoading] = useState(false);
   const [adviceResult, setAdviceResult] = useState<HealthAdviceOutput | null>(null);
 
-  // Define the form validation schema inside the component using useMemo
-  // so it can access the `t` function and re-create the schema when `t` changes.
   const formValidationSchema = useMemo(() => {
-    return HealthContextInputSchema.pick({
-      userQuery: true,
-    }).extend({
-      userQuery: z.string().min(10, { message: t('aiHealthAdvisor.userQueryMinError') }).optional(),
+    return z.object({ // We define the schema for the form fields directly
+      userQuery: z.string()
+        .optional()
+        .refine(val => {
+          // If the value is present (not undefined and not an empty string), then its length must be >= 10.
+          // If it's undefined or an empty string, it's considered valid.
+          if (val && val.length > 0) {
+            return val.length >= 10;
+          }
+          return true; // Valid if undefined or empty string
+        }, { message: t('aiHealthAdvisor.userQueryMinError') }),
     });
   }, [t]);
   
@@ -47,10 +52,11 @@ export default function AiHealthAdvisorForm() {
     },
   });
   
-  // Re-trigger validation if language changes to update messages
   useEffect(() => {
-    form.trigger(); 
-  }, [t, form, formValidationSchema]); // formValidationSchema is now a dependency
+    if (form.formState.errors.userQuery) {
+        form.trigger('userQuery'); 
+    }
+  }, [t, form, formValidationSchema]);
 
 
   const onSubmit: SubmitHandler<UserEditableFormValues> = async (formData) => {
@@ -146,7 +152,6 @@ export default function AiHealthAdvisorForm() {
               name="userQuery"
               render={({ field }) => (
                 <FormItem>
-                  {/* FormLabel removed as per user request */}
                   <FormControl>
                     <Textarea
                       placeholder={t('aiHealthAdvisor.userQueryPlaceholder')}
@@ -208,3 +213,4 @@ export default function AiHealthAdvisorForm() {
     </Card>
   );
 }
+
