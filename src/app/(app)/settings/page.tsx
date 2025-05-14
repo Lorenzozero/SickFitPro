@@ -16,7 +16,7 @@ import {
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Switch } from '@/components/ui/switch';
-import { Languages, Bell, Save, UserCircle, Shield, Eye, EyeOff } from 'lucide-react';
+import { Languages, Bell, Save, UserCircle, Shield, Eye, EyeOff, Weight } from 'lucide-react'; // Added Weight
 import { useToast } from '@/hooks/use-toast';
 import { useLanguage, type Language } from '@/context/language-context';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -28,14 +28,13 @@ export default function SettingsPage() {
   const { toast } = useToast();
   const [isClient, setIsClient] = useState(false);
 
-  // New state for profile settings
   const [profilePicture, setProfilePicture] = useState<string | null>(null);
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [profilePictureFile, setProfilePictureFile] = useState<File | null>(null);
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
+  const [currentWeight, setCurrentWeight] = useState<string>(''); // New state for current weight
 
-  // New state for password change
   const [currentPassword, setCurrentPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [confirmNewPassword, setConfirmNewPassword] = useState('');
@@ -51,11 +50,10 @@ export default function SettingsPage() {
         if (storedNotificationPref !== null) {
           setEnableNotifications(JSON.parse(storedNotificationPref));
         }
-        // Mock fetching user data
         setName(localStorage.getItem('app-user-name') || 'User Name');
         setEmail(localStorage.getItem('app-user-email') || 'user@example.com');
         setProfilePicture(localStorage.getItem('app-user-profile-picture') || null);
-
+        setCurrentWeight(localStorage.getItem('app-user-current-weight') || '');
     }
   }, []);
 
@@ -84,7 +82,6 @@ export default function SettingsPage() {
     let changesMade = false;
     const updatedPreferences: string[] = [];
 
-    // Save general settings
     if (typeof window !== 'undefined') {
         const currentNotificationPref = JSON.parse(localStorage.getItem('app-notifications-enabled') || 'true');
         if (enableNotifications !== currentNotificationPref) {
@@ -94,7 +91,6 @@ export default function SettingsPage() {
         }
     }
 
-    // Save profile information
     if (name.trim() !== (localStorage.getItem('app-user-name') || 'User Name')) {
         localStorage.setItem('app-user-name', name.trim());
         updatedPreferences.push(t('settingsPage.nameLabel'));
@@ -103,11 +99,16 @@ export default function SettingsPage() {
     if (profilePicture && profilePicture !== (localStorage.getItem('app-user-profile-picture') || null)) {
         localStorage.setItem('app-user-profile-picture', profilePicture);
         updatedPreferences.push(t('settingsPage.uploadProfilePictureLabel'));
-        // In a real app, you'd upload profilePictureFile to a server here
+        changesMade = true;
+    }
+    // Save current weight
+    if (currentWeight.trim() !== (localStorage.getItem('app-user-current-weight') || '')) {
+        localStorage.setItem('app-user-current-weight', currentWeight.trim());
+        updatedPreferences.push(t('settingsPage.currentWeightLabel', {default: "Current Weight"}));
         changesMade = true;
     }
 
-    // Handle password change
+
     if (newPassword && currentPassword) {
         if (newPassword !== confirmNewPassword) {
             toast({
@@ -117,10 +118,8 @@ export default function SettingsPage() {
             });
             return;
         }
-        // Mock password change logic
         console.log('Attempting to change password...');
-        // In a real app, you'd send currentPassword and newPassword to your backend for verification and update.
-        localStorage.setItem('app-user-password-placeholder', newPassword); // NOT FOR REAL USE
+        localStorage.setItem('app-user-password-placeholder', newPassword); 
         setCurrentPassword('');
         setNewPassword('');
         setConfirmNewPassword('');
@@ -154,7 +153,6 @@ export default function SettingsPage() {
       <>
         <PageHeader title={t('settingsPage.title')} />
         <div className="space-y-8">
-          {/* Using ShadCN Skeleton components or simple divs for placeholders */}
           <Card className="shadow-lg"><CardContent className="p-6 h-40 animate-pulse bg-muted rounded-lg"></CardContent></Card>
           <Card className="shadow-lg"><CardContent className="p-6 h-56 animate-pulse bg-muted rounded-lg"></CardContent></Card>
           <Card className="shadow-lg"><CardContent className="p-6 h-32 animate-pulse bg-muted rounded-lg"></CardContent></Card>
@@ -176,7 +174,6 @@ export default function SettingsPage() {
         title={t('settingsPage.title')}
       />
       <div className="space-y-8">
-        {/* Profile Information Card */}
         <Card className="shadow-lg">
           <CardHeader>
             <CardTitle className="flex items-center">
@@ -212,6 +209,20 @@ export default function SettingsPage() {
                 className="mt-1"
               />
             </div>
+             <div>
+              <Label htmlFor="current-weight" className="flex items-center">
+                <Weight className="w-4 h-4 mr-1.5" />
+                {t('settingsPage.currentWeightLabel', {default: "Current Weight (kg)"})}
+              </Label>
+              <Input
+                id="current-weight"
+                type="number"
+                value={currentWeight}
+                onChange={(e) => setCurrentWeight(e.target.value)}
+                placeholder={t('settingsPage.currentWeightPlaceholder', {default: "e.g., 70.5"})}
+                className="mt-1"
+              />
+            </div>
             <div>
               <Label htmlFor="email">{t('settingsPage.emailLabel')}</Label>
               <Input
@@ -226,7 +237,6 @@ export default function SettingsPage() {
           </CardContent>
         </Card>
 
-        {/* Account Security Card */}
         <Card className="shadow-lg">
           <CardHeader>
             <CardTitle className="flex items-center">
@@ -283,7 +293,6 @@ export default function SettingsPage() {
           </CardContent>
         </Card>
 
-        {/* Language Settings Card */}
         <Card className="shadow-lg">
           <CardHeader>
             <CardTitle className="flex items-center">
@@ -293,7 +302,7 @@ export default function SettingsPage() {
           </CardHeader>
           <CardContent>
             <div className="flex items-center gap-4">
-                 <Label htmlFor="language" className="whitespace-nowrap text-sm font-medium">{t('settingsPage.language')}</Label>
+                 <Label htmlFor="language-select" className="whitespace-nowrap text-sm font-medium">{t('settingsPage.language')}</Label>
                 <div className="w-auto">
                     <Select
                         value={languageContextIsClient ? language : 'en'}
@@ -315,7 +324,6 @@ export default function SettingsPage() {
           </CardContent>
         </Card>
 
-        {/* Notification Settings Card */}
         <Card className="shadow-lg">
           <CardHeader className="flex flex-row items-center justify-between">
             <CardTitle className="flex items-center">
@@ -344,3 +352,4 @@ export default function SettingsPage() {
     </>
   );
 }
+

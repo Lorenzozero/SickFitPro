@@ -4,20 +4,20 @@
 import { PageHeader } from '@/components/shared/page-header';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { TrendingUp, Weight, PlayCircle, Users, Activity, Clock, CalendarDays } from 'lucide-react'; // Added CalendarDays
+import { TrendingUp, Weight, PlayCircle, Users, Activity, Clock, CalendarDays } from 'lucide-react';
 import Link from 'next/link';
 import { useLanguage } from '@/context/language-context';
-import { useEffect, useState, useMemo } from 'react'; // Added useMemo
+import { useEffect, useState, useMemo } from 'react';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Separator } from '@/components/ui/separator';
-import { useWeeklySchedule, type ScheduledWorkout, dayKeys } from '@/context/weekly-schedule-context'; // Added
+import { useWeeklySchedule, dayKeys, type WorkoutPlanOption } from '@/context/weekly-schedule-context';
 
 interface WorkoutHistoryItem {
   id: string;
-  date: string; 
-  planNameKey: string; 
+  date: string;
+  planNameKey: string;
   defaultPlanName: string;
-  duration: string; 
+  duration: string;
 }
 
 const mockWorkoutHistory: WorkoutHistoryItem[] = [
@@ -32,23 +32,42 @@ export default function DashboardPage() {
   const { t, language, isClient: languageContextIsClient } = useLanguage();
   const { weeklySchedule, isClient: scheduleIsClient, availableWorkoutPlans } = useWeeklySchedule();
   const [isMounted, setIsMounted] = useState(false);
+  const [currentWeight, setCurrentWeight] = useState<string>('N/A');
 
   useEffect(() => {
     setIsMounted(true);
+    if (typeof window !== 'undefined') {
+        const storedWeight = localStorage.getItem('app-user-current-weight');
+        if (storedWeight) {
+            setCurrentWeight(`${storedWeight} kg`);
+        }
+    }
   }, []);
 
   const today = useMemo(() => {
     if (!isMounted) return null;
     const date = new Date();
-    return dayKeys[date.getDay() === 0 ? 6 : date.getDay() - 1]; // Monday is 0 in dayKeys, Sunday is 6
+    // Sunday is 0 for getDay(), Saturday is 6.
+    // dayKeys: monday = 0, sunday = 6
+    let dayIndex = date.getDay() - 1; // Monday (0) to Saturday (5)
+    if (dayIndex === -1) { // Sunday
+        dayIndex = 6;
+    }
+    return dayKeys[dayIndex];
   }, [isMounted]);
 
   const todaysWorkouts = useMemo(() => {
     if (!isMounted || !today || !scheduleIsClient || !weeklySchedule[today]) {
       return [];
     }
-    return weeklySchedule[today];
-  }, [isMounted, today, scheduleIsClient, weeklySchedule]);
+    return weeklySchedule[today].map(scheduledWorkout => {
+        const planDetails = availableWorkoutPlans.find(p => p.id === scheduledWorkout.planId);
+        return {
+            ...scheduledWorkout,
+            planName: planDetails ? t(planDetails.nameKey, {default: planDetails.defaultName}) : scheduledWorkout.planName,
+        };
+    });
+  }, [isMounted, today, scheduleIsClient, weeklySchedule, availableWorkoutPlans, t]);
 
   const totalScheduledWorkoutsThisWeek = useMemo(() => {
     if (!scheduleIsClient) return 0;
@@ -56,19 +75,17 @@ export default function DashboardPage() {
   }, [scheduleIsClient, weeklySchedule]);
 
   // Placeholder for actual completed workouts this week.
-  // This would typically come from logged workout history data.
-  const completedWorkoutsThisWeek = 0; 
+  const completedWorkoutsThisWeek = 0;
 
 
   const stats = [
-    // Removed 'Workouts Planned Today'
-    { titleKey: 'dashboard.workoutsThisWeek', value: `${completedWorkoutsThisWeek}/${totalScheduledWorkoutsThisWeek}`, icon: Users, color: 'text-accent' }, 
-    { titleKey: 'dashboard.weightLifted', value: '0 kg', icon: TrendingUp, color: 'text-green-500' }, 
-    { titleKey: 'dashboard.currentWeight', value: 'N/A', icon: Weight, color: 'text-orange-500' }, 
+    { titleKey: 'dashboard.workoutsThisWeek', value: `${completedWorkoutsThisWeek}/${totalScheduledWorkoutsThisWeek}`, icon: Users, color: 'text-accent' },
+    { titleKey: 'dashboard.weightLifted', value: '0 kg', icon: TrendingUp, color: 'text-green-500' },
+    { titleKey: 'dashboard.currentWeight', value: currentWeight, icon: Weight, color: 'text-orange-500' },
   ];
 
   const formatDate = (dateString: string) => {
-    if (!isMounted) return dateString; 
+    if (!isMounted) return dateString;
     return new Date(dateString + 'T00:00:00').toLocaleDateString(language, {
       year: 'numeric',
       month: 'short',
@@ -82,7 +99,7 @@ export default function DashboardPage() {
         title={t('dashboard.welcomeTitle')}
         description={t('dashboard.welcomeDescription')}
       />
-      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3"> {/* Adjusted to 3 cols for remaining stats */}
+      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
         {stats.map((stat) => (
           <Card key={stat.titleKey} className="shadow-lg hover:shadow-xl transition-shadow duration-300">
             <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
@@ -106,7 +123,7 @@ export default function DashboardPage() {
           </CardHeader>
           <CardContent>
             <div className="p-4 text-center border-2 border-dashed rounded-lg border-border" data-ai-hint="workout routine">
-              {isMounted && scheduleIsClient ? (
+              {isMounted && scheduleIsClient && languageContextIsClient ? (
                 todaysWorkouts.length > 0 ? (
                   <>
                     <CalendarDays className="w-12 h-12 mx-auto mb-2 text-primary" />
@@ -140,7 +157,6 @@ export default function DashboardPage() {
       <Card className="mt-8 shadow-lg">
         <CardHeader>
           <CardTitle>{isMounted ? t('dashboard.activityAndHistoryTitle') : "Activity & History"}</CardTitle>
-          <CardDescription>{isMounted ? t('dashboard.activityAndHistoryDescription') : "Start a new workout or review your past sessions."}</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="mb-6 flex justify-center">
@@ -188,3 +204,4 @@ export default function DashboardPage() {
     </>
   );
 }
+

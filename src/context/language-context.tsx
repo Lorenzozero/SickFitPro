@@ -21,7 +21,7 @@ const translations: Record<Language, Translations> = {
       workoutPlans: 'Workout Plans',
       calendar: 'Calendar',
       progress: 'Progress',
-      diet: 'Diet', 
+      diet: 'Diet',
     },
     userDropdown: {
       myAccount: 'My Account',
@@ -38,8 +38,8 @@ const translations: Record<Language, Translations> = {
     dashboard: {
       welcomeTitle: 'Welcome to SickFit Pro!',
       welcomeDescription: "Your journey to peak fitness starts here. Let's get to work.",
-      workoutsThisWeek: 'Workouts This Week', 
-      weightLifted: 'Total Weight Lifted', 
+      workoutsThisWeek: 'Workouts This Week',
+      weightLifted: 'Total Weight Lifted',
       currentWeight: 'Current Weight',
       logNewWorkout: 'Start Workout',
       todaysFocus: "Today's Focus",
@@ -159,6 +159,8 @@ const translations: Record<Language, Translations> = {
       toastErrorTitle: 'Error',
       showPassword: 'Show password',
       hidePassword: 'Hide password',
+      currentWeightLabel: 'Current Weight (kg)',
+      currentWeightPlaceholder: 'e.g., 70.5',
     },
     aiSplitForm: {
         cardTitle: "AI Fitness Advisor",
@@ -172,7 +174,7 @@ const translations: Record<Language, Translations> = {
         generatingSplitTitle: "Generating your advice...",
         generatingSplitDescription: "Our AI is thinking. This might take a moment.",
         yourSuggestedAdviceTitle: "Your AI Fitness Advice",
-        suggestedKeyPointsLabel: "Key Suggestions:", 
+        suggestedKeyPointsLabel: "Key Suggestions:",
         detailedAnalysisLabel: "Detailed Analysis & Advice:",
         toastSuggestionReadyTitle: "Advice Ready!",
         toastSuggestionReadyDescription: "AI has generated training advice for you.",
@@ -314,7 +316,7 @@ const translations: Record<Language, Translations> = {
         formValidationAlert: "Please fill in date, measurement type, and value.",
     },
     workoutPlansPage: {
-        title: "Workout Plans", 
+        title: "Workout Plans",
         description: "Create, manage, and share your training schedules.",
         createNewPlanButton: "Create New Plan",
         exercisesLabel: "Exercises",
@@ -332,8 +334,8 @@ const translations: Record<Language, Translations> = {
         addThisExerciseButton: "Add this Exercise",
         addedExercisesLabel: "Added Exercises:",
         noExercisesAddedYet: "No exercises added to this plan yet.",
-        exerciseSelectionPlaceholder: "Add exercises to this plan using the form above.", 
-        addExerciseButton: "Add Exercise to Plan", 
+        exerciseSelectionPlaceholder: "Add exercises to this plan using the form above.",
+        addExerciseButton: "Add Exercise to Plan",
         cancelButton: "Cancel",
         savePlanButton: "Save Plan",
         toastPlanUpdatedTitle: "Plan Updated",
@@ -393,8 +395,10 @@ const translations: Record<Language, Translations> = {
       maxWeightLabel: "Max Weight",
       maxRepsLabel: "Max Reps",
       repsUnitLabel: "reps",
+      workoutInProgressTitle: "Workout In Progress",
+      finishCurrentWorkoutPrompt: "You have an active workout. Please finish or abandon it before starting a new one or creating/editing plans.",
     },
-    dietPage: { 
+    dietPage: {
         title: "Diet Tracking",
         description: "Manage your daily nutritional intake and hydration.",
     },
@@ -406,12 +410,12 @@ const translations: Record<Language, Translations> = {
   },
   it: {
     nav: {
-      dashboard: 'Home', 
+      dashboard: 'Home',
       exercises: 'Esercizi',
-      workoutPlans: 'Schede', 
+      workoutPlans: 'Schede',
       calendar: 'Calendario',
       progress: 'Progressi',
-      diet: 'Dieta', 
+      diet: 'Dieta',
     },
     userDropdown: {
       myAccount: 'Il Mio Account',
@@ -428,10 +432,10 @@ const translations: Record<Language, Translations> = {
     dashboard: {
       welcomeTitle: 'Benvenuto in SickFit Pro!',
       welcomeDescription: 'Il tuo viaggio verso la forma fisica ottimale inizia qui. Mettiamoci al lavoro.',
-      workoutsThisWeek: 'Allenamenti Settimanali', 
+      workoutsThisWeek: 'Allenamenti Settimanali',
       weightLifted: 'Peso Totale Sollevato',
       currentWeight: 'Peso Attuale',
-      logNewWorkout: 'Inizia Allenamento', 
+      logNewWorkout: 'Inizia Allenamento',
       todaysFocus: "Focus di Oggi",
       todaysFocusDescription: "Cosa c'è in programma per oggi?",
       checkCalendarForWorkout: "Controlla il calendario per l'allenamento di oggi!",
@@ -549,6 +553,8 @@ const translations: Record<Language, Translations> = {
       toastErrorTitle: 'Errore',
       showPassword: 'Mostra password',
       hidePassword: 'Nascondi password',
+      currentWeightLabel: 'Peso Attuale (kg)',
+      currentWeightPlaceholder: 'es. 70.5',
     },
     aiSplitForm: {
         cardTitle: "Consulente Fitness AI",
@@ -562,7 +568,7 @@ const translations: Record<Language, Translations> = {
         generatingSplitTitle: "Sto generando i tuoi consigli...",
         generatingSplitDescription: "La nostra AI sta elaborando. Potrebbe volerci un momento.",
         yourSuggestedAdviceTitle: "I Tuoi Consigli dal Coach AI",
-        suggestedKeyPointsLabel: "Suggerimenti Chiave:", 
+        suggestedKeyPointsLabel: "Suggerimenti Chiave:",
         detailedAnalysisLabel: "Analisi Dettagliata e Consigli:",
         toastSuggestionReadyTitle: "Consigli Pronti!",
         toastSuggestionReadyDescription: "L'AI ha generato consigli di allenamento per te.",
@@ -704,7 +710,7 @@ const translations: Record<Language, Translations> = {
         formValidationAlert: "Compila data, tipo misurazione e valore.",
     },
      workoutPlansPage: {
-        title: "Schede Allenamento", 
+        title: "Schede Allenamento",
         description: "Crea, gestisci e condividi i tuoi programmi di allenamento.",
         createNewPlanButton: "Crea Nuova Scheda",
         exercisesLabel: "Esercizi",
@@ -783,8 +789,10 @@ const translations: Record<Language, Translations> = {
       maxWeightLabel: "Peso Max",
       maxRepsLabel: "Rip. Max",
       repsUnitLabel: "rip.",
+      workoutInProgressTitle: "Allenamento in Corso",
+      finishCurrentWorkoutPrompt: "Hai un allenamento attivo. Per favore, terminalo o abbandonalo prima di iniziarne uno nuovo o creare/modificare schede.",
     },
-    dietPage: { 
+    dietPage: {
         title: "Monitoraggio Dieta",
         description: "Gestisci il tuo apporto nutrizionale giornaliero e l'idratazione.",
     },
@@ -794,7 +802,7 @@ const translations: Record<Language, Translations> = {
       resume: "Riprendi: {planName}",
     }
   },
-  es: { 
+  es: {
     nav: {
       dashboard: 'Inicio',
       exercises: 'Ejercicios',
@@ -871,9 +879,11 @@ const translations: Record<Language, Translations> = {
       toastErrorTitle: 'Error',
       showPassword: 'Mostrar contraseña',
       hidePassword: 'Ocultar contraseña',
+      currentWeightLabel: 'Peso Actual (kg)',
+      currentWeightPlaceholder: 'ej. 70.5',
     },
-    toastErrorTitle: "Error", 
-    waterIntakeCard: { 
+    toastErrorTitle: "Error",
+    waterIntakeCard: {
       title: "Consumo de Agua",
       description: "¡Mantente hidratado! Tu meta: {dailyGoal} ml.",
       currentIntakeLabel: "Actual: {current}ml / {dailyGoal}ml",
@@ -935,7 +945,7 @@ const translations: Record<Language, Translations> = {
         errorTitle: "Error de Análisis",
         errorDescription: "No se pudo analizar la comida. Por favor, inténtalo de nuevo."
     },
-    dietPage: { 
+    dietPage: {
         title: "Seguimiento de Dieta",
         description: "Gestiona tu ingesta nutricional diaria y tu hidratación.",
     },
@@ -1160,13 +1170,15 @@ const translations: Record<Language, Translations> = {
         maxWeightLabel: "Peso Máx.",
         maxRepsLabel: "Rep. Máx.",
         repsUnitLabel: "reps",
+        workoutInProgressTitle: "Entrenamiento en Curso",
+        finishCurrentWorkoutPrompt: "Tienes un entrenamiento activo. Por favor, termínalo o abandónalo antes de empezar uno nuevo o crear/editar planes.",
     },
     resumeWorkoutButton: {
       resumeTitle: "Reanudar Entrenamiento",
       resume: "Reanudar: {planName}",
     }
   },
-  fr: { 
+  fr: {
     nav: {
       dashboard: 'Accueil',
       exercises: 'Exercices',
@@ -1243,9 +1255,11 @@ const translations: Record<Language, Translations> = {
       toastErrorTitle: 'Erreur',
       showPassword: 'Afficher le mot de passe',
       hidePassword: 'Masquer le mot de passe',
+      currentWeightLabel: 'Poids Actuel (kg)',
+      currentWeightPlaceholder: 'ex: 70.5',
     },
-    toastErrorTitle: "Erreur", 
-    waterIntakeCard: { 
+    toastErrorTitle: "Erreur",
+    waterIntakeCard: {
       title: "Apport en Eau",
       description: "Restez hydraté ! Votre objectif : {dailyGoal} ml.",
       currentIntakeLabel: "Actuel: {current}ml / {dailyGoal}ml",
@@ -1307,7 +1321,7 @@ const translations: Record<Language, Translations> = {
         errorTitle: "Erreur d'Analyse",
         errorDescription: "Impossible d'analyser le repas. Veuillez réessayer."
     },
-    dietPage: { 
+    dietPage: {
         title: "Suivi de l'Alimentation",
         description: "Gérez votre apport nutritionnel quotidien et votre hydratation.",
     },
@@ -1532,6 +1546,8 @@ const translations: Record<Language, Translations> = {
         maxWeightLabel: "Poids Max",
         maxRepsLabel: "Rép. Max",
         repsUnitLabel: "réps",
+        workoutInProgressTitle: "Entraînement en Cours",
+        finishCurrentWorkoutPrompt: "Vous avez un entraînement actif. Veuillez le terminer ou l'abandonner avant d'en commencer un nouveau ou de créer/modifier des programmes.",
     },
     resumeWorkoutButton: {
       resumeTitle: "Reprendre l'entraînement",
@@ -1572,7 +1588,7 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
       setLanguageState(clientInitialLanguage);
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []); 
+  }, []);
 
   const setLanguage = useCallback((newLanguage: Language) => {
     if (translations[newLanguage]) {
@@ -1591,7 +1607,7 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const t = useCallback((key: string, replacements?: Record<string, string | number | undefined>): string => {
-    const currentLang = isClient ? language : DEFAULT_LANGUAGE; 
+    const currentLang = isClient ? language : DEFAULT_LANGUAGE;
     const keys = key.split('.');
     let result: any = translations[currentLang];
 
@@ -1603,17 +1619,17 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
         for (const fk of keys) {
             fallbackResult = fallbackResult?.[fk];
             if (fallbackResult === undefined) {
-              return replacements?.default?.toString() || key; 
+              return replacements?.default?.toString() || key;
             }
         }
-        result = fallbackResult; 
-        break; 
+        result = fallbackResult;
+        break;
       }
     }
 
     if (typeof result === 'string' && replacements) {
       const actualReplacements = { ...replacements };
-      delete actualReplacements.default; 
+      delete actualReplacements.default;
 
       return Object.entries(actualReplacements).reduce((acc, [placeholder, value]) => {
         const replacementValue = (typeof value === 'string' || typeof value === 'number') ? String(value) : '';
@@ -1622,14 +1638,14 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
     }
 
     return typeof result === 'string' ? result : (replacements?.default?.toString() || key) ;
-  }, [language, isClient]); 
+  }, [language, isClient]);
 
 
   useEffect(() => {
-    if (isClient) { 
+    if (isClient) {
       document.documentElement.lang = language;
     }
-  }, [language, isClient]); 
+  }, [language, isClient]);
 
   return (
     <LanguageContext.Provider value={{ language, setLanguage, t, isClient }}>
@@ -1645,3 +1661,4 @@ export function useLanguage() {
   }
   return context;
 }
+
