@@ -15,12 +15,6 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-  DropdownMenuSub,
-  DropdownMenuSubTrigger,
-  DropdownMenuPortal,
-  DropdownMenuSubContent,
-  DropdownMenuRadioGroup,
-  DropdownMenuRadioItem
 } from '@/components/ui/dropdown-menu';
 import { useTheme } from '@/components/theme-provider';
 import { useLanguage } from '@/context/language-context';
@@ -28,7 +22,7 @@ import ResumeWorkoutButton from '@/components/shared/resume-workout-button';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 
 export default function AppLayout({ children }: { children: ReactNode }) {
-  const { theme, setTheme, resolvedTheme } = useTheme();
+  const { setTheme, resolvedTheme } = useTheme();
   const { t, isClient } = useLanguage();
 
   const UserProfileDropdown = () => (
@@ -51,21 +45,7 @@ export default function AppLayout({ children }: { children: ReactNode }) {
             <span>{isClient ? t('userDropdown.settings') : 'Settings'}</span>
           </Link>
         </DropdownMenuItem>
-        <DropdownMenuSub>
-          <DropdownMenuSubTrigger>
-            {isClient && resolvedTheme === 'dark' ? <Moon className="w-4 h-4 mr-2" /> : <Sun className="w-4 h-4 mr-2" />}
-            <span>{isClient ? t('userDropdown.theme') : 'Theme'}</span>
-          </DropdownMenuSubTrigger>
-          <DropdownMenuPortal>
-            <DropdownMenuSubContent>
-              <DropdownMenuRadioGroup value={theme} onValueChange={(value) => setTheme(value as 'light' | 'dark' | 'system')}>
-                <DropdownMenuRadioItem value="light">{isClient ? t('userDropdown.light') : 'Light'}</DropdownMenuRadioItem>
-                <DropdownMenuRadioItem value="dark">{isClient ? t('userDropdown.dark') : 'Dark'}</DropdownMenuRadioItem>
-                <DropdownMenuRadioItem value="system">{isClient ? t('userDropdown.system') : 'System'}</DropdownMenuRadioItem>
-              </DropdownMenuRadioGroup>
-            </DropdownMenuSubContent>
-          </DropdownMenuPortal>
-        </DropdownMenuSub>
+        {/* Removed Theme Submenu */}
         <DropdownMenuSeparator />
         <DropdownMenuItem>
           <LogOut className="w-4 h-4 mr-2" />
@@ -93,7 +73,7 @@ export default function AppLayout({ children }: { children: ReactNode }) {
       >
         <Link href={item.href} className="flex items-center">
           <item.icon className={mobile ? "mr-3 h-5 w-5" : "mr-1.5 h-4 w-4"} />
-          {isClient ? t(item.titleKey) : item.titleKey.split('.').pop() || item.titleKey}
+          {isClient ? t(item.titleKey, { default: item.titleKey.split('.').pop() }) : item.titleKey.split('.').pop() || item.titleKey}
         </Link>
       </Button>
     ))
@@ -114,7 +94,7 @@ export default function AppLayout({ children }: { children: ReactNode }) {
               </SheetTrigger>
               <SheetContent side="left" className="w-[300px] sm:w-[340px] p-0 flex flex-col">
                  <div className="p-6 border-b">
-                    <Link href="/" className="block group" aria-label={isClient ? t('nav.home') : 'Home'}>
+                    <Link href="/" className="block group" aria-label={isClient ? t('nav.home', { default: "Home"}) : 'Home'}>
                       <Logo />
                     </Link>
                   </div>
@@ -126,14 +106,14 @@ export default function AppLayout({ children }: { children: ReactNode }) {
                   </div>
               </SheetContent>
             </Sheet>
-             <Link href="/" className="block group md:hidden" aria-label={isClient ? t('nav.home') : 'Home'}>
+             <Link href="/" className="block group md:hidden" aria-label={isClient ? t('nav.home', { default: "Home"}) : 'Home'}>
                 <Logo />
             </Link>
           </div>
 
           {/* Desktop Logo and Navigation */}
           <div className="hidden md:flex items-center gap-6">
-            <Link href="/" className="block group" aria-label={isClient ? t('nav.home') : 'Home'}>
+            <Link href="/" className="block group" aria-label={isClient ? t('nav.home', { default: "Home"}) : 'Home'}>
               <Logo />
             </Link>
             <nav className="flex items-center gap-1">
@@ -151,7 +131,7 @@ export default function AppLayout({ children }: { children: ReactNode }) {
         </div>
       </header>
 
-      <main className="flex-1 p-4 md:p-6 text-center">
+      <main className="flex-1 p-4 md:p-6 text-center"> {/* Applied text-center here */}
         {children}
       </main>
       <ResumeWorkoutButton />
