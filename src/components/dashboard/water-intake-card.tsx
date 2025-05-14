@@ -2,13 +2,13 @@
 'use client';
 
 import { useState, useEffect, type ChangeEvent } from 'react';
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'; // Removed CardDescription
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Droplet, PlusCircle, MinusCircle, RotateCcw, GlassWater, Milk, Bell, Settings } from 'lucide-react';
+import { Droplet, RotateCcw, GlassWater, Milk, Bell, Settings } from 'lucide-react';
 import { useLanguage } from '@/context/language-context';
 import { useToast } from '@/hooks/use-toast';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
@@ -27,14 +27,12 @@ export default function WaterIntakeCard() {
   const [inputGoal, setInputGoal] = useState(DEFAULT_DAILY_WATER_GOAL_ML.toString());
   const [reminderFrequency, setReminderFrequency] = useState<ReminderFrequency>('off');
   const [isClient, setIsClient] = useState(false);
-  const [isGoalSettingsOpen, setIsGoalSettingsOpen] = useState(false); // New state
+  const [isGoalSettingsOpen, setIsGoalSettingsOpen] = useState(false);
 
   useEffect(() => {
     setIsClient(true);
-    // In a real app, load dailyWaterGoal and reminderFrequency from localStorage or backend
-    // For now, also load inputGoal from dailyWaterGoal if it changes from an external source
     setInputGoal(dailyWaterGoal.toString());
-  }, [dailyWaterGoal]); // Added dailyWaterGoal as dependency
+  }, [dailyWaterGoal]);
 
   const addWater = (amount: number) => {
     setCurrentWaterIntake(prev => Math.max(0, prev + amount));
@@ -60,14 +58,14 @@ export default function WaterIntakeCard() {
         title: t('waterIntakeCard.goalSavedTitle'),
         description: t('waterIntakeCard.goalSavedDescription'),
       });
-      setIsGoalSettingsOpen(false); // Close settings after saving
+      setIsGoalSettingsOpen(false); 
     } else {
       toast({
         title: t('toastErrorTitle'),
         description: t('waterIntakeCard.errorInvalidGoal', { default: "Please enter a valid goal."}),
         variant: "destructive"
       });
-      setInputGoal(dailyWaterGoal.toString()); // Reset input to current valid goal
+      setInputGoal(dailyWaterGoal.toString()); 
     }
   };
 
@@ -123,7 +121,7 @@ export default function WaterIntakeCard() {
                     variant="ghost" 
                     size="icon" 
                     aria-label={t('waterIntakeCard.settingsButtonLabel', { default: 'Settings' })}
-                    onClick={() => setIsGoalSettingsOpen(!isGoalSettingsOpen)} // Toggle settings visibility
+                    onClick={() => setIsGoalSettingsOpen(!isGoalSettingsOpen)}
                   >
                     <Settings className="w-4 h-4" />
                   </Button>
@@ -135,10 +133,10 @@ export default function WaterIntakeCard() {
             </TooltipProvider>
           </div>
         </div>
-        <CardDescription>{t('waterIntakeCard.description', { dailyGoal: dailyWaterGoal })}</CardDescription>
+        {/* CardDescription removed as per request */}
       </CardHeader>
       <CardContent className="space-y-4">
-        {isGoalSettingsOpen && ( // Conditionally render goal settings
+        {isGoalSettingsOpen && (
             <div>
             <Label htmlFor="water-goal" className="text-md font-semibold">
                 {t('waterIntakeCard.setGoalLabel')}
@@ -223,3 +221,4 @@ export default function WaterIntakeCard() {
     </Card>
   );
 }
+
