@@ -9,10 +9,10 @@ import { PlusCircle, Edit2, Trash2, Share2, PlayCircle, ListChecks, Ban, Clock }
 import {
   Dialog,
   DialogContent,
-  DialogHeader as UIDialogHeader, 
+  DialogHeader as UIDialogHeader, // Renamed to avoid conflict with CardHeader if used
   DialogTitle,
   DialogClose,
-  DialogFooter as UIDialogFooter,
+  DialogFooter as UIDialogFooter, // Renamed
 } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -28,12 +28,19 @@ import { PageHeader } from '@/components/shared/page-header';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
 // Mock data from exercises page for the dropdown
+// In a real app, this would likely come from a shared context, state, or API
 const initialExercisesMockForSelect = [
   { id: '1', name: 'Bench Press' },
   { id: '2', name: 'Squat' },
   { id: '3', name: 'Deadlift' },
   { id: '4', name: 'Overhead Press' },
   { id: '5', name: 'Running' },
+  // Add more common exercises
+  { id: '6', name: 'Bicep Curl' },
+  { id: '7', name: 'Tricep Pushdown' },
+  { id: '8', name: 'Leg Press' },
+  { id: '9', name: 'Lateral Raise' },
+  { id: '10', name: 'Plank' },
 ];
 const CREATE_NEW_EXERCISE_VALUE = '__create_new__';
 
@@ -127,14 +134,14 @@ export default function WorkoutPlansPage() {
     } else {
       const selectedExercise = initialExercisesMockForSelect.find(ex => ex.id === selectedExerciseIdOrAction);
       if (!selectedExercise) {
-         toast({ title: t('toastErrorTitle'), description: "Selected exercise not found.", variant: "destructive" });
+         toast({ title: t('toastErrorTitle'), description: t('workoutPlansPage.errorSelectedExerciseNotFound', { default: "Selected exercise not found."}), variant: "destructive" });
         return;
       }
       exerciseNameToAdd = selectedExercise.name;
     }
 
     if (!exerciseNameToAdd || !newExerciseSets.trim() || !newExerciseReps.trim()) {
-      toast({ title: t('toastErrorTitle'), description: "Please fill in exercise name, sets, and reps.", variant: "destructive" });
+      toast({ title: t('toastErrorTitle'), description: t('workoutPlansPage.errorExerciseDetailsRequired', { default: "Please fill in exercise name, sets, and reps."}), variant: "destructive" });
       return;
     }
 
@@ -150,7 +157,6 @@ export default function WorkoutPlansPage() {
       exerciseDetails: [...(prev.exerciseDetails || []), newExerciseDetail]
     }));
 
-    // Reset fields for next exercise addition
     setSelectedExerciseIdOrAction(initialExercisesMockForSelect[0]?.id || '');
     setNewExerciseManualName('');
     setNewExerciseSets('');
@@ -167,7 +173,7 @@ export default function WorkoutPlansPage() {
   const handleSavePlan = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (!currentPlan.name?.trim()) {
-        toast({title: t('toastErrorTitle'), description: "Plan name is required.", variant: "destructive"});
+        toast({title: t('toastErrorTitle'), description: t('workoutPlansPage.errorPlanNameRequired', { default: "Plan name is required."}), variant: "destructive"});
         return;
     }
 
@@ -225,7 +231,7 @@ export default function WorkoutPlansPage() {
   return (
     <>
       <PageHeader
-        title={t('nav.workoutPlans')}
+        title={t('nav.workoutPlans')} // Using nav key for "Schede"
         actions={
           <Button onClick={() => openDialog()} disabled={!!(activeWorkoutIsClient && activePlanId)}>
             <PlusCircle className="w-4 h-4 mr-2" /> {t('workoutPlansPage.createNewPlanButton')}
@@ -234,11 +240,13 @@ export default function WorkoutPlansPage() {
       />
       {activeWorkoutIsClient && activePlanId && (
           <Card className="mb-6 shadow-md border-destructive bg-destructive/10">
-            <CardContent className="p-4">
+            <UIDialogHeader className="p-4"> {/* Re-using UIDialogHeader for consistent styling with Dialog headers */}
               <h3 className="text-destructive flex items-center font-semibold"> 
                 <Ban className="w-5 h-5 mr-2" />
                 {t('activeWorkoutPage.workoutInProgressTitle', { default: 'Workout In Progress' })}
               </h3>
+            </UIDialogHeader>
+            <CardContent className="p-4 pt-0"> {/* Adjust padding if header already has it */}
               <p className="text-sm text-destructive-foreground mt-2">
                  {t('activeWorkoutPage.finishCurrentWorkoutPrompt', { default: 'You have an active workout. Please finish or abandon it before starting a new one or creating/editing plans.' })}
               </p>
@@ -252,7 +260,7 @@ export default function WorkoutPlansPage() {
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
         {plans.map((plan) => (
           <Card key={plan.id} className="flex flex-col shadow-lg hover:shadow-xl transition-shadow duration-300">
-            <CardContent className="flex-grow p-4 relative">
+            <CardContent className="flex-grow p-4 relative"> {/* Added relative for absolute positioning of duration */}
               <div className="flex flex-col sm:flex-row items-start gap-4">
                 <div className="relative w-full sm:w-36 h-48 flex-shrink-0">
                   <Image 
@@ -322,14 +330,13 @@ export default function WorkoutPlansPage() {
       </div>
 
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-        <DialogContent className="sm:max-w-lg">
-          <UIDialogHeader> 
+        <DialogContent className="sm:max-w-lg flex flex-col max-h-[90vh] p-0">
+          <UIDialogHeader className="p-6 border-b shrink-0"> 
             <DialogTitle>{currentPlan?.id ? t('workoutPlansPage.dialogEditTitle') : t('workoutPlansPage.dialogCreateTitle')}</DialogTitle>
-            {/* DialogDescription removed as per user request */}
           </UIDialogHeader>
-          <form onSubmit={handleSavePlan}>
-            <ScrollArea className="max-h-[calc(100vh-20rem)]">
-              <div className="grid gap-4 py-4 px-1"> 
+          <form onSubmit={handleSavePlan} className="flex flex-col flex-grow overflow-hidden">
+            <ScrollArea className="flex-grow">
+              <div className="grid gap-4 p-6"> 
                 <div>
                   <Label htmlFor="planName">{t('workoutPlansPage.planNameLabel')}</Label>
                   <Input 
@@ -360,7 +367,7 @@ export default function WorkoutPlansPage() {
                 </div>
                 
                 <Card className="mt-4">
-                  <UIDialogHeader className="pb-2 p-4">
+                  <UIDialogHeader className="pb-2 p-4 border-b">
                     <h4 className="text-base flex items-center font-semibold">
                         <ListChecks className="w-4 h-4 mr-2" />
                         {t('workoutPlansPage.addExerciseButton')}
@@ -439,7 +446,7 @@ export default function WorkoutPlansPage() {
                 )}
               </div>
             </ScrollArea>
-            <UIDialogFooter className="pt-4 border-t sm:justify-center">
+            <UIDialogFooter className="p-6 border-t shrink-0 sm:justify-center">
               <DialogClose asChild>
                 <Button type="button" variant="outline">{t('workoutPlansPage.cancelButton')}</Button>
               </DialogClose>
@@ -451,3 +458,5 @@ export default function WorkoutPlansPage() {
     </>
   );
 }
+
+    
