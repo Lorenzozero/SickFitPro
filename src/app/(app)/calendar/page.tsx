@@ -48,7 +48,7 @@ const DayScheduleContent: React.FC<DayScheduleContentProps> = ({
 }) => {
   return (
     <div className="flex flex-col h-full">
-      <ul className={`space-y-0.5 flex-grow overflow-y-auto mb-1.5 ${isMobile ? 'max-h-[150px]' : ''}`}> {/* Reduced space-y and mb */}
+      <ul className={`space-y-0.5 flex-grow overflow-y-auto mb-1.5 ${isMobile ? 'max-h-[100px]' : ''}`}> {/* Reduced space-y and mb, further reduced max-h */}
         {workouts && workouts.length > 0 ? (
           workouts.map(workout => {
             const planDetails = availableWorkoutPlans.find(p => p.id === workout.planId);
@@ -64,7 +64,7 @@ const DayScheduleContent: React.FC<DayScheduleContentProps> = ({
             );
           })
         ) : (
-          <p className="text-xs text-center text-muted-foreground pt-2">
+          <p className="text-xs text-center text-muted-foreground pt-1"> {/* Reduced pt */}
             {t('calendarPage.noWorkoutsForDayOfWeek', { dayOfWeek: t(`calendarPage.days.${dayKey}`)})}
           </p>
         )}
@@ -73,7 +73,7 @@ const DayScheduleContent: React.FC<DayScheduleContentProps> = ({
         onClick={() => onOpenDialog(dayKey)} 
         size="sm" 
         variant={isMobile ? "default" : "outline"} 
-        className="w-full mt-auto text-xs px-2 py-1 h-auto"
+        className="w-full mt-auto text-xs px-2 py-1 h-auto" // Kept compact button
       >
         <PlusCircle className="w-3 h-3 mr-1 shrink-0" /> <span className="truncate">{t('calendarPage.addWorkoutToDay')}</span>
       </Button>
@@ -160,13 +160,13 @@ export default function CalendarPage() {
       <Card className="shadow-lg">
         <CardContent className="p-0">
           {/* Mobile View */}
-          <div className="md:hidden flex flex-col gap-3 p-3"> {/* Reduced gap and padding */}
+          <div className="md:hidden flex flex-col gap-2 p-2"> {/* Further reduced gap and padding */}
             {dayKeys.map(dayKey => (
               <Card key={`mobile-${dayKey}`} className="shadow-sm border">
-                <CardHeader className="p-2.5"> {/* Reduced padding */}
-                  <CardTitle className="text-md capitalize text-center font-semibold">{t(`calendarPage.days.${dayKey}`)}</CardTitle>
+                <CardHeader className="p-2"> {/* Further reduced padding */}
+                  <CardTitle className="text-base capitalize text-center font-semibold">{t(`calendarPage.days.${dayKey}`)}</CardTitle> {/* text-base from md */}
                 </CardHeader>
-                <CardContent className="p-2.5 pt-0 min-h-[110px]"> {/* Reduced padding and min-height */}
+                <CardContent className="p-2 pt-0 min-h-[100px]"> {/* Reduced padding and min-height */}
                   <DayScheduleContent
                     dayKey={dayKey}
                     workouts={weeklySchedule[dayKey] || []}
@@ -188,7 +188,7 @@ export default function CalendarPage() {
               <TableHeader>
                 <TableRow>
                   {dayKeys.map(dayKey => (
-                    <TableHead key={`desktop-head-${dayKey}`} className="text-center capitalize p-2 md:p-3 w-[14.28%] min-w-[110px] md:min-w-[90px]"> {/* Reduced padding and min-width */}
+                    <TableHead key={`desktop-head-${dayKey}`} className="text-center capitalize p-1.5 md:p-2 w-[14.28%] min-w-[100px] md:min-w-[80px]"> {/* Further reduced padding and min-width */}
                       {t(`calendarPage.days.${dayKey}`)}
                     </TableHead>
                   ))}
@@ -197,7 +197,7 @@ export default function CalendarPage() {
               <TableBody>
                 <TableRow className="align-top">
                   {dayKeys.map(dayKey => (
-                    <TableCell key={`desktop-cell-${dayKey}`} className="p-1 md:p-1.5 h-48 md:h-56 border align-top"> {/* Reduced padding and height */}
+                    <TableCell key={`desktop-cell-${dayKey}`} className="p-1 md:p-1.5 h-36 md:h-40 border align-top"> {/* Further reduced height */}
                       <DayScheduleContent
                         dayKey={dayKey}
                         workouts={weeklySchedule[dayKey] || []}
