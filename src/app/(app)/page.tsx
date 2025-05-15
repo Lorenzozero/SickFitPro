@@ -115,9 +115,13 @@ export default function DashboardPage() {
 
       <div className="mt-6 grid gap-4 md:grid-cols-1 lg:grid-cols-2">
         <Card className="shadow-lg">
-          <CardHeader>
+          <CardHeader className="flex flex-row items-center justify-between">
             <CardTitle>{isMounted ? t('dashboard.todaysFocus') : "Today's Focus"}</CardTitle>
-            <CardDescription>{isMounted ? t('dashboard.todaysFocusDescription') : "What's on the agenda?"}</CardDescription>
+            <Button asChild className="md:w-auto" size="sm">
+              <Link href="/start-workout">
+                <PlayCircle className="w-4 h-4 mr-2"/> {isMounted ? t('dashboard.logNewWorkout') : 'Start Workout'}
+              </Link>
+            </Button>
           </CardHeader>
           <CardContent>
             <div className="relative p-4 text-center border-2 border-dashed rounded-lg border-border min-h-[180px] flex flex-col justify-center" data-ai-hint="workout routine">
@@ -160,14 +164,6 @@ export default function DashboardPage() {
             <CardTitle>{isMounted ? t('dashboard.activityAndHistoryTitle') : "Activity & History"}</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="mb-4 flex justify-center">
-              <Button asChild className="w-full md:w-auto">
-                <Link href="/start-workout">
-                  <PlayCircle className="w-4 h-4 mr-2"/> {isMounted ? t('dashboard.logNewWorkout') : 'Start Workout'}
-                </Link>
-              </Button>
-            </div>
-
             {mockWorkoutHistory.length > 0 ? (
               <ScrollArea className="h-64">
                 <ul className="space-y-2 pr-3">
@@ -206,3 +202,4 @@ export default function DashboardPage() {
     </>
   );
 }
+
