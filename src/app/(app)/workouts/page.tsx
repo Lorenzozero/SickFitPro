@@ -4,15 +4,16 @@
 import { useState, type FormEvent } from 'react';
 import Link from 'next/link';
 import Image from 'next/image'; 
-import { Card, CardContent, CardFooter } from '@/components/ui/card'; 
+import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card'; 
 import { PlusCircle, Edit2, Trash2, Share2, PlayCircle, ListChecks, Ban, Clock } from 'lucide-react';
 import {
   Dialog,
   DialogContent,
   DialogHeader as UIDialogHeader, 
   DialogTitle,
+  DialogDescription,
   DialogClose,
-  DialogFooter,
+  DialogFooter as UIDialogFooter, // Renamed to avoid conflict if DialogFooter is also imported
 } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -37,9 +38,8 @@ interface WorkoutPlan {
   id: string;
   name: string;
   description: string; 
-  exercises: number; 
-  duration: string; 
   exerciseDetails: ExerciseDetail[];
+  duration: string; 
   muscleGroups: MuscleGroup[]; 
 }
 
@@ -48,33 +48,30 @@ const initialWorkoutPlans: WorkoutPlan[] = [
     id: '1', 
     name: 'Full Body Blast', 
     description: 'A comprehensive full-body workout for strength and endurance.', 
-    exercises: 2, 
-    duration: '60 min', 
     exerciseDetails: [
       { id: 'e1-1', name: 'Squats', sets: '3', reps: '8-12'},
       { id: 'e1-2', name: 'Bench Press', sets: '3', reps: '8-12'},
     ],
-    muscleGroups: ['Chest', 'Back', 'Legs', 'Shoulders', 'Biceps', 'Triceps', 'Abs'] 
+    muscleGroups: ['Chest', 'Back', 'Legs', 'Shoulders', 'Biceps', 'Triceps', 'Abs'],
+    duration: '60 min', 
   },
   { 
     id: '2', 
     name: 'Upper Body Power', 
     description: 'Focus on building strength in your chest, back, and arms.', 
-    exercises: 1, 
-    duration: '75 min', 
     exerciseDetails: [
       { id: 'e2-1', name: 'Pull-ups', sets: '4', reps: 'AMRAP'},
     ],
-    muscleGroups: ['Upper Body', 'Back', 'Biceps', 'Shoulders'] 
+    muscleGroups: ['Upper Body', 'Back', 'Biceps', 'Shoulders'],
+    duration: '75 min', 
   },
   { 
     id: '3', 
     name: 'Leg Day Domination', 
     description: 'Intense leg workout to build lower body strength and size.', 
-    exercises: 0, 
-    duration: '90 min', 
     exerciseDetails: [],
-    muscleGroups: ['Lower Body', 'Legs', 'Abs'] 
+    muscleGroups: ['Lower Body', 'Legs', 'Abs'],
+    duration: '90 min', 
   },
 ];
 
@@ -145,7 +142,6 @@ export default function WorkoutPlansPage() {
       name: currentPlan.name,
       description: currentPlan.description || '',
       exerciseDetails: currentPlan.exerciseDetails || [],
-      exercises: (currentPlan.exerciseDetails || []).length,
       duration: currentPlan.duration || 'N/A', 
       muscleGroups: currentPlan.muscleGroups || [], 
     };
@@ -204,12 +200,12 @@ export default function WorkoutPlansPage() {
       />
       {activeWorkoutIsClient && activePlanId && (
           <Card className="mb-6 shadow-md border-destructive bg-destructive/10">
-            <UIDialogHeader className="pb-2 p-4"> 
+            <CardHeader className="p-4">
               <h3 className="text-destructive flex items-center font-semibold"> 
                 <Ban className="w-5 h-5 mr-2" />
                 {t('activeWorkoutPage.workoutInProgressTitle', { default: 'Workout In Progress' })}
               </h3>
-            </UIDialogHeader>
+            </CardHeader>
             <CardContent>
               <p className="text-sm text-destructive-foreground">
                  {t('activeWorkoutPage.finishCurrentWorkoutPrompt', { default: 'You have an active workout. Please finish or abandon it before starting a new one or creating/editing plans.' })}
@@ -224,7 +220,7 @@ export default function WorkoutPlansPage() {
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
         {plans.map((plan) => (
           <Card key={plan.id} className="flex flex-col shadow-lg hover:shadow-xl transition-shadow duration-300">
-            <CardContent className="flex-grow p-4">
+            <CardContent className="flex-grow p-4 relative"> {/* Added relative positioning */}
               <div className="flex flex-col sm:flex-row items-start gap-4">
                 <div className="relative w-full sm:w-36 h-48 flex-shrink-0">
                   <Image 
@@ -260,12 +256,13 @@ export default function WorkoutPlansPage() {
                         <p className="text-xs text-muted-foreground">{t('workoutPlansPage.noMuscleGroupsSpecified', {default: 'N/A'})}</p>
                     )}
                   </div>
-
-                  <div className="mt-auto ml-auto flex items-center text-sm text-muted-foreground pt-2"> 
-                    <Clock className="w-3.5 h-3.5 mr-1.5 shrink-0" /> 
-                    <span>{plan.duration}</span>
-                  </div>
+                  {/* Duration is now absolutely positioned */}
                 </div>
+              </div>
+              {/* Absolutely positioned duration */}
+              <div className="absolute bottom-4 right-4 flex items-center text-sm text-muted-foreground"> 
+                <Clock className="w-3.5 h-3.5 mr-1.5 shrink-0" /> 
+                <span>{plan.duration}</span>
               </div>
             </CardContent>
             <CardFooter className="flex flex-col sm:flex-row justify-between items-center gap-2 pt-3 border-t p-3">
@@ -298,7 +295,9 @@ export default function WorkoutPlansPage() {
         <DialogContent className="sm:max-w-lg">
           <UIDialogHeader> 
             <DialogTitle>{currentPlan?.id ? t('workoutPlansPage.dialogEditTitle') : t('workoutPlansPage.dialogCreateTitle')}</DialogTitle>
-            
+            <DialogDescription>
+              {currentPlan?.id ? t('workoutPlansPage.dialogEditDescription') : t('workoutPlansPage.dialogCreateDescription')}
+            </DialogDescription>
           </UIDialogHeader>
           <form onSubmit={handleSavePlan}>
             <ScrollArea className="max-h-[calc(100vh-20rem)]">
@@ -323,7 +322,7 @@ export default function WorkoutPlansPage() {
                   />
                 </div>
                 <div>
-                  <Label htmlFor="planDuration">{t('workoutPlansPage.estDurationLabel')}</Label>
+                  <Label htmlFor="planDuration">{t('workoutPlansPage.planDurationLabel')}</Label>
                   <Input 
                     id="planDuration" 
                     name="planDuration" 
@@ -385,16 +384,15 @@ export default function WorkoutPlansPage() {
                 )}
               </div>
             </ScrollArea>
-            <DialogFooter className="pt-4 border-t sm:justify-center">
+            <UIDialogFooter className="pt-4 border-t sm:justify-center">
               <DialogClose asChild>
                 <Button type="button" variant="outline">{t('workoutPlansPage.cancelButton')}</Button>
               </DialogClose>
               <Button type="submit">{t('workoutPlansPage.savePlanButton')}</Button>
-            </DialogFooter>
+            </UIDialogFooter>
           </form>
         </DialogContent>
       </Dialog>
     </>
   );
 }
-
