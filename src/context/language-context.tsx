@@ -62,7 +62,7 @@ const translations: Record<Language, Translations> = {
       waterResetTitle: "Water Reset",
       waterResetDescription: "Your water intake for the day has been reset.",
       goalSettingsButtonLabel: "Goal Settings", 
-      goalSettingsAriaLabel: "Goal Settings",
+      goalSettingsAriaLabel: "Water Goal Settings",
       goalSettingsTooltip: "Set your daily water goal",
       ariaAddGlass: "Add glass ({amount}ml)",
       ariaAddBottle: "Add bottle ({amount}ml)",
@@ -317,9 +317,7 @@ const translations: Record<Language, Translations> = {
     },
     workoutPlansPage: {
         title: "Workout Plans",
-        description: "Create, manage, and share your training schedules.",
         createNewPlanButton: "Create New Plan",
-        estDurationLabel: "Est. Duration", 
         exercisesLabel: "Exercises",
         involvedMusclesLabel: "Muscles Involved:",
         startButton: "Start",
@@ -348,7 +346,8 @@ const translations: Record<Language, Translations> = {
         toastLinkCopiedTitle: "Link Copied!",
         toastLinkCopiedDescription: "Workout plan link copied to clipboard.",
         muscleSilhouetteAlt: "Muscle groups involved in the plan",
-        noMuscleGroupsSpecified: "N/A"
+        noMuscleGroupsSpecified: "N/A",
+        estDurationLabel: "Est. Duration", 
     },
      startWorkoutPage: {
       title: "Start New Workout",
@@ -747,9 +746,7 @@ const translations: Record<Language, Translations> = {
     },
      workoutPlansPage: {
         title: "Schede Allenamento",
-        description: "Crea, gestisci e condividi i tuoi programmi di allenamento.",
         createNewPlanButton: "Crea Nuova Scheda",
-        estDurationLabel: "Durata Stimata",
         exercisesLabel: "Esercizi",
         involvedMusclesLabel: "Muscoli Coinvolti:",
         startButton: "Inizia",
@@ -778,7 +775,7 @@ const translations: Record<Language, Translations> = {
         toastLinkCopiedTitle: "Link Copiato!",
         toastLinkCopiedDescription: "Link della scheda di allenamento copiato negli appunti.",
         muscleSilhouetteAlt: "Gruppi muscolari coinvolti nella scheda",
-        noMuscleGroupsSpecified: "N/D"
+        noMuscleGroupsSpecified: "N/D",
     },
     startWorkoutPage: {
       title: "Inizia Nuovo Allenamento",
@@ -1175,10 +1172,7 @@ const translations: Record<Language, Translations> = {
     },
     workoutPlansPage: {
         title: "Planes de Entrenamiento",
-        description: "Crea, gestiona y comparte tus horarios de entrenamiento.",
         createNewPlanButton: "Crear Nuevo Plan",
-        estDurationLabel: "Duración Estimada",
-        exercisesLabel: "Ejercicios",
         involvedMusclesLabel: "Músculos Involucrados:",
         startButton: "Empezar",
         dialogEditTitle: "Editar Plan de Entrenamiento",
@@ -1204,7 +1198,7 @@ const translations: Record<Language, Translations> = {
         toastLinkCopiedTitle: "¡Enlace Copiado!",
         toastLinkCopiedDescription: "Enlace del plan de entrenamiento copiado al portapapeles.",
         muscleSilhouetteAlt: "Grupos musculares involucrados en el plan",
-        noMuscleGroupsSpecified: "N/A"
+        noMuscleGroupsSpecified: "N/A",
     },
     startWorkoutPage: {
       title: "Empezar Nuevo Entrenamiento",
@@ -1595,10 +1589,7 @@ const translations: Record<Language, Translations> = {
     },
     workoutPlansPage: {
         title: "Programmes d'Entraînement",
-        description: "Créez, gérez et partagez vos programmes d'entraînement.",
         createNewPlanButton: "Créer un Nouveau Programme",
-        estDurationLabel: "Durée Estimée",
-        exercisesLabel: "Exercices",
         involvedMusclesLabel: "Muscles Impliqués :",
         startButton: "Commencer",
         dialogEditTitle: "Modifier le Programme d'Entraînement",
@@ -1624,7 +1615,7 @@ const translations: Record<Language, Translations> = {
         toastLinkCopiedTitle: "Lien Copié !",
         toastLinkCopiedDescription: "Lien du programme d'entraînement copié dans le presse-papiers.",
         muscleSilhouetteAlt: "Groupes musculaires impliqués dans le programme",
-        noMuscleGroupsSpecified: "N/A"
+        noMuscleGroupsSpecified: "N/A",
     },
     startWorkoutPage: {
       title: "Commencer un Nouvel Entraînement",

@@ -9,11 +9,11 @@ import { PlusCircle, Edit2, Trash2, Share2, PlayCircle, ListChecks, Ban, Clock }
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
   DialogHeader as UIDialogHeader, 
   DialogTitle,
   DialogClose,
-  DialogDescription,
-  DialogFooter, // Added DialogFooter
+  DialogFooter,
 } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -25,8 +25,8 @@ import { useActiveWorkout } from '@/context/active-workout-context';
 import { useRouter } from 'next/navigation';
 import type { MuscleGroup } from '@/components/shared/muscle-group-icons'; 
 import { Button } from '@/components/ui/button';
-import { CardHeader } from '@/components/ui/card'; // Ensure CardHeader is imported
-import { PageHeader } from '@/components/shared/page-header'; // Added import for PageHeader
+import { CardHeader } from '@/components/ui/card'; 
+import { PageHeader } from '@/components/shared/page-header'; 
 
 interface ExerciseDetail {
   id: string;
@@ -88,7 +88,7 @@ export default function WorkoutPlansPage() {
   const [plans, setPlans] = useState<WorkoutPlan[]>(initialWorkoutPlans);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   
-  const [currentPlan, setCurrentPlan] = useState<Partial<WorkoutPlan> & { exerciseDetails: ExerciseDetail[], muscleGroups?: MuscleGroup[] }>({ name: '', description: '', exerciseDetails: [], muscleGroups: [] });
+  const [currentPlan, setCurrentPlan] = useState<Partial<WorkoutPlan> & { exerciseDetails: ExerciseDetail[], muscleGroups?: MuscleGroup[] }>({ name: '', description: '', exerciseDetails: [], duration: 'N/A', muscleGroups: [] });
   
   const [newExerciseName, setNewExerciseName] = useState('');
   const [newExerciseSets, setNewExerciseSets] = useState('');
@@ -197,8 +197,7 @@ export default function WorkoutPlansPage() {
   return (
     <>
       <PageHeader
-        title={t('nav.workoutPlans')} // Using nav key for "Schede"
-        description={t('workoutPlansPage.description')}
+        title={t('nav.workoutPlans')}
         actions={
           <Button onClick={() => openDialog()} disabled={!!(activeWorkoutIsClient && activePlanId)}>
             <PlusCircle className="w-4 h-4 mr-2" /> {t('workoutPlansPage.createNewPlanButton')}
@@ -207,8 +206,8 @@ export default function WorkoutPlansPage() {
       />
       {activeWorkoutIsClient && activePlanId && (
           <Card className="mb-6 shadow-md border-destructive bg-destructive/10">
-            <CardHeader className="p-4"> {/* Added CardHeader for consistency */}
-              <h3 className="text-destructive flex items-center font-semibold"> {/* Changed to h3 for semantic consistency */}
+            <CardHeader className="p-4">
+              <h3 className="text-destructive flex items-center font-semibold">
                 <Ban className="w-5 h-5 mr-2" />
                 {t('activeWorkoutPage.workoutInProgressTitle', { default: 'Workout In Progress' })}
               </h3>
@@ -224,13 +223,12 @@ export default function WorkoutPlansPage() {
           </Card>
         )}
 
-      <div className="space-y-4"> {/* This ensures cards are in a single column */}
+      <div className="space-y-4">
         {plans.map((plan) => (
           <Card key={plan.id} className="flex flex-col shadow-lg hover:shadow-xl transition-shadow duration-300">
             <CardContent className="flex-grow p-4">
               <div className="flex flex-col sm:flex-row items-start gap-4">
-                {/* Left: Image */}
-                <div className="relative w-full sm:w-36 h-48 flex-shrink-0"> {/* Adjusted size */}
+                <div className="relative w-full sm:w-36 h-48 flex-shrink-0">
                   <Image 
                       src={
                         plan.id === '1' ? "https://placehold.co/144x192.png" :
@@ -249,11 +247,10 @@ export default function WorkoutPlansPage() {
                   />
                 </div>
 
-                {/* Right: Details */}
-                <div className="flex-grow">
+                <div className="flex-grow flex flex-col">
                   <h3 className="text-xl font-semibold text-primary mb-2">{plan.name}</h3>
                   
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-x-4 gap-y-2">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-x-4 gap-y-2 mb-2">
                     <div>
                       <h4 className="text-sm font-semibold text-muted-foreground mb-0.5">
                           {t('workoutPlansPage.involvedMusclesLabel', { default: "Muscles Involved:"})}
@@ -266,14 +263,10 @@ export default function WorkoutPlansPage() {
                           <p className="text-xs text-muted-foreground">{t('workoutPlansPage.noMuscleGroupsSpecified', {default: 'N/A'})}</p>
                       )}
                     </div>
-                    
-                    <div className="flex items-start text-sm text-muted-foreground md:mt-0"> {/* Use items-start for alignment with heading */}
-                      <Clock className="w-3.5 h-3.5 mr-1.5 mt-0.5 shrink-0" /> 
-                      <div>
-                        <span className="font-semibold block">{t('workoutPlansPage.estDurationLabel')}</span>
-                        <span>{plan.duration}</span>
-                      </div>
-                    </div>
+                  </div>
+                  <div className="mt-auto ml-auto flex items-center text-sm text-muted-foreground pt-2">
+                      <Clock className="w-3.5 h-3.5 mr-1.5 shrink-0" /> 
+                      <span>{plan.duration}</span>
                   </div>
                 </div>
               </div>
