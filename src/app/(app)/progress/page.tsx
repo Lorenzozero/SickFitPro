@@ -1,31 +1,31 @@
 
 'use client';
 
-import { useState, type ChangeEvent, useEffect, useMemo } from 'react';
+import { useState, type ChangeEvent, useEffect, useMemo, useRef } from 'react';
 import { PageHeader } from '@/components/shared/page-header';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import Image from 'next/image';
-import { LineChart as LucideLineChart, UploadCloud, Users, PlusCircle, Edit2, Trash2, Bell, Wand2, BarChart } from 'lucide-react'; // Added BarChart
+import { LineChart as LucideLineChart, UploadCloud, Users, PlusCircle, Edit2, Trash2, Bell, Wand2, BarChart } from 'lucide-react';
 import { ChartContainer, ChartTooltip, ChartTooltipContent, ChartLegend, ChartLegendContent } from "@/components/ui/chart";
 import { Bar, CartesianGrid, XAxis, YAxis, Tooltip as RechartsTooltip, ResponsiveContainer, Line, Legend as RechartsLegend, BarChart as RechartsPrimitiveBarChart, LineChart as RechartsPrimitiveLineChart } from "recharts";
 import type { ChartConfig } from '@/components/ui/chart';
 import { useLanguage } from '@/context/language-context';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Label } from '@/components/ui/label';
 import { useToast } from '@/hooks/use-toast';
 import { AddMeasurementDialog } from '@/components/dialogs/add-measurement-dialog';
 import { Skeleton } from '@/components/ui/skeleton';
 import { AiSplitForm } from '@/components/forms/ai-split-form';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { format, parseISO, getISOWeek, getMonth, getYear, startOfWeek, endOfWeek, startOfMonth, endOfMonth, eachWeekOfInterval, eachMonthOfInterval, subWeeks, subMonths, subYears, isWithinInterval } from 'date-fns';
+import { format, parseISO, getISOWeek, getMonth, getYear, subWeeks, subMonths, subYears } from 'date-fns';
 import { it as dateFnsIt, es as dateFnsEs, fr as dateFnsFr, enUS as dateFnsEnUs } from 'date-fns/locale';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 
 
 const BODY_MEASUREMENTS_STORAGE_KEY = 'sickfit-pro-userBodyMeasurements';
+const PROGRESS_PHOTOS_STORAGE_KEY = 'sickfit-pro-progressPhotos';
 
 interface DetailedWorkoutLog {
   date: string; // YYYY-MM-DD
@@ -43,7 +43,6 @@ const mockDetailedWorkoutLogs: DetailedWorkoutLog[] = [
   { date: '2024-08-05', exerciseName: 'Squat', sets: [{ reps: 5, weight: 102.5 }, { reps: 5, weight: 105 }] },
   { date: '2024-08-07', exerciseName: 'Deadlift', sets: [{ reps: 3, weight: 120 }, { reps: 3, weight: 122.5 }] },
   { date: '2024-08-07', exerciseName: 'Bicep Curl', sets: [{ reps: 10, weight: 17.5 }, { reps: 8, weight: 17.5 }] },
-  // Data for previous months
   { date: '2024-06-03', exerciseName: 'Bench Press', sets: [{ reps: 10, weight: 65 }, { reps: 10, weight: 65 }] },
   { date: '2024-06-03', exerciseName: 'Squat', sets: [{ reps: 8, weight: 90 }, { reps: 8, weight: 90 }] },
   { date: '2024-06-10', exerciseName: 'Overhead Press', sets: [{ reps: 8, weight: 45 }, { reps: 7, weight: 45 }] },
@@ -56,7 +55,7 @@ const exerciseToMuscleGroupMap: Record<string, string> = {
   'Incline Dumbbell Press': 'chest',
   'Squat': 'legs',
   'Leg Press': 'legs',
-  'Deadlift': 'back', // Can also be legs, but primarily back for this example
+  'Deadlift': 'back', 
   'Barbell Row': 'back',
   'Overhead Press': 'shoulders',
   'Lateral Raise': 'shoulders',
@@ -88,11 +87,17 @@ const initialBodyCompositionChartData = [
 
 export interface BodyMeasurement {
   id: string;
-  date: string; // YYYY-MM-DD
+  date: string; 
   measurementName: string;
   value: number;
   unit: 'cm' | 'in' | 'kg' | 'lbs';
   notes?: string;
+}
+
+export interface ProgressPhoto {
+  id: string;
+  src: string;
+  date: string; // YYYY-MM-DD
 }
 
 const initialBodyMeasurements: BodyMeasurement[] = [
@@ -107,8 +112,10 @@ type ReminderFrequency = 'off' | 'weekly' | 'bi-weekly' | 'monthly';
 export default function ProgressPage() {
   const { t, language, isClient: languageContextIsClient } = useLanguage();
   const { toast } = useToast();
+  const [progressPhotos, setProgressPhotos] = useState<ProgressPhoto[]>([]);
   const [photoBefore, setPhotoBefore] = useState<string | null>(null);
   const [photoAfter, setPhotoAfter] = useState<string | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const [isClient, setIsClient] = useState(false);
 
   const [bodyMeasurements, setBodyMeasurements] = useState<BodyMeasurement[]>(initialBodyMeasurements);
@@ -132,8 +139,41 @@ export default function ProgressPage() {
                 setBodyMeasurements(initialBodyMeasurements);
             }
         }
+        const storedPhotos = localStorage.getItem(PROGRESS_PHOTOS_STORAGE_KEY);
+        if (storedPhotos) {
+          try {
+            setProgressPhotos(JSON.parse(storedPhotos));
+          } catch (e) {
+            console.error("Error parsing progress photos from localStorage", e);
+          }
+        }
     }
   }, []);
+
+  useEffect(() => {
+    if (isClient && progressPhotos.length > 0) {
+      localStorage.setItem(PROGRESS_PHOTOS_STORAGE_KEY, JSON.stringify(progressPhotos));
+    } else if (isClient && progressPhotos.length === 0) {
+      localStorage.removeItem(PROGRESS_PHOTOS_STORAGE_KEY);
+    }
+  }, [progressPhotos, isClient]);
+
+  useEffect(() => {
+    if (!isClient) return;
+    const sortedPhotos = [...progressPhotos].sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+
+    if (sortedPhotos.length === 0) {
+      setPhotoBefore(null);
+      setPhotoAfter(null);
+    } else if (sortedPhotos.length === 1) {
+      setPhotoBefore(null);
+      setPhotoAfter(sortedPhotos[0].src);
+    } else {
+      setPhotoBefore(sortedPhotos[0].src);
+      setPhotoAfter(sortedPhotos[sortedPhotos.length - 1].src);
+    }
+  }, [progressPhotos, isClient]);
+
 
   useEffect(() => {
     if (!isClient || !languageContextIsClient) {
@@ -151,20 +191,20 @@ export default function ProgressPage() {
       let displayFormatFn: (periodStr: string) => string;
 
       if (selectedTimeRange === 'weekly') {
-        startDateLimit = subWeeks(now, 7); // Last 8 weeks
+        startDateLimit = subWeeks(now, 7); 
         periodFormatFn = (date) => `${getYear(date)}-W${String(getISOWeek(date)).padStart(2, '0')}`;
         displayFormatFn = (periodStr) => {
             const [_year, weekNum] = periodStr.split('-W');
             return t('progressPage.weekShortLabel', { default: `W${weekNum}`, num: weekNum });
         };
       } else if (selectedTimeRange === 'monthly') {
-        startDateLimit = subMonths(now, 11); // Last 12 months
+        startDateLimit = subMonths(now, 11); 
         periodFormatFn = (date) => `${getYear(date)}-${String(getMonth(date) + 1).padStart(2, '0')}`;
         displayFormatFn = (periodStr) => {
             const [year, monthNum] = periodStr.split('-');
             return format(new Date(parseInt(year), parseInt(monthNum) - 1, 1), 'MMM yy', { locale });
         };
-      } else { // yearly (show monthly data for the past year)
+      } else { 
         startDateLimit = subYears(now, 1);
         periodFormatFn = (date) => `${getYear(date)}-${String(getMonth(date) + 1).padStart(2, '0')}`;
          displayFormatFn = (periodStr) => {
@@ -195,8 +235,8 @@ export default function ProgressPage() {
 
       const chartFormattedData = sortedPeriods.map(periodStr => {
         return {
-          period: displayFormatFn(periodStr), // Use for display
-          originalPeriod: periodStr, // Keep for potential further sorting if needed
+          period: displayFormatFn(periodStr), 
+          originalPeriod: periodStr, 
           ...aggregatedData[periodStr]
         };
       });
@@ -231,21 +271,30 @@ export default function ProgressPage() {
     }
   };
 
-  const handleImageUpload = (event: ChangeEvent<HTMLInputElement>, setImage: (url: string | null) => void) => {
+  const handleNewPhotoUpload = (event: ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
       const reader = new FileReader();
       reader.onloadend = () => {
-        setImage(reader.result as string);
+        const newPhoto: ProgressPhoto = {
+          id: String(Date.now()),
+          src: reader.result as string,
+          date: new Date().toISOString().split('T')[0],
+        };
+        setProgressPhotos(prevPhotos => [...prevPhotos, newPhoto]);
+        toast({ title: t('progressPage.photoUploadedSuccess', {default: "Photo uploaded!"}) });
       };
       reader.readAsDataURL(file);
+    }
+    if (fileInputRef.current) {
+      fileInputRef.current.value = "";
     }
   };
   
   const getMonthAbbreviation = (fullMonthName: string) => {
     if (!languageContextIsClient) return fullMonthName.slice(0, 3);
     const currentLanguage = languageContextIsClient ? language : 'en';
-    const date = new Date(`2000 ${fullMonthName} 1`); // Create a date to format
+    const date = new Date(`2000 ${fullMonthName} 1`); 
     return format(date, 'MMM', { locale: getDateFnsLocale(currentLanguage) });
   };
 
@@ -439,45 +488,48 @@ export default function ProgressPage() {
       </Card>
 
       <Card className="mt-6 shadow-lg">
-        <CardHeader>
+        <CardHeader className="flex flex-row items-center justify-between">
           <CardTitle>{t('progressPage.photoComparisonCardTitle')}</CardTitle>
+          <div>
+            <Input
+              type="file"
+              className="sr-only"
+              id="new-progress-photo-upload"
+              accept="image/*"
+              onChange={handleNewPhotoUpload}
+              ref={fileInputRef}
+            />
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button variant="outline" size="icon" onClick={() => fileInputRef.current?.click()}>
+                    <UploadCloud className="w-4 h-4" />
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>{t('progressPage.uploadNewPhotoButton', { default: 'Upload New Photo' })}</p>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
+          </div>
         </CardHeader>
         <CardContent className="grid gap-6 md:grid-cols-2">
           {[
-            { titleKey: 'progressPage.beforePhotoLabel', photo: photoBefore, setPhoto: setPhotoBefore, hint: "fitness before" },
-            { titleKey: 'progressPage.afterPhotoLabel', photo: photoAfter, setPhoto: setPhotoAfter, hint: "fitness after" }
+            { titleKey: 'progressPage.beforePhotoLabel', photoSrc: photoBefore, hint: "fitness before" },
+            { titleKey: 'progressPage.afterPhotoLabel', photoSrc: photoAfter, hint: "fitness after" }
           ].map(item => (
             <div key={item.titleKey}>
               <h3 className="mb-2 text-lg font-semibold">{t(item.titleKey)}</h3>
               <div className="relative w-full overflow-hidden border-2 border-dashed rounded-lg aspect-square border-border group">
-                {item.photo ? (
-                  <Image src={item.photo} alt={t(item.titleKey)} layout="fill" objectFit="cover" data-ai-hint={item.hint} />
+                {item.photoSrc ? (
+                  <Image src={item.photoSrc} alt={t(item.titleKey)} layout="fill" objectFit="cover" data-ai-hint={item.hint} />
                 ) : (
                   <div className="flex flex-col items-center justify-center w-full h-full bg-muted/50">
                     <UploadCloud className="w-12 h-12 text-muted-foreground" />
-                    <p className="mt-2 text-sm text-muted-foreground">{t('progressPage.noPhotoUploaded')}</p>
+                    <p className="mt-2 text-sm text-muted-foreground">{t('progressPage.noPhotoAvailable', { default: 'No photo available' })}</p>
                   </div>
                 )}
-                <label
-                  htmlFor={`upload-${item.titleKey.toLowerCase().replace(/\s+/g, '-')}`}
-                  className="absolute inset-0 flex items-center justify-center text-sm font-medium text-white transition-opacity duration-300 bg-black/50 opacity-0 cursor-pointer group-hover:opacity-100"
-                >
-                  {t('progressPage.clickToUpload')}
-                  <Input
-                    id={`upload-${item.titleKey.toLowerCase().replace(/\s+/g, '-')}`}
-                    type="file"
-                    className="sr-only"
-                    accept="image/*"
-                    onChange={(e) => handleImageUpload(e, item.setPhoto)}
-                  />
-                </label>
               </div>
-              <Button variant="outline" size="sm" className="w-full mt-2" onClick={() => {
-                const el = document.getElementById(`upload-${item.titleKey.toLowerCase().replace(/\s+/g, '-')}`);
-                el?.click();
-                }}>
-                {t('progressPage.uploadButtonLabel')} {t(item.titleKey)}
-              </Button>
             </div>
           ))}
         </CardContent>

@@ -291,7 +291,6 @@ const translations: Record<Language, Translations> = {
         measurementReminderLabel: "Measurement Reminder",
         selectReminderFrequencyPlaceholder: "Set reminder frequency",
         reminderOff: "Off",
-        reminderDaily: "Daily",
         reminderWeekly: "Weekly",
         reminderBiWeekly: "Bi-Weekly",
         reminderMonthly: "Monthly",
@@ -312,6 +311,9 @@ const translations: Record<Language, Translations> = {
         weeklyTrainingVolumeLabel: "Training Volume", 
         measurementReminderSettingsAriaLabel: "Measurement Reminder Settings",
         measurementReminderTooltip: "Set measurement reminder",
+        uploadNewPhotoButton: "Upload New Photo",
+        photoUploadedSuccess: "Photo uploaded successfully!",
+        noPhotoAvailable: "No photo available",
     },
     workoutPlansPage: {
         title: "Workout Plans",
@@ -739,6 +741,9 @@ const translations: Record<Language, Translations> = {
         weeklyTrainingVolumeLabel: "Volume Allenamento",
         measurementReminderSettingsAriaLabel: "Impostazioni Promemoria Misurazioni",
         measurementReminderTooltip: "Imposta promemoria misurazioni",
+        uploadNewPhotoButton: "Carica Nuova Foto",
+        photoUploadedSuccess: "Foto caricata con successo!",
+        noPhotoAvailable: "Nessuna foto disponibile",
     },
      workoutPlansPage: {
         title: "Schede Allenamento",
@@ -1164,6 +1169,9 @@ const translations: Record<Language, Translations> = {
         weeklyTrainingVolumeLabel: "Volumen de Entrenamiento",
         measurementReminderSettingsAriaLabel: "Configuración del Recordatorio de Medidas",
         measurementReminderTooltip: "Establecer recordatorio de medidas",
+        uploadNewPhotoButton: "Subir Nueva Foto",
+        photoUploadedSuccess: "¡Foto subida correctamente!",
+        noPhotoAvailable: "No hay foto disponible",
     },
     workoutPlansPage: {
         title: "Planes de Entrenamiento",
@@ -1581,6 +1589,9 @@ const translations: Record<Language, Translations> = {
         weeklyTrainingVolumeLabel: "Volume d'Entraînement",
         measurementReminderSettingsAriaLabel: "Paramètres du Rappel de Mesures",
         measurementReminderTooltip: "Définir le rappel de mesures",
+        uploadNewPhotoButton: "Télécharger Nouvelle Photo",
+        photoUploadedSuccess: "Photo téléchargée avec succès !",
+        noPhotoAvailable: "Aucune photo disponible",
     },
     workoutPlansPage: {
         title: "Programmes d'Entraînement",
