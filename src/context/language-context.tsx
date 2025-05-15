@@ -310,6 +310,8 @@ const translations: Record<Language, Translations> = {
         muscleGroupTricepsChart: "Triceps (Volume)",
         weekShortLabel: "W{num}",
         weeklyTrainingVolumeLabel: "Training Volume", // For Y-axis label
+        measurementReminderSettingsAriaLabel: "Measurement Reminder Settings",
+        measurementReminderTooltip: "Set measurement reminder",
     },
     workoutPlansPage: {
         title: "Workout Plans",
@@ -736,6 +738,8 @@ const translations: Record<Language, Translations> = {
         muscleGroupTricepsChart: "Tricipiti (Volume)",
         weekShortLabel: "S{num}",
         weeklyTrainingVolumeLabel: "Volume Allenamento",
+        measurementReminderSettingsAriaLabel: "Impostazioni Promemoria Misurazioni",
+        measurementReminderTooltip: "Imposta promemoria misurazioni",
     },
      workoutPlansPage: {
         title: "Schede Allenamento",
@@ -1160,6 +1164,8 @@ const translations: Record<Language, Translations> = {
         muscleGroupTricepsChart: "Tríceps (Volumen)",
         weekShortLabel: "S{num}",
         weeklyTrainingVolumeLabel: "Volumen de Entrenamiento",
+        measurementReminderSettingsAriaLabel: "Configuración del Recordatorio de Medidas",
+        measurementReminderTooltip: "Establecer recordatorio de medidas",
     },
     workoutPlansPage: {
         title: "Planes de Entrenamiento",
@@ -1576,6 +1582,8 @@ const translations: Record<Language, Translations> = {
         muscleGroupTricepsChart: "Triceps (Volume)",
         weekShortLabel: "S{num}",
         weeklyTrainingVolumeLabel: "Volume d'Entraînement",
+        measurementReminderSettingsAriaLabel: "Paramètres du Rappel de Mesures",
+        measurementReminderTooltip: "Définir le rappel de mesures",
     },
     workoutPlansPage: {
         title: "Programmes d'Entraînement",

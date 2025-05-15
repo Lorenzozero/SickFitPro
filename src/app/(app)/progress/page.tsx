@@ -22,6 +22,7 @@ import { AiSplitForm } from '@/components/forms/ai-split-form';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { format, parseISO, getISOWeek, getMonth, getYear, startOfWeek, endOfWeek, startOfMonth, endOfMonth, eachWeekOfInterval, eachMonthOfInterval, subWeeks, subMonths, subYears, isWithinInterval } from 'date-fns';
 import { it as dateFnsIt, es as dateFnsEs, fr as dateFnsFr, enUS as dateFnsEnUs } from 'date-fns/locale';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 
 
 const BODY_MEASUREMENTS_STORAGE_KEY = 'sickfit-pro-userBodyMeasurements';
@@ -372,12 +373,38 @@ export default function ProgressPage() {
 
       <Card className="mt-6 shadow-lg">
         <CardHeader className="flex flex-row items-center justify-between">
-            <div>
+            <div className="flex items-center">
+                <BarChart className="w-5 h-5 mr-2 text-primary" />
                 <CardTitle>{t('progressPage.bodyMeasurementsCardTitle')}</CardTitle>
             </div>
-            <Button onClick={() => openMeasurementDialog()}>
-                <PlusCircle className="w-4 h-4 mr-2" /> {t('progressPage.addMeasurementButton')}
-            </Button>
+            <div className="flex items-center gap-2">
+                 <TooltipProvider>
+                    <Tooltip>
+                        <TooltipTrigger asChild>
+                             <Select value={reminderFrequency} onValueChange={(value) => setReminderFrequency(value as ReminderFrequency)}>
+                                <SelectTrigger asChild aria-label={t('progressPage.measurementReminderSettingsAriaLabel', {default: "Measurement Reminder Settings"})}>
+                                    <Button variant="ghost" size="icon">
+                                        <Bell className="w-4 h-4" />
+                                    </Button>
+                                </SelectTrigger>
+                                <SelectContent>
+                                    <SelectItem value="off">{t('progressPage.reminderOff')}</SelectItem>
+                                    <SelectItem value="daily">{t('progressPage.reminderDaily')}</SelectItem>
+                                    <SelectItem value="weekly">{t('progressPage.reminderWeekly')}</SelectItem>
+                                    <SelectItem value="bi-weekly">{t('progressPage.reminderBiWeekly')}</SelectItem>
+                                    <SelectItem value="monthly">{t('progressPage.reminderMonthly')}</SelectItem>
+                                </SelectContent>
+                            </Select>
+                        </TooltipTrigger>
+                        <TooltipContent>
+                            <p>{t('progressPage.measurementReminderTooltip', {default: "Set measurement reminder"})}</p>
+                        </TooltipContent>
+                    </Tooltip>
+                </TooltipProvider>
+                <Button onClick={() => openMeasurementDialog()}>
+                    <PlusCircle className="w-4 h-4 mr-2" /> {t('progressPage.addMeasurementButton')}
+                </Button>
+            </div>
         </CardHeader>
         <CardContent>
             {bodyMeasurements.length > 0 ? (
@@ -411,24 +438,6 @@ export default function ProgressPage() {
             ) : (
                 <p className="text-sm text-center text-muted-foreground py-4">{t('progressPage.noMeasurementsYet')}</p>
             )}
-             <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between p-4 mt-6 border-t gap-4">
-                <Label htmlFor="measurement-reminders" className="flex items-center font-normal whitespace-nowrap">
-                    <Bell className="w-4 h-4 mr-2" />
-                    {t('progressPage.measurementReminderLabel')}
-                </Label>
-                <Select value={reminderFrequency} onValueChange={(value) => setReminderFrequency(value as ReminderFrequency)}>
-                    <SelectTrigger id="measurement-reminders" className="w-full sm:w-auto min-w-[180px]">
-                        <SelectValue placeholder={t('progressPage.selectReminderFrequencyPlaceholder')} />
-                    </SelectTrigger>
-                    <SelectContent>
-                        <SelectItem value="off">{t('progressPage.reminderOff')}</SelectItem>
-                        <SelectItem value="daily">{t('progressPage.reminderDaily')}</SelectItem>
-                        <SelectItem value="weekly">{t('progressPage.reminderWeekly')}</SelectItem>
-                        <SelectItem value="bi-weekly">{t('progressPage.reminderBiWeekly')}</SelectItem>
-                        <SelectItem value="monthly">{t('progressPage.reminderMonthly')}</SelectItem>
-                    </SelectContent>
-                </Select>
-            </div>
         </CardContent>
       </Card>
 
