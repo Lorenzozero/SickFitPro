@@ -235,7 +235,6 @@ export default function ProgressPage() {
                 <Users className="w-5 h-5 mr-2 text-primary" />
                 {t('progressPage.bodyCompositionCardTitle')}
             </CardTitle>
-            <CardDescription>{t('progressPage.bodyCompositionCardDescription')}</CardDescription>
           </CardHeader>
           <CardContent>
              <ChartContainer config={chartConfig} className="h-[300px] w-full">
