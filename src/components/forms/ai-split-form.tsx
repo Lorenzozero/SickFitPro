@@ -3,19 +3,17 @@
 
 import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { suggestTrainingSplit, type SuggestTrainingSplitInput, type SuggestTrainingSplitOutput } from '@/ai/flows/suggest-training-split';
 import { Loader2, Wand2 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { useLanguage } from '@/context/language-context';
 import { Skeleton } from '@/components/ui/skeleton';
+import React from 'react'; // Import React
 
 // Mock functions for fetching and formatting user training data
-// In a real application, these would interact with your backend or state management
 export const mockGetUserTrainingData = async (): Promise<Array<{ date: string; exercise: string; sets: Array<{ reps: number; weight: number }> }>> => {
-  // Simulate API call delay
-  await new Promise(resolve => setTimeout(resolve, 500)); // Reduced delay
-  // Return some mock data. This should be replaced with actual data fetching.
+  await new Promise(resolve => setTimeout(resolve, 300)); 
   return [
     { date: '2024-07-01', exercise: 'Squat', sets: [{ reps: 5, weight: 100 }, { reps: 5, weight: 100 }, { reps: 5, weight: 102.5 }] },
     { date: '2024-07-01', exercise: 'Bench Press', sets: [{ reps: 8, weight: 70 }, { reps: 8, weight: 70 }, { reps: 7, weight: 70 }] },
@@ -32,17 +30,59 @@ export const formatTrainingDataToString = (data: Array<{ date: string; exercise:
   ).join('\n');
 };
 
+const formatAiResponse = (text: string): React.ReactNode[] => {
+  if (!text) return [];
+
+  const elements: React.ReactNode[] = [];
+  const lines = text.split('\n');
+  
+  let currentListItems: React.ReactNode[] = [];
+
+  function flushList() {
+    if (currentListItems.length > 0) {
+      elements.push(<ul key={`ul-${elements.length}`} className="my-2 ml-4 space-y-1 list-disc">{currentListItems}</ul>);
+      currentListItems = [];
+    }
+  }
+
+  function processInlineFormatting(lineContent: string): React.ReactNode {
+    const parts = lineContent.split(/(\*\*.*?\*\*)/g); // Splitta per **testo**, mantenendo i delimitatori
+    return parts.filter(Boolean).map((part, index) => {
+      if (part.startsWith('**') && part.endsWith('**')) {
+        return <strong key={`strong-part-${index}`}>{part.substring(2, part.length - 2)}</strong>;
+      }
+      return part; 
+    });
+  }
+
+  lines.forEach((line) => {
+    const trimmedLine = line.trim();
+
+    if (trimmedLine.startsWith('* ') || trimmedLine.startsWith('- ')) {
+      const listItemText = trimmedLine.substring(trimmedLine.startsWith('* ') ? 2 : (trimmedLine.startsWith('- ') ? 2 : 0));
+      currentListItems.push(<li key={`li-${elements.length}-${currentListItems.length}`}>{processInlineFormatting(listItemText)}</li>);
+    } else {
+      flushList(); 
+      if (trimmedLine) { 
+        elements.push(<p key={`p-${elements.length}`} className="my-2">{processInlineFormatting(trimmedLine)}</p>);
+      } else if (elements.length > 0) {
+        // Potremmo aggiungere un <br /> o uno spazio maggiore se una riga vuota tra paragrafi è desiderata
+        // Per ora, i margini di <p> dovrebbero bastare
+      }
+    }
+  });
+
+  flushList(); 
+
+  return elements;
+};
+
 
 export function AiSplitForm() {
-  const { t } = useLanguage();
+  const { t, isClient: languageContextIsClient } = useLanguage(); // Use languageContextIsClient
   const [isLoading, setIsLoading] = useState(true); // Start loading immediately
   const [result, setResult] = useState<SuggestTrainingSplitOutput | null>(null);
   const { toast } = useToast();
-  const [isClient, setIsClient] = useState(false);
-
-  useEffect(() => {
-    setIsClient(true);
-  }, []);
 
   const handleGenerateAdvice = async () => {
     setIsLoading(true);
@@ -58,31 +98,35 @@ export function AiSplitForm() {
 
       const response = await suggestTrainingSplit(input);
       setResult(response);
-      toast({
-        title: t('aiSplitForm.toastSuggestionReadyTitle'),
-        description: t('aiSplitForm.toastSuggestionReadyDescription'),
-      });
+      if (languageContextIsClient) { // Ensure toast is called only on client
+        toast({
+          title: t('aiSplitForm.toastSuggestionReadyTitle'),
+          description: t('aiSplitForm.toastSuggestionReadyDescription'),
+        });
+      }
     } catch (error) {
       console.error("Error fetching AI suggestion:", error);
-      toast({
-        title: t('aiSplitForm.toastErrorTitle'),
-        description: t('aiSplitForm.toastErrorDescription'),
-        variant: "destructive",
-      });
+      if (languageContextIsClient) {
+        toast({
+          title: t('aiSplitForm.toastErrorTitle'),
+          description: t('aiSplitForm.toastErrorDescription'),
+          variant: "destructive",
+        });
+      }
     } finally {
       setIsLoading(false);
     }
   };
   
   useEffect(() => {
-    if (isClient) {
+    if (languageContextIsClient) { // Ensure this runs only when context is ready on client
       handleGenerateAdvice();
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isClient]); // Run only when isClient becomes true
+  }, [languageContextIsClient]); // Depend on languageContextIsClient
 
 
-  if (!isClient) { // Show skeleton or a more basic loading state during SSR or before client mount
+  if (!languageContextIsClient) { 
     return (
         <Card className="shadow-lg">
             <CardHeader className="flex flex-row items-center justify-between">
@@ -136,11 +180,15 @@ export function AiSplitForm() {
             <div className="space-y-4 pt-4">
               <div>
                 <h3 className="mb-1 text-lg font-semibold">{t('aiSplitForm.suggestedKeyPointsLabel')}</h3>
-                <p className="p-3 rounded-md bg-secondary/50 whitespace-pre-line text-sm">{result.suggestedSplit}</p>
+                <div className="p-3 rounded-md bg-secondary/50 text-sm">
+                  {formatAiResponse(result.suggestedSplit)}
+                </div>
               </div>
               <div>
                 <h3 className="mb-1 text-lg font-semibold">{t('aiSplitForm.detailedAnalysisLabel')}</h3>
-                <p className="p-3 rounded-md bg-secondary/50 whitespace-pre-line text-sm">{result.reasoning}</p>
+                 <div className="p-3 rounded-md bg-secondary/50 text-sm">
+                  {formatAiResponse(result.reasoning)}
+                </div>
               </div>
             </div>
           )}
