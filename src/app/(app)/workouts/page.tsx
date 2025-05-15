@@ -1,7 +1,7 @@
 
 'use client';
 
-import { useState, type FormEvent } from 'react';
+import { useState, type FormEvent, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { Card, CardContent, CardFooter } from '@/components/ui/card';
@@ -9,10 +9,10 @@ import { PlusCircle, Edit2, Trash2, Share2, PlayCircle, ListChecks, Ban, Clock }
 import {
   Dialog,
   DialogContent,
-  DialogHeader as UIDialogHeader, // Renamed to avoid conflict with native DialogHeader
+  DialogHeader as UIDialogHeader,
   DialogTitle,
   DialogClose,
-  DialogFooter as UIDialogFooter, // Renamed to avoid conflict
+  DialogFooter as UIDialogFooter,
 } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -25,8 +25,9 @@ import type { MuscleGroup } from '@/components/shared/muscle-group-icons';
 import { Button } from '@/components/ui/button';
 import { PageHeader } from '@/components/shared/page-header';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Checkbox } from '@/components/ui/checkbox'; // Importa Checkbox
 
-// Expanded mock exercise list since the dedicated exercises page is removed
+
 const initialExercisesMockForSelect: Array<{ id: string; name: string; muscleGroups: MuscleGroup[] }> = [
   { id: 'ex-bp', name: 'Bench Press', muscleGroups: ['Chest', 'Triceps', 'Shoulders'] },
   { id: 'ex-sq', name: 'Squat', muscleGroups: ['Legs', 'Core'] },
@@ -51,6 +52,13 @@ const initialExercisesMockForSelect: Array<{ id: string; name: string; muscleGro
 ];
 const CREATE_NEW_EXERCISE_VALUE = '__create_new__';
 
+// Definisci tutti i gruppi muscolari selezionabili
+const allMuscleGroups: MuscleGroup[] = [
+  'Chest', 'Back', 'Legs', 'Shoulders', 'Biceps', 
+  'Triceps', 'Abs', 'Core', 'Cardio', 'Full Body', 
+  'Upper Body', 'Lower Body'
+];
+
 interface ExerciseDetail {
   id: string;
   name: string;
@@ -64,7 +72,7 @@ interface WorkoutPlan {
   name: string;
   exerciseDetails: ExerciseDetail[];
   duration: string;
-  muscleGroups: MuscleGroup[];
+  muscleGroups: MuscleGroup[]; // Gruppi muscolari principali per l'intera scheda
 }
 
 const initialWorkoutPlans: WorkoutPlan[] = [
@@ -110,8 +118,24 @@ export default function WorkoutPlansPage() {
   const [newExerciseManualName, setNewExerciseManualName] = useState('');
   const [newExerciseSets, setNewExerciseSets] = useState('');
   const [newExerciseReps, setNewExerciseReps] = useState('');
+  const [dialogSelectedMuscleGroups, setDialogSelectedMuscleGroups] = useState<MuscleGroup[]>([]); // Stato per i gruppi muscolari nel dialogo
 
   const { toast } = useToast();
+
+  useEffect(() => {
+    if (selectedExerciseIdOrAction && selectedExerciseIdOrAction !== CREATE_NEW_EXERCISE_VALUE) {
+      const selectedEx = initialExercisesMockForSelect.find(ex => ex.id === selectedExerciseIdOrAction);
+      setDialogSelectedMuscleGroups(selectedEx?.muscleGroups || []);
+    } else {
+      setDialogSelectedMuscleGroups([]); 
+    }
+  }, [selectedExerciseIdOrAction]);
+
+  const handleMuscleGroupChangeInDialog = (muscleGroup: MuscleGroup, checked: boolean) => {
+    setDialogSelectedMuscleGroups(prev => 
+      checked ? [...prev, muscleGroup] : prev.filter(mg => mg !== muscleGroup)
+    );
+  };
 
   const openDialog = (plan?: WorkoutPlan) => {
     if (plan) {
@@ -123,22 +147,19 @@ export default function WorkoutPlansPage() {
     setNewExerciseManualName('');
     setNewExerciseSets('');
     setNewExerciseReps('');
+    setDialogSelectedMuscleGroups([]); // Resetta i gruppi muscolari del dialogo all'apertura
     setIsDialogOpen(true);
   };
 
   const handleAddExerciseToCurrentPlan = () => {
     let exerciseNameToAdd = '';
-    let exerciseMuscleGroupsToAdd: MuscleGroup[] = [];
-
+    
     if (selectedExerciseIdOrAction === CREATE_NEW_EXERCISE_VALUE) {
       if (!newExerciseManualName.trim()) {
         toast({ title: t('toastErrorTitle'), description: t('workoutPlansPage.errorNewExerciseNameRequired', { default: "Please enter a name for the new exercise." }), variant: "destructive" });
         return;
       }
       exerciseNameToAdd = newExerciseManualName.trim();
-      // For newly created exercises, we don't have predefined muscle groups yet.
-      // Could be extended to allow selecting muscle groups for new exercises.
-      exerciseMuscleGroupsToAdd = []; 
     } else {
       const selectedExercise = initialExercisesMockForSelect.find(ex => ex.id === selectedExerciseIdOrAction);
       if (!selectedExercise) {
@@ -146,25 +167,35 @@ export default function WorkoutPlansPage() {
         return;
       }
       exerciseNameToAdd = selectedExercise.name;
-      exerciseMuscleGroupsToAdd = selectedExercise.muscleGroups;
     }
 
     if (!exerciseNameToAdd || !newExerciseSets.trim() || !newExerciseReps.trim()) {
       toast({ title: t('toastErrorTitle'), description: t('workoutPlansPage.errorExerciseDetailsRequired', { default: "Please fill in exercise name, sets, and reps."}), variant: "destructive" });
       return;
     }
+    
+    if (dialogSelectedMuscleGroups.length === 0 && selectedExerciseIdOrAction !== CREATE_NEW_EXERCISE_VALUE) {
+        const predefinedExercise = initialExercisesMockForSelect.find(ex => ex.id === selectedExerciseIdOrAction);
+        if (predefinedExercise) {
+            // If no muscle groups were explicitly changed in dialog, use the predefined ones for existing exercises
+             setDialogSelectedMuscleGroups(predefinedExercise.muscleGroups);
+        }
+    }
+
 
     const newExerciseDetail: ExerciseDetail = {
       id: String(Date.now()),
       name: exerciseNameToAdd,
       sets: newExerciseSets,
       reps: newExerciseReps,
-      muscleGroups: exerciseMuscleGroupsToAdd,
+      muscleGroups: [...dialogSelectedMuscleGroups], // Usa i gruppi muscolari selezionati nel dialogo
     };
 
     setCurrentPlan(prev => ({
       ...prev,
-      exerciseDetails: [...(prev.exerciseDetails || []), newExerciseDetail]
+      exerciseDetails: [...(prev.exerciseDetails || []), newExerciseDetail],
+      // Aggiorna i gruppi muscolari della scheda in base agli esercizi aggiunti
+      muscleGroups: Array.from(new Set([...(prev.muscleGroups || []), ...newExerciseDetail.muscleGroups]))
     }));
 
     // Reset fields for adding next exercise
@@ -172,13 +203,19 @@ export default function WorkoutPlansPage() {
     setNewExerciseManualName('');
     setNewExerciseSets('');
     setNewExerciseReps('');
+    setDialogSelectedMuscleGroups([]); // Resetta i gruppi muscolari del dialogo
   };
 
   const handleRemoveExerciseFromCurrentPlan = (exerciseId: string) => {
-    setCurrentPlan(prev => ({
-        ...prev,
-        exerciseDetails: (prev.exerciseDetails || []).filter(ex => ex.id !== exerciseId)
-    }));
+    setCurrentPlan(prev => {
+        const updatedExerciseDetails = (prev.exerciseDetails || []).filter(ex => ex.id !== exerciseId);
+        const updatedMuscleGroups = Array.from(new Set(updatedExerciseDetails.flatMap(ex => ex.muscleGroups)));
+        return {
+            ...prev,
+            exerciseDetails: updatedExerciseDetails,
+            muscleGroups: updatedMuscleGroups
+        }
+    });
   };
 
   const handleSavePlan = (e: FormEvent<HTMLFormElement>) => {
@@ -192,8 +229,8 @@ export default function WorkoutPlansPage() {
       id: currentPlan.id || String(Date.now()),
       name: currentPlan.name,
       exerciseDetails: currentPlan.exerciseDetails || [],
-      duration: currentPlan.duration || '', // Default to empty string if not set
-      muscleGroups: currentPlan.muscleGroups || [],
+      duration: currentPlan.duration || '',
+      muscleGroups: Array.from(new Set((currentPlan.exerciseDetails || []).flatMap(ex => ex.muscleGroups))), // Ricalcola i gruppi della scheda
     };
 
     if (currentPlan.id) {
@@ -232,10 +269,9 @@ export default function WorkoutPlansPage() {
 
   const handleStartPlanClick = (planId: string, planName: string) => {
     if (activeWorkoutIsClient && activePlanId) {
-      // Button should be disabled, but this is a safeguard
       return;
     }
-    contextStartWorkout(planId, planName); // Use the renamed function from context
+    contextStartWorkout(planId, planName); 
     router.push(`/workouts/${planId}/active`);
   };
 
@@ -292,7 +328,7 @@ export default function WorkoutPlansPage() {
                   />
                 </div>
 
-                <div className="flex-grow flex flex-col min-w-0"> {/* Added min-w-0 for flex truncation */}
+                <div className="flex-grow flex flex-col min-w-0">
                   <h3 className="text-xl font-semibold text-primary mb-2 truncate">{plan.name}</h3>
                   <div className="grid grid-cols-1 md:grid-cols-1 gap-x-4 mb-2"> 
                     <div>
@@ -308,7 +344,6 @@ export default function WorkoutPlansPage() {
                         )}
                     </div>
                   </div>
-                   {/* Duration now positioned absolutely at the bottom right of CardContent */}
                 </div>
               </div>
               <div className="absolute bottom-4 right-4 flex items-center text-sm text-muted-foreground">
@@ -389,7 +424,7 @@ export default function WorkoutPlansPage() {
                           {initialExercisesMockForSelect.map(ex => (
                             <SelectItem key={ex.id} value={ex.id}>
                                 {ex.name} 
-                                {ex.muscleGroups.length > 0 && 
+                                {ex.muscleGroups && ex.muscleGroups.length > 0 && 
                                  ` (${ex.muscleGroups.map(mg => t(`exercisesPage.muscleGroup${mg.replace(/\s+/g, '')}`, {default: mg})).join(', ')})`}
                             </SelectItem>
                           ))}
@@ -422,6 +457,25 @@ export default function WorkoutPlansPage() {
                         <Input id="newExerciseReps" value={newExerciseReps} onChange={(e) => setNewExerciseReps(e.target.value)} placeholder={t('workoutPlansPage.repsPlaceholder', {default: "e.g., 8-12"})} />
                       </div>
                     </div>
+                    
+                    <div>
+                        <Label>{t('workoutPlansPage.muscleGroupsLabel', { default: 'Muscle Groups' })}</Label>
+                        <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 mt-1 p-2 border rounded-md max-h-32 overflow-y-auto">
+                            {allMuscleGroups.map(mg => (
+                            <div key={mg} className="flex items-center space-x-2">
+                                <Checkbox
+                                id={`mg-dialog-${mg}`} // Prefisso per evitare conflitti ID
+                                checked={dialogSelectedMuscleGroups.includes(mg)}
+                                onCheckedChange={(checked) => handleMuscleGroupChangeInDialog(mg, !!checked)}
+                                />
+                                <Label htmlFor={`mg-dialog-${mg}`} className="text-sm font-normal cursor-pointer">
+                                {t(`exercisesPage.muscleGroup${mg.replace(/\s+/g, '')}`, { default: mg })}
+                                </Label>
+                            </div>
+                            ))}
+                        </div>
+                    </div>
+
                     <div className="flex justify-center">
                         <Button type="button" variant="outline" size="sm" onClick={handleAddExerciseToCurrentPlan} className="w-full">
                         <PlusCircle className="w-4 h-4 mr-2" /> {t('workoutPlansPage.addThisExerciseButton')}
@@ -470,3 +524,4 @@ export default function WorkoutPlansPage() {
     </>
   );
 }
+

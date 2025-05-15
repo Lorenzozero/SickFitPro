@@ -72,8 +72,8 @@ const translations: Record<Language, Translations> = {
       reminderHourly: "Hourly",
       hydrationReminderSettingsAriaLabel: "Hydration Reminder Settings",
       hydrationReminderTooltip: "Set hydration reminder",
-      settingsIconAriaLabel: "Water Goal Settings", // Kept for consistency if needed elsewhere
-      settingsIconTooltip: "Set your daily water goal", // Kept for consistency
+      settingsIconAriaLabel: "Water Goal Settings", 
+      settingsIconTooltip: "Set your daily water goal", 
       targetIconAriaLabel: "Water Goal Settings",
       targetIconTooltip: "Set your daily water goal",
     },
@@ -201,7 +201,7 @@ const translations: Record<Language, Translations> = {
         errorSelectDayAndPlan: "Please select a day and a workout plan.",
         errorPlanNotFound: "Selected plan not found.",
     },
-    exercisesPage: {
+    exercisesPage: { // Anche se la pagina è rimossa, le chiavi per i gruppi muscolari sono ancora utili
       muscleGroupChest: "Chest",
       muscleGroupBack: "Back",
       muscleGroupLegs: "Legs",
@@ -280,8 +280,11 @@ const translations: Record<Language, Translations> = {
     },
     workoutPlansPage: {
         title: "Workout Plans",
+        description: "Create, manage, and share your workout programs.",
         createNewPlanButton: "Create New Plan",
         involvedMusclesLabel: "Muscles Involved:",
+        estDurationLabel: "Est. Duration:",
+        exercisesLabel: "Exercises:",
         startButton: "Start",
         dialogEditTitle: "Edit Workout Plan",
         dialogCreateTitle: "Create New Workout Plan",
@@ -317,6 +320,7 @@ const translations: Record<Language, Translations> = {
         errorSelectedExerciseNotFound: "Selected exercise not found.",
         errorExerciseDetailsRequired: "Please fill in exercise name, sets, and reps.",
         errorPlanNameRequired: "Plan name is required.",
+        muscleGroupsLabel: "Muscle Groups", // Nuova chiave
     },
      startWorkoutPage: {
       title: "Start New Workout",
@@ -598,7 +602,7 @@ const translations: Record<Language, Translations> = {
         errorSelectDayAndPlan: "Seleziona un giorno e una scheda di allenamento.",
         errorPlanNotFound: "Scheda selezionata non trovata.",
     },
-    exercisesPage: {
+     exercisesPage: { // Anche se la pagina è rimossa, le chiavi per i gruppi muscolari sono ancora utili
       muscleGroupChest: "Petto",
       muscleGroupBack: "Schiena",
       muscleGroupLegs: "Gambe",
@@ -677,13 +681,16 @@ const translations: Record<Language, Translations> = {
     },
      workoutPlansPage: {
         title: "Schede Allenamento",
+        description: "Crea, gestisci e condividi i tuoi programmi di allenamento.",
         createNewPlanButton: "Crea Nuova Scheda",
         involvedMusclesLabel: "Muscoli Coinvolti:",
+        estDurationLabel: "Durata Stimata:",
+        exercisesLabel: "Esercizi:",
         startButton: "Inizia",
         dialogEditTitle: "Modifica Scheda Allenamento",
         dialogCreateTitle: "Crea Nuova Scheda Allenamento",
         planNameLabel: "Nome Scheda",
-        planDurationLabel: "Durata Stimata",
+        planDurationLabel: "Durata Stima",
         planDurationPlaceholder: "es. 60 min",
         exerciseNameLabel: "Esercizio",
         setsLabel: "Serie",
@@ -714,6 +721,7 @@ const translations: Record<Language, Translations> = {
         errorSelectedExerciseNotFound: "Esercizio selezionato non trovato.",
         errorExerciseDetailsRequired: "Compila nome esercizio, serie e ripetizioni.",
         errorPlanNameRequired: "Il nome della scheda è obbligatorio.",
+        muscleGroupsLabel: "Gruppi Muscolari", // Nuova chiave
     },
     startWorkoutPage: {
       title: "Inizia Nuovo Allenamento",
@@ -1073,8 +1081,11 @@ const translations: Record<Language, Translations> = {
     },
     workoutPlansPage: {
         title: "Planes de Entrenamiento",
+        description: "Crea, gestiona y comparte tus programas de entrenamiento.",
         createNewPlanButton: "Crear Nuevo Plan",
         involvedMusclesLabel: "Músculos Involucrados:",
+        estDurationLabel: "Duración Est.:",
+        exercisesLabel: "Ejercicios:",
         startButton: "Empezar",
         dialogEditTitle: "Editar Plan de Entrenamiento",
         dialogCreateTitle: "Crear Nuevo Plan de Entrenamiento",
@@ -1110,6 +1121,7 @@ const translations: Record<Language, Translations> = {
         errorSelectedExerciseNotFound: "Ejercicio seleccionado no encontrado.",
         errorExerciseDetailsRequired: "Por favor, completa el nombre del ejercicio, series y repeticiones.",
         errorPlanNameRequired: "El nombre del plan es obligatorio.",
+        muscleGroupsLabel: "Grupos Musculares", // Nuova chiave
     },
     startWorkoutPage: {
       title: "Empezar Nuevo Entrenamiento",
@@ -1463,8 +1475,11 @@ const translations: Record<Language, Translations> = {
     },
     workoutPlansPage: {
         title: "Programmes d'Entraînement",
+        description: "Créez, gérez et partagez vos programmes d'entraînement.",
         createNewPlanButton: "Créer un Nouveau Programme",
         involvedMusclesLabel: "Muscles Impliqués :",
+        estDurationLabel: "Durée Est.:",
+        exercisesLabel: "Exercices:",
         startButton: "Commencer",
         dialogEditTitle: "Modifier le Programme d'Entraînement",
         dialogCreateTitle: "Créer un Nouveau Programme d'Entraînement",
@@ -1500,6 +1515,7 @@ const translations: Record<Language, Translations> = {
         errorSelectedExerciseNotFound: "Exercice sélectionné non trouvé.",
         errorExerciseDetailsRequired: "Veuillez remplir le nom de l'exercice, les séries et les répétitions.",
         errorPlanNameRequired: "Le nom du programme est obligatoire.",
+        muscleGroupsLabel: "Groupes Musculaires", // Nuova chiave
     },
     startWorkoutPage: {
       title: "Commencer un Nouvel Entraînement",
