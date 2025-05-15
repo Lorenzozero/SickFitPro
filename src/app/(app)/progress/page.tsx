@@ -154,7 +154,7 @@ export default function ProgressPage() {
         periodFormatFn = (date) => `${getYear(date)}-W${String(getISOWeek(date)).padStart(2, '0')}`;
         displayFormatFn = (periodStr) => {
             const [_year, weekNum] = periodStr.split('-W');
-            return t('progressPage.weekShortLabel', { num: weekNum, default: `W${weekNum}` });
+            return t('progressPage.weekShortLabel', { default: `W${weekNum}`, num: weekNum });
         };
       } else if (selectedTimeRange === 'monthly') {
         startDateLimit = subMonths(now, 11); // Last 12 months
@@ -315,7 +315,7 @@ export default function ProgressPage() {
                 <TabsTrigger value="yearly">{t('progressPage.timeRangeYearly')}</TabsTrigger>
               </TabsList>
             </Tabs>
-            <ChartContainer config={performanceChartConfig} className="h-[350px] w-full">
+            <ChartContainer config={performanceChartConfig} className="h-[280px] sm:h-[350px] w-full">
               <ResponsiveContainer width="100%" height="100%">
                 <RechartsPrimitiveLineChart data={performanceChartData}>
                   <CartesianGrid vertical={false} />
@@ -354,7 +354,7 @@ export default function ProgressPage() {
             </CardTitle>
           </CardHeader>
           <CardContent>
-             <ChartContainer config={bodyCompositionChartConfig} className="h-[350px] w-full">
+             <ChartContainer config={bodyCompositionChartConfig} className="h-[280px] sm:h-[350px] w-full">
                 <ResponsiveContainer width="100%" height="100%">
                     <RechartsPrimitiveBarChart data={initialBodyCompositionChartData}>
                         <CartesianGrid vertical={false} />
