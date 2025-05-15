@@ -4,15 +4,15 @@
 import { useState, type FormEvent } from 'react';
 import Link from 'next/link';
 import Image from 'next/image'; 
-import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card'; 
+import { Card, CardContent, CardFooter } from '@/components/ui/card'; 
 import { PlusCircle, Edit2, Trash2, Share2, PlayCircle, ListChecks, Ban, Clock } from 'lucide-react';
 import {
   Dialog,
   DialogContent,
-  DialogHeader as UIDialogHeader,
+  DialogHeader as UIDialogHeader, // Renamed to avoid conflict if DialogHeader is used locally
   DialogTitle,
   DialogClose,
-  DialogFooter as UIDialogFooter,
+  DialogFooter as UIDialogFooter, // Renamed to avoid conflict
 } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -27,27 +27,28 @@ import { Button } from '@/components/ui/button';
 import { PageHeader } from '@/components/shared/page-header'; 
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
-const initialExercisesMockForSelect = [
-  { id: '1', name: 'Bench Press' },
-  { id: '2', name: 'Squat' },
-  { id: '3', name: 'Deadlift' },
-  { id: '4', name: 'Overhead Press' },
-  { id: '5', name: 'Barbell Row' },
-  { id: '6', name: 'Bicep Curl' },
-  { id: '7', name: 'Tricep Pushdown' },
-  { id: '8', name: 'Leg Press' },
-  { id: '9', name: 'Lateral Raise' },
-  { id: '10', name: 'Plank' },
-  { id: '11', name: 'Pull-up' },
-  { id: '12', name: 'Dip' },
-  { id: '13', name: 'Lunge' },
-  { id: '14', name: 'Calf Raise' },
-  { id: '15', name: 'Running (Cardio)' },
-  { id: '16', name: 'Cycling (Cardio)' },
-  { id: '17', name: 'Dumbbell Shoulder Press'},
-  { id: '18', name: 'Dumbbell Flyes'},
-  { id: '19', name: 'Leg Extension'},
-  { id: '20', name: 'Leg Curl'},
+// Expanded mock exercise list with muscle groups
+const initialExercisesMockForSelect: Array<{ id: string; name: string; muscleGroup: MuscleGroup }> = [
+  { id: '1', name: 'Bench Press', muscleGroup: 'Chest' },
+  { id: '2', name: 'Squat', muscleGroup: 'Legs' },
+  { id: '3', name: 'Deadlift', muscleGroup: 'Back' }, // Often full body, but primary is back/legs
+  { id: '4', name: 'Overhead Press', muscleGroup: 'Shoulders' },
+  { id: '5', name: 'Barbell Row', muscleGroup: 'Back' },
+  { id: '6', name: 'Bicep Curl', muscleGroup: 'Biceps' },
+  { id: '7', name: 'Tricep Pushdown', muscleGroup: 'Triceps' },
+  { id: '8', name: 'Leg Press', muscleGroup: 'Legs' },
+  { id: '9', name: 'Lateral Raise', muscleGroup: 'Shoulders' },
+  { id: '10', name: 'Plank', muscleGroup: 'Abs' }, // Core/Abs
+  { id: '11', name: 'Pull-up', muscleGroup: 'Back' }, // Primarily Back and Biceps
+  { id: '12', name: 'Dip', muscleGroup: 'Chest' }, // Primarily Chest and Triceps
+  { id: '13', name: 'Lunge', muscleGroup: 'Legs' },
+  { id: '14', name: 'Calf Raise', muscleGroup: 'Legs' }, // Specifically Calves, grouped under Legs
+  { id: '15', name: 'Running (Cardio)', muscleGroup: 'Cardio' },
+  { id: '16', name: 'Cycling (Cardio)', muscleGroup: 'Cardio' },
+  { id: '17', name: 'Dumbbell Shoulder Press', muscleGroup: 'Shoulders'},
+  { id: '18', name: 'Dumbbell Flyes', muscleGroup: 'Chest'},
+  { id: '19', name: 'Leg Extension', muscleGroup: 'Legs'}, // Quadriceps
+  { id: '20', name: 'Leg Curl', muscleGroup: 'Legs'}, // Hamstrings
 ];
 const CREATE_NEW_EXERCISE_VALUE = '__create_new__';
 
@@ -56,6 +57,7 @@ interface ExerciseDetail {
   name: string;
   sets: string;
   reps: string;
+  muscleGroup?: MuscleGroup; // Added muscleGroup
 }
 
 interface WorkoutPlan {
@@ -73,8 +75,8 @@ const initialWorkoutPlans: WorkoutPlan[] = [
     name: 'Full Body Blast', 
     description: 'A comprehensive full-body workout for strength and endurance.', 
     exerciseDetails: [
-      { id: 'e1-1', name: 'Squats', sets: '3', reps: '8-12'},
-      { id: 'e1-2', name: 'Bench Press', sets: '3', reps: '8-12'},
+      { id: 'e1-1', name: 'Squats', sets: '3', reps: '8-12', muscleGroup: 'Legs'},
+      { id: 'e1-2', name: 'Bench Press', sets: '3', reps: '8-12', muscleGroup: 'Chest'},
     ],
     muscleGroups: ['Chest', 'Back', 'Legs', 'Shoulders', 'Biceps', 'Triceps', 'Abs'],
     duration: '60 min', 
@@ -84,9 +86,9 @@ const initialWorkoutPlans: WorkoutPlan[] = [
     name: 'Upper Body Power', 
     description: 'Focus on building strength in your chest, back, and arms.', 
     exerciseDetails: [
-      { id: 'e2-1', name: 'Pull-ups', sets: '4', reps: 'AMRAP'},
+      { id: 'e2-1', name: 'Pull-ups', sets: '4', reps: 'AMRAP', muscleGroup: 'Back'},
     ],
-    muscleGroups: ['Upper Body', 'Back', 'Biceps', 'Shoulders'],
+    muscleGroups: ['Chest', 'Back', 'Shoulders', 'Biceps', 'Triceps'], // More specific than 'Upper Body' for icon display
     duration: '75 min', 
   },
   { 
@@ -94,7 +96,7 @@ const initialWorkoutPlans: WorkoutPlan[] = [
     name: 'Leg Day Domination', 
     description: 'Intense leg workout to build lower body strength and size.', 
     exerciseDetails: [],
-    muscleGroups: ['Lower Body', 'Legs', 'Abs'],
+    muscleGroups: ['Legs', 'Abs'], // More specific than 'Lower Body'
     duration: '90 min', 
   },
 ];
@@ -109,7 +111,7 @@ export default function WorkoutPlansPage() {
   
   const [currentPlan, setCurrentPlan] = useState<Partial<WorkoutPlan> & { exerciseDetails: ExerciseDetail[], muscleGroups?: MuscleGroup[] }>({ name: '', description: '', exerciseDetails: [], duration: 'N/A', muscleGroups: [] });
   
-  const [selectedExerciseIdOrAction, setSelectedExerciseIdOrAction] = useState<string>('');
+  const [selectedExerciseIdOrAction, setSelectedExerciseIdOrAction] = useState<string>(initialExercisesMockForSelect[0]?.id || '');
   const [newExerciseManualName, setNewExerciseManualName] = useState('');
   const [newExerciseSets, setNewExerciseSets] = useState('');
   const [newExerciseReps, setNewExerciseReps] = useState('');
@@ -131,6 +133,7 @@ export default function WorkoutPlansPage() {
 
   const handleAddExerciseToCurrentPlan = () => {
     let exerciseNameToAdd = '';
+    let exerciseMuscleGroup: MuscleGroup | undefined = undefined;
 
     if (selectedExerciseIdOrAction === CREATE_NEW_EXERCISE_VALUE) {
       if (!newExerciseManualName.trim()) {
@@ -138,6 +141,7 @@ export default function WorkoutPlansPage() {
         return;
       }
       exerciseNameToAdd = newExerciseManualName.trim();
+      // Muscle group for manually created exercises won't be automatically set unless we add another input for it.
     } else {
       const selectedExercise = initialExercisesMockForSelect.find(ex => ex.id === selectedExerciseIdOrAction);
       if (!selectedExercise) {
@@ -145,6 +149,7 @@ export default function WorkoutPlansPage() {
         return;
       }
       exerciseNameToAdd = selectedExercise.name;
+      exerciseMuscleGroup = selectedExercise.muscleGroup;
     }
 
     if (!exerciseNameToAdd || !newExerciseSets.trim() || !newExerciseReps.trim()) {
@@ -157,6 +162,7 @@ export default function WorkoutPlansPage() {
       name: exerciseNameToAdd,
       sets: newExerciseSets,
       reps: newExerciseReps,
+      muscleGroup: exerciseMuscleGroup,
     };
 
     setCurrentPlan(prev => ({
@@ -247,12 +253,12 @@ export default function WorkoutPlansPage() {
       />
       {activeWorkoutIsClient && activePlanId && (
           <Card className="mb-6 shadow-md border-destructive bg-destructive/10">
-            <CardHeader className="p-4">
+            <UIDialogHeader className="p-4">
               <h3 className="text-destructive flex items-center font-semibold"> 
                 <Ban className="w-5 h-5 mr-2" />
                 {t('activeWorkoutPage.workoutInProgressTitle', { default: 'Workout In Progress' })}
               </h3>
-            </CardHeader>
+            </UIDialogHeader>
             <CardContent className="p-4 pt-0">
               <p className="text-sm text-destructive-foreground mt-2">
                  {t('activeWorkoutPage.finishCurrentWorkoutPrompt', { default: 'You have an active workout. Please finish or abandon it before starting a new one or creating/editing plans.' })}
@@ -291,7 +297,7 @@ export default function WorkoutPlansPage() {
                 <div className="flex-grow flex flex-col">
                   <h3 className="text-xl font-semibold text-primary mb-2">{plan.name}</h3>
                   
-                  <div className="grid grid-cols-1 md:grid-cols-1"> {/* Changed to single column for details */}
+                  <div className="grid grid-cols-1 md:grid-cols-1">
                     <div>
                         <h4 className="text-sm font-semibold text-muted-foreground mb-0.5">
                             {t('workoutPlansPage.involvedMusclesLabel', { default: "Muscles Involved:"})}
@@ -392,7 +398,7 @@ export default function WorkoutPlansPage() {
                         </SelectTrigger>
                         <SelectContent>
                           {initialExercisesMockForSelect.map(ex => (
-                            <SelectItem key={ex.id} value={ex.id}>{ex.name}</SelectItem>
+                            <SelectItem key={ex.id} value={ex.id}>{ex.name} ({t(`exercisesPage.muscleGroup${ex.muscleGroup.replace(/\s+/g, '')}`, { default: ex.muscleGroup })})</SelectItem>
                           ))}
                           <SelectItem value={CREATE_NEW_EXERCISE_VALUE}>
                             {t('workoutPlansPage.createNewExerciseInDialog', { default: "Create New Exercise..."})}
@@ -416,11 +422,11 @@ export default function WorkoutPlansPage() {
                     <div className="grid grid-cols-2 gap-3">
                       <div>
                         <Label htmlFor="newExerciseSets">{t('workoutPlansPage.setsLabel')}</Label>
-                        <Input id="newExerciseSets" value={newExerciseSets} onChange={(e) => setNewExerciseSets(e.target.value)} placeholder="es. 3" />
+                        <Input id="newExerciseSets" value={newExerciseSets} onChange={(e) => setNewExerciseSets(e.target.value)} placeholder={t('workoutPlansPage.setsPlaceholder', {default: "e.g., 3"})} />
                       </div>
                       <div>
                         <Label htmlFor="newExerciseReps">{t('workoutPlansPage.repsLabel')}</Label>
-                        <Input id="newExerciseReps" value={newExerciseReps} onChange={(e) => setNewExerciseReps(e.target.value)} placeholder="es. 8-12" />
+                        <Input id="newExerciseReps" value={newExerciseReps} onChange={(e) => setNewExerciseReps(e.target.value)} placeholder={t('workoutPlansPage.repsPlaceholder', {default: "e.g., 8-12"})} />
                       </div>
                     </div>
                     <div className="flex justify-center">
@@ -438,7 +444,14 @@ export default function WorkoutPlansPage() {
                       <ul className="space-y-1">
                         {currentPlan.exerciseDetails.map(ex => (
                           <li key={ex.id} className="flex justify-between items-center text-sm p-1 bg-secondary rounded-sm">
-                            <span className="truncate">{ex.name} ({ex.sets} x {ex.reps})</span>
+                            <span className="truncate">
+                                {ex.name} ({ex.sets} x {ex.reps})
+                                {ex.muscleGroup && (
+                                <span className="text-xs text-muted-foreground ml-1">
+                                    ({t(`exercisesPage.muscleGroup${ex.muscleGroup.replace(/\s+/g, '')}`, { default: ex.muscleGroup })})
+                                </span>
+                                )}
+                            </span>
                             <Button type="button" variant="ghost" size="icon" className="h-6 w-6 text-destructive" onClick={() => handleRemoveExerciseFromCurrentPlan(ex.id)}>
                               <Trash2 className="h-3.5 w-3.5" />
                             </Button>
@@ -465,3 +478,4 @@ export default function WorkoutPlansPage() {
     </>
   );
 }
+

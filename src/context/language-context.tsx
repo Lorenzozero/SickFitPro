@@ -16,7 +16,6 @@ interface Translations {
 const translations: Record<Language, Translations> = {
   en: {
     nav: {
-      // home: 'Home', // Removed
       workoutPlans: 'Workout Plans',
       calendar: 'Calendar',
       progress: 'Progress',
@@ -30,6 +29,7 @@ const translations: Record<Language, Translations> = {
     header: {
       toggleTheme: 'Toggle theme',
       openMenu: 'Open menu',
+      home: 'Home',
     },
     dashboard: {
       welcomeTitle: 'Welcome to SickFit Pro!',
@@ -86,12 +86,6 @@ const translations: Record<Language, Translations> = {
         saveGoalsButton: "Save Goals for Day",
         goalsSavedTitle: "Macro Goals Saved",
         goalsForDaySaved: "Goals for {dayOfWeek} saved successfully!",
-        monthlyTotalsTitle: "Estimated Monthly Totals", 
-        totalProteinMonth: "Total Protein (Month)", 
-        totalCarbsMonth: "Total Carbs (Month)", 
-        totalFatMonth: "Total Fat (Month)", 
-        unitGrams: "g",
-        loadingTotals: "Calculating monthly totals...", 
         macroTrendChartTitle: "Macronutrient Goal Trends",
         dailyTab: "Daily",
         weeklyTab: "Weekly",
@@ -211,46 +205,19 @@ const translations: Record<Language, Translations> = {
         errorPlanNotFound: "Selected plan not found.",
     },
     exercisesPage: {
-      // title: "Exercise Library", // Removed
-      // description: "Browse and manage your custom exercises.", // Removed
-      // createNewExerciseButton: "Create New Exercise", // Removed
-      // muscleGroupFilterLabel: "Filter by Muscle Group", // Removed
-      // allMuscleGroups: "All Muscle Groups", // Removed
-      // searchPlaceholder: "Search exercises...", // Removed
-      // dialogEditTitle: "Edit Exercise", // Removed
-      // dialogCreateTitle: "Create New Exercise", // Removed
-      // exerciseNameLabel: "Exercise Name", // Removed
-      // muscleGroupLabel: "Main Muscle Group", // Removed
-      // selectMuscleGroupPlaceholder: "Select muscle group", // Removed
-      // equipmentLabel: "Equipment (optional)", // Removed
-      // instructionsLabel: "Instructions (optional)", // Removed
-      // gifUrlLabel: "GIF URL (optional)", // Removed
-      // cancelButton: "Cancel", // Removed
-      // saveExerciseButton: "Save Exercise", // Removed
-      // toastExerciseUpdatedTitle: "Exercise Updated", // Removed
-      // toastExerciseUpdatedDescription: "\"{exerciseName}\" has been updated.", // Removed
-      // toastExerciseCreatedTitle: "Exercise Created", // Removed
-      // toastExerciseCreatedDescription: "\"{exerciseName}\" has been created.", // Removed
-      // toastExerciseDeletedTitle: "Exercise Deleted", // Removed
-      // toastExerciseDeletedDescription: "\"{exerciseName}\" has been deleted.", // Removed
-      // tableHeaderName: "Name", // Removed
-      // tableHeaderMuscleGroup: "Muscle Group", // Removed
-      // tableHeaderEquipment: "Equipment", // Removed
-      // tableHeaderActions: "Actions", // Removed
-      // muscleGroupChest: "Chest", // Removed
-      // muscleGroupBack: "Back", // Removed
-      // muscleGroupLegs: "Legs", // Removed
-      // muscleGroupShoulders: "Shoulders", // Removed
-      // muscleGroupBiceps: "Biceps", // Removed
-      // muscleGroupTriceps: "Triceps", // Removed
-      // muscleGroupAbs: "Abs", // Removed
-      // muscleGroupCore: "Core", // Removed
-      // muscleGroupCardio: "Cardio", // Removed
-      // muscleGroupFullBody: "Full Body", // Removed
-      // muscleGroupUpperBody: "Upper Body", // Removed
-      // muscleGroupLowerBody: "Lower Body", // Removed
-      // errorExerciseNameRequired: "Exercise name is required.", // Removed
-      // errorMuscleGroupRequired: "Muscle group is required.", // Removed
+      muscleGroupChest: "Chest",
+      muscleGroupBack: "Back",
+      muscleGroupLegs: "Legs",
+      muscleGroupShoulders: "Shoulders",
+      muscleGroupBiceps: "Biceps",
+      muscleGroupTriceps: "Triceps",
+      muscleGroupAbs: "Abs",
+      muscleGroupCore: "Core",
+      muscleGroupCardio: "Cardio",
+      muscleGroupFullBody: "Full Body",
+      muscleGroupUpperBody: "Upper Body",
+      muscleGroupLowerBody: "Lower Body",
+      tableHeaderActions: "Actions",
     },
     progressPage: {
         title: "Progress Tracking",
@@ -321,11 +288,8 @@ const translations: Record<Language, Translations> = {
     },
     workoutPlansPage: {
         title: "Workout Plans",
-        // description: "Create, manage, and share your training programs.", // Removed
         createNewPlanButton: "Create New Plan",
         involvedMusclesLabel: "Muscles Involved:",
-        // estDurationLabel: "Est. Duration:", // Removed
-        // exercisesLabel: "Exercises", // Removed
         startButton: "Start",
         dialogEditTitle: "Edit Workout Plan",
         dialogCreateTitle: "Create New Workout Plan",
@@ -334,7 +298,9 @@ const translations: Record<Language, Translations> = {
         planDurationLabel: "Est. Duration (e.g., 60 min)",
         exerciseNameLabel: "Exercise",
         setsLabel: "Sets",
+        setsPlaceholder: "e.g., 3",
         repsLabel: "Reps",
+        repsPlaceholder: "e.g., 8-12",
         addThisExerciseButton: "Add this Exercise",
         addedExercisesLabel: "Added Exercises:",
         noExercisesAddedYet: "No exercises added to this plan yet.",
@@ -359,6 +325,7 @@ const translations: Record<Language, Translations> = {
         errorSelectedExerciseNotFound: "Selected exercise not found.",
         errorExerciseDetailsRequired: "Please fill in exercise name, sets, and reps.",
         errorPlanNameRequired: "Plan name is required.",
+        // description: "Create, manage, and share your training programs.", // Removed
     },
      startWorkoutPage: {
       title: "Start New Workout",
@@ -455,7 +422,6 @@ const translations: Record<Language, Translations> = {
   },
   it: {
     nav: {
-      // home: 'Home', // Rimosso
       workoutPlans: 'Schede', 
       calendar: 'Calendario',
       progress: 'Progressi',
@@ -469,6 +435,7 @@ const translations: Record<Language, Translations> = {
     header: {
       toggleTheme: 'Cambia tema',
       openMenu: 'Apri menu',
+      home: 'Home',
     },
     dashboard: {
       welcomeTitle: 'Benvenuto in SickFit Pro!',
@@ -525,12 +492,6 @@ const translations: Record<Language, Translations> = {
         saveGoalsButton: "Salva Obiettivi del Giorno",
         goalsSavedTitle: "Obiettivi Macro Salvati",
         goalsForDaySaved: "Obiettivi per {dayOfWeek} salvati con successo!",
-        monthlyTotalsTitle: "Totali Mensili Stimati",
-        totalProteinMonth: "Proteine Totali (Mese)",
-        totalCarbsMonth: "Carboidrati Totali (Mese)",
-        totalFatMonth: "Grassi Totali (Mese)",
-        unitGrams: "g",
-        loadingTotals: "Calcolo totali mensili...",
         macroTrendChartTitle: "Andamento Obiettivi Macronutrienti",
         dailyTab: "Giornaliero",
         weeklyTab: "Settimanale",
@@ -650,7 +611,19 @@ const translations: Record<Language, Translations> = {
         errorPlanNotFound: "Scheda selezionata non trovata.",
     },
     exercisesPage: {
-      // Contenuto rimosso
+      muscleGroupChest: "Petto",
+      muscleGroupBack: "Schiena",
+      muscleGroupLegs: "Gambe",
+      muscleGroupShoulders: "Spalle",
+      muscleGroupBiceps: "Bicipiti",
+      muscleGroupTriceps: "Tricipiti",
+      muscleGroupAbs: "Addominali",
+      muscleGroupCore: "Core",
+      muscleGroupCardio: "Cardio",
+      muscleGroupFullBody: "Total Body",
+      muscleGroupUpperBody: "Parte Superiore",
+      muscleGroupLowerBody: "Parte Inferiore",
+      tableHeaderActions: "Azioni",
     },
     progressPage: {
         title: "Monitoraggio Progressi",
@@ -721,11 +694,8 @@ const translations: Record<Language, Translations> = {
     },
      workoutPlansPage: {
         title: "Schede Allenamento",
-        // description: "Crea, gestisci e condividi i tuoi programmi di allenamento.", // Rimosso
         createNewPlanButton: "Crea Nuova Scheda",
         involvedMusclesLabel: "Muscoli Coinvolti:",
-        // estDurationLabel: "Durata Stima:", // Rimosso
-        // exercisesLabel: "Esercizi:", // Rimosso
         startButton: "Inizia",
         dialogEditTitle: "Modifica Scheda Allenamento",
         dialogCreateTitle: "Crea Nuova Scheda Allenamento",
@@ -734,7 +704,9 @@ const translations: Record<Language, Translations> = {
         planDurationLabel: "Durata Stima (es. 60 min)",
         exerciseNameLabel: "Esercizio",
         setsLabel: "Serie",
+        setsPlaceholder: "es. 3",
         repsLabel: "Ripetizioni",
+        repsPlaceholder: "es. 8-12",
         addThisExerciseButton: "Aggiungi Esercizio",
         addedExercisesLabel: "Esercizi Aggiunti:",
         noExercisesAddedYet: "Nessun esercizio aggiunto a questa scheda.",
@@ -854,7 +826,6 @@ const translations: Record<Language, Translations> = {
   },
   es: { 
     nav: {
-      // home: 'Inicio', // Eliminado
       workoutPlans: 'Planes de Entrenamiento',
       calendar: 'Calendario',
       progress: 'Progreso',
@@ -868,6 +839,7 @@ const translations: Record<Language, Translations> = {
     header: {
         toggleTheme: 'Cambiar tema',
         openMenu: 'Abrir menú',
+        home: 'Inicio',
     },
      dashboard: {
       welcomeTitle: '¡Bienvenido a SickFit Pro!',
@@ -963,13 +935,7 @@ const translations: Record<Language, Translations> = {
         setYourWeeklyGoals: "Establece Tus Metas Semanales de Macros",
         selectDay: "Seleccionar Día",
         saveGoalsButton: "Guardar Metas del Día",
-        monthlyTotalsTitle: "Totales Mensuales Estimados",
-        totalProteinMonth: "Proteína Total (Mes)",
-        totalCarbsMonth: "Carbohidratos Totales (Mes)",
-        totalFatMonth: "Grasa Total (Mes)",
-        unitGrams: "g",
-        loadingTotals: "Calculando totales mensuales...",
-         goalsSavedTitle: "Metas de Macros Guardadas",
+        goalsSavedTitle: "Metas de Macros Guardadas",
         goalsForDaySaved: "¡Metas para {dayOfWeek} guardadas con éxito!",
         macroTrendChartTitle: "Tendencias de Metas de Macronutrientes",
         dailyTab: "Diario",
@@ -1049,7 +1015,19 @@ const translations: Record<Language, Translations> = {
         loadingCalendar: "Cargando calendario...",
     },
     exercisesPage: {
-        // Contenido eliminado
+        muscleGroupChest: "Pecho",
+        muscleGroupBack: "Espalda",
+        muscleGroupLegs: "Piernas",
+        muscleGroupShoulders: "Hombros",
+        muscleGroupBiceps: "Bíceps",
+        muscleGroupTriceps: "Tríceps",
+        muscleGroupAbs: "Abdominales",
+        muscleGroupCore: "Núcleo",
+        muscleGroupCardio: "Cardio",
+        muscleGroupFullBody: "Cuerpo Completo",
+        muscleGroupUpperBody: "Tren Superior",
+        muscleGroupLowerBody: "Tren Inferior",
+        tableHeaderActions: "Acciones",
     },
     progressPage: {
         title: "Seguimiento de Progreso",
@@ -1119,11 +1097,8 @@ const translations: Record<Language, Translations> = {
     },
     workoutPlansPage: {
         title: "Planes de Entrenamiento",
-        // description: "Crea, gestiona y comparte tus programas de entrenamiento.", // Eliminado
         createNewPlanButton: "Crear Nuevo Plan",
         involvedMusclesLabel: "Músculos Involucrados:",
-        // estDurationLabel: "Duración Est.:", // Eliminado
-        // exercisesLabel: "Ejercicios:", // Eliminado
         startButton: "Empezar",
         dialogEditTitle: "Editar Plan de Entrenamiento",
         dialogCreateTitle: "Crear Nuevo Plan de Entrenamiento",
@@ -1132,7 +1107,9 @@ const translations: Record<Language, Translations> = {
         planDurationLabel: "Duración Est. (ej. 60 min)",
         exerciseNameLabel: "Ejercicio",
         setsLabel: "Series",
+        setsPlaceholder: "ej. 3",
         repsLabel: "Repeticiones",
+        repsPlaceholder: "ej. 8-12",
         addThisExerciseButton: "Añadir este Ejercicio",
         addedExercisesLabel: "Ejercicios Añadidos:",
         noExercisesAddedYet: "Aún no se han añadido ejercicios a este plan.",
@@ -1246,7 +1223,6 @@ const translations: Record<Language, Translations> = {
   },
   fr: { 
     nav: {
-      // home: 'Accueil', // Supprimé
       workoutPlans: 'Programmes',
       calendar: 'Calendrier',
       progress: 'Progrès',
@@ -1260,6 +1236,7 @@ const translations: Record<Language, Translations> = {
     header: {
         toggleTheme: 'Changer de thème',
         openMenu: 'Ouvrir le menu',
+        home: 'Accueil',
     },
      dashboard: {
       welcomeTitle: 'Bienvenue sur SickFit Pro !',
@@ -1355,12 +1332,6 @@ const translations: Record<Language, Translations> = {
         setYourWeeklyGoals: "Définissez Vos Objectifs Hebdomadaires de Macros",
         selectDay: "Sélectionner Jour",
         saveGoalsButton: "Sauvegarder Objectifs du Jour",
-        monthlyTotalsTitle: "Totaux Mensuels Estimés",
-        totalProteinMonth: "Protéines Totales (Mois)",
-        totalCarbsMonth: "Glucides Totals (Mois)",
-        totalFatMonth: "Lipides Totals (Mois)",
-        unitGrams: "g",
-        loadingTotals: "Calcul des totaux mensuels...",
         goalsSavedTitle: "Objectifs Macros Sauvegardés",
         goalsForDaySaved: "Objectifs pour {dayOfWeek} sauvegardés avec succès !",
         macroTrendChartTitle: "Tendances des Objectifs de Macronutriments",
@@ -1441,7 +1412,19 @@ const translations: Record<Language, Translations> = {
         loadingCalendar: "Chargement du calendrier...",
     },
     exercisesPage: {
-      // Contenu supprimé
+        muscleGroupChest: "Pectoraux",
+        muscleGroupBack: "Dos",
+        muscleGroupLegs: "Jambes",
+        muscleGroupShoulders: "Épaules",
+        muscleGroupBiceps: "Biceps",
+        muscleGroupTriceps: "Triceps",
+        muscleGroupAbs: "Abdominaux",
+        muscleGroupCore: "Tronc", // Core
+        muscleGroupCardio: "Cardio",
+        muscleGroupFullBody: "Corps Complet",
+        muscleGroupUpperBody: "Haut du Corps",
+        muscleGroupLowerBody: "Bas du Corps",
+        tableHeaderActions: "Actions",
     },
     progressPage: {
         title: "Suivi des Progrès",
@@ -1511,11 +1494,8 @@ const translations: Record<Language, Translations> = {
     },
     workoutPlansPage: {
         title: "Programmes d'Entraînement",
-        // description: "Créez, gérez et partagez vos programmes d'entraînement.", // Supprimé
         createNewPlanButton: "Créer un Nouveau Programme",
         involvedMusclesLabel: "Muscles Impliqués :",
-        // estDurationLabel: "Durée Est.:", // Supprimé
-        // exercisesLabel: "Exercices :", // Supprimé
         startButton: "Commencer",
         dialogEditTitle: "Modifier le Programme d'Entraînement",
         dialogCreateTitle: "Créer un Nouveau Programme d'Entraînement",
@@ -1524,7 +1504,9 @@ const translations: Record<Language, Translations> = {
         planDurationLabel: "Durée Est. (ex. 60 min)",
         exerciseNameLabel: "Exercice",
         setsLabel: "Séries",
+        setsPlaceholder: "ex. 3",
         repsLabel: "Répétitions",
+        repsPlaceholder: "ex. 8-12",
         addThisExerciseButton: "Ajouter cet Exercice",
         addedExercisesLabel: "Exercices Ajoutés :",
         noExercisesAddedYet: "Aucun exercice ajouté à ce programme pour l'instant.",
