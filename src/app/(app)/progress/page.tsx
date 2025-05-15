@@ -7,7 +7,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import Image from 'next/image';
-import { LineChart as LucideLineChart, UploadCloud, BarChart as LucideBarChart, Users, PlusCircle, Edit2, Trash2, Bell, Wand2, BarChart } from 'lucide-react'; // Added BarChart
+import { LineChart as LucideLineChart, UploadCloud, Users, PlusCircle, Edit2, Trash2, Bell, Wand2, BarChart } from 'lucide-react'; // Added BarChart
 import { ChartContainer, ChartTooltip, ChartTooltipContent, ChartLegend, ChartLegendContent } from "@/components/ui/chart";
 import { Bar, CartesianGrid, XAxis, YAxis, Tooltip as RechartsTooltip, ResponsiveContainer, Line, Legend as RechartsLegend, BarChart as RechartsPrimitiveBarChart, LineChart as RechartsPrimitiveLineChart } from "recharts";
 import type { ChartConfig } from '@/components/ui/chart';
@@ -101,7 +101,7 @@ const initialBodyMeasurements: BodyMeasurement[] = [
     { id: 'm3', date: '2023-01-15', measurementName: 'Weight', value: 70, unit: 'kg' },
 ];
 
-type ReminderFrequency = 'off' | 'daily' | 'weekly' | 'bi-weekly' | 'monthly';
+type ReminderFrequency = 'off' | 'weekly' | 'bi-weekly' | 'monthly';
 
 
 export default function ProgressPage() {
@@ -220,7 +220,7 @@ export default function ProgressPage() {
      weight: {
       label: languageContextIsClient ? t('progressPage.weightLabel') : 'Weight (kg)',
       color: 'hsl(var(--chart-3))',
-      icon: LucideBarChart,
+      icon: LucideLineChart, 
     }
   };
 
@@ -282,7 +282,6 @@ export default function ProgressPage() {
       <>
         <PageHeader
             title={t('progressPage.title')}
-            description={t('progressPage.description')}
         />
         <div className="space-y-6">
             <Skeleton className="h-[400px] w-full" />
@@ -388,7 +387,6 @@ export default function ProgressPage() {
                                 </SelectTrigger>
                                 <SelectContent>
                                     <SelectItem value="off">{t('progressPage.reminderOff')}</SelectItem>
-                                    <SelectItem value="daily">{t('progressPage.reminderDaily')}</SelectItem>
                                     <SelectItem value="weekly">{t('progressPage.reminderWeekly')}</SelectItem>
                                     <SelectItem value="bi-weekly">{t('progressPage.reminderBiWeekly')}</SelectItem>
                                     <SelectItem value="monthly">{t('progressPage.reminderMonthly')}</SelectItem>
