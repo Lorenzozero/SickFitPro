@@ -1,7 +1,7 @@
 
 'use client';
 
-import { useState, type ChangeEvent, useEffect } from 'react';
+import { useState, type ChangeEvent, useEffect, useMemo } from 'react';
 import { PageHeader } from '@/components/shared/page-header';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -16,27 +16,67 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Label } from '@/components/ui/label';
 import { useToast } from '@/hooks/use-toast';
-import { AddMeasurementDialog } from '@/components/dialogs/add-measurement-dialog'; 
+import { AddMeasurementDialog } from '@/components/dialogs/add-measurement-dialog';
 import { Skeleton } from '@/components/ui/skeleton';
 import { AiSplitForm } from '@/components/forms/ai-split-form';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { format, parseISO, getISOWeek, getMonth, getYear, startOfWeek, endOfWeek, startOfMonth, endOfMonth, eachWeekOfInterval, eachMonthOfInterval, subWeeks, subMonths, subYears, isWithinInterval } from 'date-fns';
+import { it as dateFnsIt, es as dateFnsEs, fr as dateFnsFr, enUS as dateFnsEnUs } from 'date-fns/locale';
 
 
 const BODY_MEASUREMENTS_STORAGE_KEY = 'sickfit-pro-userBodyMeasurements';
 
-// Mock data for weekly training volume
-const weeklyVolumeChartData = [
-  { week: "W1", volume: 12000 },
-  { week: "W2", volume: 12500 },
-  { week: "W3", volume: 13000 },
-  { week: "W4", volume: 12800 },
-  { week: "W5", volume: 13500 },
-  { week: "W6", volume: 14000 },
-  { week: "W7", volume: 13800 },
-  { week: "W8", volume: 14200 },
+interface DetailedWorkoutLog {
+  date: string; // YYYY-MM-DD
+  exerciseName: string;
+  sets: Array<{ reps: number; weight: number }>;
+}
+
+const mockDetailedWorkoutLogs: DetailedWorkoutLog[] = [
+  { date: '2024-07-29', exerciseName: 'Bench Press', sets: [{ reps: 8, weight: 70 }, { reps: 8, weight: 70 }, { reps: 6, weight: 72.5 }] },
+  { date: '2024-07-29', exerciseName: 'Squat', sets: [{ reps: 5, weight: 100 }, { reps: 5, weight: 100 }, { reps: 5, weight: 102.5 }] },
+  { date: '2024-07-29', exerciseName: 'Bicep Curl', sets: [{ reps: 12, weight: 15 }, { reps: 10, weight: 15 }] },
+  { date: '2024-07-31', exerciseName: 'Overhead Press', sets: [{ reps: 6, weight: 50 }, { reps: 6, weight: 50 }] },
+  { date: '2024-07-31', exerciseName: 'Triceps Pushdown', sets: [{ reps: 12, weight: 25 }, { reps: 12, weight: 25 }] },
+  { date: '2024-08-05', exerciseName: 'Bench Press', sets: [{ reps: 8, weight: 72.5 }, { reps: 7, weight: 72.5 }] },
+  { date: '2024-08-05', exerciseName: 'Squat', sets: [{ reps: 5, weight: 102.5 }, { reps: 5, weight: 105 }] },
+  { date: '2024-08-07', exerciseName: 'Deadlift', sets: [{ reps: 3, weight: 120 }, { reps: 3, weight: 122.5 }] },
+  { date: '2024-08-07', exerciseName: 'Bicep Curl', sets: [{ reps: 10, weight: 17.5 }, { reps: 8, weight: 17.5 }] },
+  // Data for previous months
+  { date: '2024-06-03', exerciseName: 'Bench Press', sets: [{ reps: 10, weight: 65 }, { reps: 10, weight: 65 }] },
+  { date: '2024-06-03', exerciseName: 'Squat', sets: [{ reps: 8, weight: 90 }, { reps: 8, weight: 90 }] },
+  { date: '2024-06-10', exerciseName: 'Overhead Press', sets: [{ reps: 8, weight: 45 }, { reps: 7, weight: 45 }] },
+  { date: '2024-05-15', exerciseName: 'Bench Press', sets: [{ reps: 10, weight: 60 }] },
+  { date: '2024-05-15', exerciseName: 'Deadlift', sets: [{ reps: 5, weight: 110 }] },
 ];
 
-// Mock data for body composition chart (e.g., weight over months)
-const bodyCompositionChartData = [
+const exerciseToMuscleGroupMap: Record<string, string> = {
+  'Bench Press': 'chest',
+  'Incline Dumbbell Press': 'chest',
+  'Squat': 'legs',
+  'Leg Press': 'legs',
+  'Deadlift': 'back', // Can also be legs, but primarily back for this example
+  'Barbell Row': 'back',
+  'Overhead Press': 'shoulders',
+  'Lateral Raise': 'shoulders',
+  'Bicep Curl': 'biceps',
+  'Hammer Curl': 'biceps',
+  'Triceps Pushdown': 'triceps',
+  'Skullcrusher': 'triceps',
+};
+
+const MUSCLE_GROUPS_TO_TRACK = ['chest', 'back', 'legs', 'shoulders', 'biceps', 'triceps'];
+
+const getDateFnsLocale = (lang: string) => {
+  switch (lang) {
+    case 'it': return dateFnsIt;
+    case 'es': return dateFnsEs;
+    case 'fr': return dateFnsFr;
+    default: return dateFnsEnUs;
+  }
+};
+
+const initialBodyCompositionChartData = [
   { month: "January", weight: 70 },
   { month: "February", weight: 69.5 },
   { month: "March", weight: 69 },
@@ -45,17 +85,15 @@ const bodyCompositionChartData = [
   { month: "June", weight: 67.5 },
 ];
 
-
 export interface BodyMeasurement {
   id: string;
   date: string; // YYYY-MM-DD
-  measurementName: string; // e.g., "Biceps", "Weight", "Height"
+  measurementName: string;
   value: number;
   unit: 'cm' | 'in' | 'kg' | 'lbs';
   notes?: string;
 }
 
-// Mock initial measurements - will be overridden by localStorage if present
 const initialBodyMeasurements: BodyMeasurement[] = [
     { id: 'm1', date: '2023-01-15', measurementName: 'Biceps', value: 35, unit: 'cm', notes: 'Right arm, flexed' },
     { id: 'm2', date: '2023-01-15', measurementName: 'Waist', value: 80, unit: 'cm' },
@@ -77,6 +115,9 @@ export default function ProgressPage() {
   const [currentMeasurement, setCurrentMeasurement] = useState<Partial<BodyMeasurement> | null>(null);
   const [reminderFrequency, setReminderFrequency] = useState<ReminderFrequency>('off');
 
+  const [selectedTimeRange, setSelectedTimeRange] = useState<'weekly' | 'monthly' | 'yearly'>('weekly');
+  const [performanceChartData, setPerformanceChartData] = useState<any[]>([]);
+
 
   useEffect(() => {
     setIsClient(true);
@@ -87,29 +128,105 @@ export default function ProgressPage() {
                 setBodyMeasurements(JSON.parse(storedMeasurements));
             } catch (e) {
                 console.error("Error parsing body measurements from localStorage", e);
-                setBodyMeasurements(initialBodyMeasurements); // Fallback
+                setBodyMeasurements(initialBodyMeasurements);
             }
         }
     }
   }, []);
 
-  const persistMeasurements = (updatedMeasurements: BodyMeasurement[]) => {
-    if (typeof window !== 'undefined') {
-      localStorage.setItem(BODY_MEASUREMENTS_STORAGE_KEY, JSON.stringify(updatedMeasurements));
+  useEffect(() => {
+    if (!isClient || !languageContextIsClient) {
+      setPerformanceChartData([]);
+      return;
+    }
+
+    const processData = () => {
+      const locale = getDateFnsLocale(language);
+      const aggregatedData: Record<string, Record<string, number>> = {};
+      const periodsSet = new Set<string>();
+      const now = new Date();
+      let startDateLimit: Date;
+      let periodFormatFn: (date: Date) => string;
+      let displayFormatFn: (periodStr: string) => string;
+
+      if (selectedTimeRange === 'weekly') {
+        startDateLimit = subWeeks(now, 7); // Last 8 weeks
+        periodFormatFn = (date) => `${getYear(date)}-W${String(getISOWeek(date)).padStart(2, '0')}`;
+        displayFormatFn = (periodStr) => {
+            const [_year, weekNum] = periodStr.split('-W');
+            return t('progressPage.weekShortLabel', { num: weekNum, default: `W${weekNum}` });
+        };
+      } else if (selectedTimeRange === 'monthly') {
+        startDateLimit = subMonths(now, 11); // Last 12 months
+        periodFormatFn = (date) => `${getYear(date)}-${String(getMonth(date) + 1).padStart(2, '0')}`;
+        displayFormatFn = (periodStr) => {
+            const [year, monthNum] = periodStr.split('-');
+            return format(new Date(parseInt(year), parseInt(monthNum) - 1, 1), 'MMM yy', { locale });
+        };
+      } else { // yearly (show monthly data for the past year)
+        startDateLimit = subYears(now, 1);
+        periodFormatFn = (date) => `${getYear(date)}-${String(getMonth(date) + 1).padStart(2, '0')}`;
+         displayFormatFn = (periodStr) => {
+            const [year, monthNum] = periodStr.split('-');
+            return format(new Date(parseInt(year), parseInt(monthNum) - 1, 1), 'MMM yy', { locale });
+        };
+      }
+
+      mockDetailedWorkoutLogs.forEach(log => {
+        const logDate = parseISO(log.date);
+        if (logDate < startDateLimit || logDate > now) return;
+
+        const muscleGroupKey = exerciseToMuscleGroupMap[log.exerciseName];
+        if (!muscleGroupKey || !MUSCLE_GROUPS_TO_TRACK.includes(muscleGroupKey)) return;
+
+        const volume = log.sets.reduce((sum, set) => sum + (set.reps * set.weight), 0);
+        const periodKey = periodFormatFn(logDate);
+
+        if (!aggregatedData[periodKey]) {
+          aggregatedData[periodKey] = {};
+          MUSCLE_GROUPS_TO_TRACK.forEach(mg => aggregatedData[periodKey][mg] = 0);
+        }
+        aggregatedData[periodKey][muscleGroupKey] = (aggregatedData[periodKey][muscleGroupKey] || 0) + volume;
+        periodsSet.add(periodKey);
+      });
+      
+      const sortedPeriods = Array.from(periodsSet).sort();
+
+      const chartFormattedData = sortedPeriods.map(periodStr => {
+        return {
+          period: displayFormatFn(periodStr), // Use for display
+          originalPeriod: periodStr, // Keep for potential further sorting if needed
+          ...aggregatedData[periodStr]
+        };
+      });
+      
+      setPerformanceChartData(chartFormattedData);
+    };
+
+    processData();
+  }, [selectedTimeRange, isClient, language, t, languageContextIsClient]);
+
+  const performanceChartConfig: ChartConfig = useMemo(() => MUSCLE_GROUPS_TO_TRACK.reduce((acc, mgKey) => {
+    acc[mgKey] = {
+      label: t(`progressPage.muscleGroup${mgKey.charAt(0).toUpperCase() + mgKey.slice(1)}Chart`, { default: mgKey }),
+      color: `hsl(var(--chart-${(MUSCLE_GROUPS_TO_TRACK.indexOf(mgKey) % 5) + 1}))`,
+      icon: LucideLineChart,
+    };
+    return acc;
+  }, {} as ChartConfig), [t]);
+  
+  const bodyCompositionChartConfig: ChartConfig = {
+     weight: {
+      label: languageContextIsClient ? t('progressPage.weightLabel') : 'Weight (kg)',
+      color: 'hsl(var(--chart-3))',
+      icon: LucideBarChart,
     }
   };
 
 
-  const chartConfig: ChartConfig = {
-    weeklyVolume: {
-      label: languageContextIsClient ? t('progressPage.weeklyTrainingVolumeLabel') : 'Weekly Training Volume (kg)',
-      color: "hsl(var(--chart-1))",
-      icon: LucideLineChart,
-    },
-    weight: {
-      label: languageContextIsClient ? t('progressPage.weightLabel') : 'Weight (kg)',
-      color: 'hsl(var(--chart-3))',
-      icon: LucideBarChart,
+  const persistMeasurements = (updatedMeasurements: BodyMeasurement[]) => {
+    if (typeof window !== 'undefined') {
+      localStorage.setItem(BODY_MEASUREMENTS_STORAGE_KEY, JSON.stringify(updatedMeasurements));
     }
   };
 
@@ -126,18 +243,9 @@ export default function ProgressPage() {
   
   const getMonthAbbreviation = (fullMonthName: string) => {
     if (!languageContextIsClient) return fullMonthName.slice(0, 3);
-
     const currentLanguage = languageContextIsClient ? language : 'en';
-
-    if (currentLanguage === 'it') {
-        const monthMap: { [key: string]: string } = {
-            "January": "Gen", "February": "Feb", "March": "Mar", "April": "Apr",
-            "May": "Mag", "June": "Giu", "July": "Lug", "August": "Ago",
-            "September": "Set", "October": "Ott", "November": "Nov", "December": "Dic"
-        };
-        return monthMap[fullMonthName] || fullMonthName.slice(0,3);
-    }
-    return fullMonthName.slice(0, 3);
+    const date = new Date(`2000 ${fullMonthName} 1`); // Create a date to format
+    return format(date, 'MMM', { locale: getDateFnsLocale(currentLanguage) });
   };
 
 
@@ -168,7 +276,7 @@ export default function ProgressPage() {
   };
 
 
-  if (!isClient) {
+  if (!isClient || !languageContextIsClient) {
     return (
       <>
         <PageHeader
@@ -179,7 +287,7 @@ export default function ProgressPage() {
             <Skeleton className="h-[400px] w-full" />
             <Skeleton className="h-[400px] w-full" />
             <Skeleton className="h-[300px] w-full" />
-            <Skeleton className="h-[500px] w-full" /> {/* For AI Form */}
+            <Skeleton className="h-[500px] w-full" />
         </div>
       </>
     );
@@ -198,31 +306,40 @@ export default function ProgressPage() {
               <LucideLineChart className="w-5 h-5 mr-2 text-primary" />
               {t('progressPage.performanceMetricsCardTitle')}
             </CardTitle>
-            
           </CardHeader>
           <CardContent>
-            <ChartContainer config={chartConfig} className="h-[300px] w-full">
+            <Tabs value={selectedTimeRange} onValueChange={(value) => setSelectedTimeRange(value as any)} className="mb-4">
+              <TabsList className="grid w-full grid-cols-3">
+                <TabsTrigger value="weekly">{t('progressPage.timeRangeWeekly')}</TabsTrigger>
+                <TabsTrigger value="monthly">{t('progressPage.timeRangeMonthly')}</TabsTrigger>
+                <TabsTrigger value="yearly">{t('progressPage.timeRangeYearly')}</TabsTrigger>
+              </TabsList>
+            </Tabs>
+            <ChartContainer config={performanceChartConfig} className="h-[350px] w-full">
               <ResponsiveContainer width="100%" height="100%">
-                <RechartsPrimitiveLineChart data={weeklyVolumeChartData}>
+                <RechartsPrimitiveLineChart data={performanceChartData}>
                   <CartesianGrid vertical={false} />
                   <XAxis
-                    dataKey="week"
+                    dataKey="period"
                     tickLine={false}
                     tickMargin={10}
                     axisLine={false}
-                    tickFormatter={(value) => value} 
                   />
-                  <YAxis />
-                  <RechartsTooltip content={<ChartTooltipContent hideLabel />} />
+                  <YAxis label={{ value: t('progressPage.weeklyTrainingVolumeLabel'), angle: -90, position: 'insideLeft', offset: -5, style:{fontSize: '0.8rem'} }} />
+                  <RechartsTooltip content={<ChartTooltipContent />} />
                   <RechartsLegend content={<ChartLegendContent />} />
-                  <Line
-                    dataKey="volume"
-                    type="monotone"
-                    stroke="var(--color-weeklyVolume)"
-                    strokeWidth={2}
-                    dot={false}
-                    name={chartConfig.weeklyVolume?.label?.toString()}
-                  />
+                  {MUSCLE_GROUPS_TO_TRACK.map(mgKey => (
+                    <Line
+                      key={mgKey}
+                      dataKey={mgKey}
+                      type="monotone"
+                      stroke={`var(--color-${mgKey})`}
+                      strokeWidth={2}
+                      dot={true}
+                      name={performanceChartConfig[mgKey]?.label?.toString()}
+                      connectNulls={true}
+                    />
+                  ))}
                 </RechartsPrimitiveLineChart>
               </ResponsiveContainer>
             </ChartContainer>
@@ -237,15 +354,15 @@ export default function ProgressPage() {
             </CardTitle>
           </CardHeader>
           <CardContent>
-             <ChartContainer config={chartConfig} className="h-[300px] w-full">
+             <ChartContainer config={bodyCompositionChartConfig} className="h-[350px] w-full">
                 <ResponsiveContainer width="100%" height="100%">
-                    <RechartsPrimitiveBarChart data={bodyCompositionChartData}>
+                    <RechartsPrimitiveBarChart data={initialBodyCompositionChartData}>
                         <CartesianGrid vertical={false} />
                         <XAxis dataKey="month" tickLine={false} tickMargin={10} axisLine={false} tickFormatter={(value) => getMonthAbbreviation(value)} />
                         <YAxis dataKey="weight" />
                         <RechartsTooltip content={<ChartTooltipContent indicator="dot" />} />
                         <RechartsLegend content={<ChartLegendContent />} />
-                        <Bar dataKey="weight" fill="var(--color-weight)" radius={4} name={chartConfig.weight?.label?.toString()} />
+                        <Bar dataKey="weight" fill="var(--color-weight)" radius={4} name={bodyCompositionChartConfig.weight?.label?.toString()} />
                     </RechartsPrimitiveBarChart>
                 </ResponsiveContainer>
             </ChartContainer>
@@ -318,7 +435,6 @@ export default function ProgressPage() {
       <Card className="mt-6 shadow-lg">
         <CardHeader>
           <CardTitle>{t('progressPage.photoComparisonCardTitle')}</CardTitle>
-          <CardDescription>{t('progressPage.photoComparisonCardDescription')}</CardDescription>
         </CardHeader>
         <CardContent className="grid gap-6 md:grid-cols-2">
           {[
@@ -361,7 +477,6 @@ export default function ProgressPage() {
         </CardContent>
       </Card>
       
-      {/* AI Fitness Advisor Form */}
       <div className="mt-8">
          <AiSplitForm />
       </div>
