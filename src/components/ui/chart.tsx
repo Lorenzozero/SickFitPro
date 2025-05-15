@@ -263,12 +263,12 @@ const ChartLegendContent = React.forwardRef<
   HTMLDivElement,
   React.ComponentProps<"div"> &
     Pick<RechartsPrimitive.LegendProps, "payload" | "verticalAlign"> & {
-      hideIcon?: boolean
+      hideIcon?: boolean // Kept for compatibility, but icons won't be rendered by default now
       nameKey?: string
     }
 >(
   (
-    { className, hideIcon = false, payload, verticalAlign = "bottom", nameKey },
+    { className, payload, verticalAlign = "bottom", nameKey },
     ref
   ) => {
     const { config } = useChart()
@@ -281,33 +281,29 @@ const ChartLegendContent = React.forwardRef<
       <div
         ref={ref}
         className={cn(
-          "flex items-center justify-center gap-4",
+          "flex flex-wrap items-center justify-center gap-x-3 gap-y-1 text-xs md:gap-x-4", // Adjusted gap for responsiveness and wrapping
           verticalAlign === "top" ? "pb-3" : "pt-3",
           className
         )}
       >
         {payload.map((item) => {
-          const key = `${nameKey || item.dataKey || "value"}`
+          const key = `${nameKey || item.dataKey || item.value}` // item.value is often the dataKey for legend items
           const itemConfig = getPayloadConfigFromPayload(config, item, key)
 
           return (
             <div
-              key={item.value}
+              key={item.value} // Use item.value (which is typically the dataKey) for the key
               className={cn(
-                "flex items-center gap-1.5 [&>svg]:h-3 [&>svg]:w-3 [&>svg]:text-muted-foreground"
+                "flex items-center gap-1.5" // Simplified className as icon is removed
               )}
             >
-              {itemConfig?.icon && !hideIcon ? (
-                <itemConfig.icon />
-              ) : (
-                <div
-                  className="h-3 w-3 shrink-0 rounded-sm"
-                  style={{
-                    backgroundColor: item.color,
-                  }}
-                />
-              )}
-              {itemConfig?.label}
+              <div
+                className="h-2.5 w-2.5 shrink-0 rounded-sm" // Standard size for the color swatch
+                style={{
+                  backgroundColor: item.color, // This comes directly from the chart series color
+                }}
+              />
+              {itemConfig?.label || item.value} {/* Fallback to item.value (dataKey) if label is not found */}
             </div>
           )
         })}
@@ -364,3 +360,4 @@ export {
   ChartLegendContent,
   ChartStyle,
 }
+
