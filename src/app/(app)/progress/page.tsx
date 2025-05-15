@@ -257,7 +257,6 @@ export default function ProgressPage() {
         <CardHeader className="flex flex-row items-center justify-between">
             <div>
                 <CardTitle>{t('progressPage.bodyMeasurementsCardTitle')}</CardTitle>
-                <CardDescription>{t('progressPage.bodyMeasurementsCardDescription')}</CardDescription>
             </div>
             <Button onClick={() => openMeasurementDialog()}>
                 <PlusCircle className="w-4 h-4 mr-2" /> {t('progressPage.addMeasurementButton')}
