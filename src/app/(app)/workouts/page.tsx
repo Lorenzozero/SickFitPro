@@ -4,7 +4,7 @@
 import { useState, type FormEvent } from 'react';
 import Link from 'next/link';
 import Image from 'next/image'; 
-import { Card, CardContent, CardFooter } from '@/components/ui/card'; 
+import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card'; 
 import { PlusCircle, Edit2, Trash2, Share2, PlayCircle, ListChecks, Ban, Clock } from 'lucide-react';
 import {
   Dialog,
@@ -25,7 +25,6 @@ import { useActiveWorkout } from '@/context/active-workout-context';
 import { useRouter } from 'next/navigation';
 import type { MuscleGroup } from '@/components/shared/muscle-group-icons'; 
 import { Button } from '@/components/ui/button';
-import { CardHeader } from '@/components/ui/card'; 
 import { PageHeader } from '@/components/shared/page-header'; 
 
 interface ExerciseDetail {
@@ -197,7 +196,7 @@ export default function WorkoutPlansPage() {
   return (
     <>
       <PageHeader
-        title={t('nav.workoutPlans')}
+        title={t('nav.workoutPlans')} 
         actions={
           <Button onClick={() => openDialog()} disabled={!!(activeWorkoutIsClient && activePlanId)}>
             <PlusCircle className="w-4 h-4 mr-2" /> {t('workoutPlansPage.createNewPlanButton')}
@@ -206,8 +205,8 @@ export default function WorkoutPlansPage() {
       />
       {activeWorkoutIsClient && activePlanId && (
           <Card className="mb-6 shadow-md border-destructive bg-destructive/10">
-            <CardHeader className="p-4">
-              <h3 className="text-destructive flex items-center font-semibold">
+            <CardHeader className="p-4"> 
+              <h3 className="text-destructive flex items-center font-semibold"> 
                 <Ban className="w-5 h-5 mr-2" />
                 {t('activeWorkoutPage.workoutInProgressTitle', { default: 'Workout In Progress' })}
               </h3>
@@ -223,7 +222,7 @@ export default function WorkoutPlansPage() {
           </Card>
         )}
 
-      <div className="space-y-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
         {plans.map((plan) => (
           <Card key={plan.id} className="flex flex-col shadow-lg hover:shadow-xl transition-shadow duration-300">
             <CardContent className="flex-grow p-4">
@@ -250,7 +249,7 @@ export default function WorkoutPlansPage() {
                 <div className="flex-grow flex flex-col">
                   <h3 className="text-xl font-semibold text-primary mb-2">{plan.name}</h3>
                   
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-x-4 gap-y-2 mb-2">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-x-4 gap-y-1 mb-3">
                     <div>
                       <h4 className="text-sm font-semibold text-muted-foreground mb-0.5">
                           {t('workoutPlansPage.involvedMusclesLabel', { default: "Muscles Involved:"})}
