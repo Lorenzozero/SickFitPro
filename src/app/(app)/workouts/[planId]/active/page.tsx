@@ -176,7 +176,7 @@ function ExerciseCard({ exercise, onLogSet, onDeleteSet, isCurrentlyVisible, exe
                 <Input id={`weight-${exercise.id}`} type="number" placeholder="60" value={weightInput} onChange={(e) => setWeightInput(e.target.value)} required className="h-9" />
               </div>
               <div className="col-span-2">
-                <Button type="submit" className="w-full h-9" disabled={completedSets >= exercise.targetSets}>
+                <Button type="submit" className="w-full h-9">
                   <PlusCircle className="w-4 h-4 mr-1.5" /> {t('activeWorkoutPage.logSetButton')}
                 </Button>
               </div>
@@ -467,8 +467,8 @@ export default function ActiveWorkoutPage() {
   return (
     <>
       <PageHeader
-        title={t('activeWorkoutPage.title', { planName: plan.name })}
-        description={plan.description}
+        title={languageContextIsClient ? t('activeWorkoutPage.title', { planName: plan.name }) : plan.name}
+        description={languageContextIsClient ? plan.description : ''}
         actions={
           <div className="flex items-center gap-2">
             <div className="flex items-center gap-1 p-2 border rounded-md bg-background shadow-sm">
@@ -538,3 +538,4 @@ export default function ActiveWorkoutPage() {
     </>
   );
 }
+
