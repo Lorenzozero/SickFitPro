@@ -7,7 +7,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import Image from 'next/image';
-import { LineChart as LucideLineChart, UploadCloud, BarChart as LucideBarChart, Users, PlusCircle, Edit2, Trash2, Bell, Wand2 } from 'lucide-react';
+import { LineChart as LucideLineChart, UploadCloud, BarChart as LucideBarChart, Users, PlusCircle, Edit2, Trash2, Bell, Wand2, BarChart } from 'lucide-react'; // Added BarChart
 import { ChartContainer, ChartTooltip, ChartTooltipContent, ChartLegend, ChartLegendContent } from "@/components/ui/chart";
 import { Bar, CartesianGrid, XAxis, YAxis, Tooltip as RechartsTooltip, ResponsiveContainer, Line, Legend as RechartsLegend, BarChart as RechartsPrimitiveBarChart, LineChart as RechartsPrimitiveLineChart } from "recharts";
 import type { ChartConfig } from '@/components/ui/chart';
@@ -298,7 +298,6 @@ export default function ProgressPage() {
     <>
       <PageHeader
         title={t('progressPage.title')}
-        description={t('progressPage.description')}
       />
       <div className="grid gap-6 lg:grid-cols-2">
         <Card className="shadow-lg">
