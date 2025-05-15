@@ -17,7 +17,7 @@ const translations: Record<Language, Translations> = {
   en: {
     nav: {
       home: 'Home',
-      exercises: 'Exercises',
+      // exercises: 'Exercises', // Removed
       workoutPlans: 'Workout Plans',
       calendar: 'Calendar',
       progress: 'Progress',
@@ -212,42 +212,7 @@ const translations: Record<Language, Translations> = {
         errorSelectDayAndPlan: "Please select a day and a workout plan.",
         errorPlanNotFound: "Selected plan not found.",
     },
-    exercisesPage: {
-        title: "Custom Exercises",
-        description: "Manage your personalized exercise library.",
-        addNewExerciseButton: "Add New Exercise",
-        yourExercisesCardTitle: "Your Exercises",
-        tableHeaderName: "Name",
-        tableHeaderMuscleGroup: "Muscle Group",
-        tableHeaderType: "Type",
-        tableHeaderActions: "Actions",
-        dialogAddTitle: "Add New Exercise",
-        dialogAddDescription: "Fill in the details for your new exercise.",
-        dialogEditTitle: "Edit Exercise",
-        dialogEditDescription: "Update the details of your exercise.",
-        formNameLabel: "Name",
-        formDescriptionLabel: "Description",
-        formMuscleGroupLabel: "Muscle Group",
-        selectMuscleGroupPlaceholder: "Select muscle group",
-        muscleGroupChest: "Chest",
-        muscleGroupBack: "Back",
-        muscleGroupLegs: "Legs",
-        muscleGroupShoulders: "Shoulders",
-        muscleGroupBiceps: "Biceps",
-        muscleGroupTriceps: "Triceps",
-        muscleGroupAbs: "Abs",
-        muscleGroupCardio: "Cardio",
-        muscleGroupOther: "Other",
-        formTypeLabel: "Type",
-        selectExerciseTypePlaceholder: "Select exercise type",
-        typeStrength: "Strength",
-        typeCardio: "Cardio",
-        typeFlexibility: "Flexibility",
-        typePlyometrics: "Plyometrics",
-        typeOther: "Other",
-        cancelButton: "Cancel",
-        saveExerciseButton: "Save Exercise",
-    },
+    // exercisesPage translations removed
     progressPage: {
         title: "Progress Tracking",
         description: "Visualize your fitness journey and celebrate your achievements.",
@@ -319,14 +284,15 @@ const translations: Record<Language, Translations> = {
         title: "Workout Plans",
         description: "Create, manage, and share your training programs.",
         createNewPlanButton: "Create New Plan",
-        exercisesLabel: "Exercises",
+        // exercisesLabel: "Exercises", // No longer directly used in card display
         involvedMusclesLabel: "Muscles Involved:",
         startButton: "Start",
         dialogEditTitle: "Edit Workout Plan",
-        dialogEditDescription: "Update the details of your workout plan.",
+        // dialogEditDescription: "Update the details of your workout plan.", // Removed
         dialogCreateTitle: "Create New Workout Plan",
-        dialogCreateDescription: "Design your new workout plan.",
+        // dialogCreateDescription: "Design your new workout plan.", // Removed
         planNameLabel: "Plan Name",
+        descriptionLabel: "Description", // Added for dialog
         planDurationLabel: "Est. Duration (e.g., 60 min)",
         exerciseNameLabel: "Exercise",
         setsLabel: "Sets",
@@ -352,6 +318,9 @@ const translations: Record<Language, Translations> = {
         newExerciseNameLabel: "New Exercise Name",
         newExerciseNamePlaceholder: "e.g., Custom Bicep Curl",
         errorNewExerciseNameRequired: "Please enter a name for the new exercise.",
+        errorSelectedExerciseNotFound: "Selected exercise not found.",
+        errorExerciseDetailsRequired: "Please fill in exercise name, sets, and reps.",
+        errorPlanNameRequired: "Plan name is required.",
     },
      startWorkoutPage: {
       title: "Start New Workout",
@@ -444,12 +413,13 @@ const translations: Record<Language, Translations> = {
         enableAllNotificationsAria: "Toggle all supplement notifications",
         enableNotificationAria: "Enable notification for {name}",
         disableNotificationAria: "Disable notification for {name}",
+        // enableNotificationForSupplement: "Enable notification for this supplement" // Removed due to UI change
     }
   },
   it: {
     nav: {
       home: 'Home', 
-      exercises: 'Esercizi',
+      // exercises: 'Esercizi', // Rimosso
       workoutPlans: 'Schede', 
       calendar: 'Calendario',
       progress: 'Progressi',
@@ -644,42 +614,7 @@ const translations: Record<Language, Translations> = {
         errorSelectDayAndPlan: "Seleziona un giorno e una scheda di allenamento.",
         errorPlanNotFound: "Scheda selezionata non trovata.",
     },
-    exercisesPage: {
-        title: "Esercizi Personalizzati",
-        description: "Gestisci la tua libreria di esercizi personalizzati.",
-        addNewExerciseButton: "Aggiungi Nuovo Esercizio",
-        yourExercisesCardTitle: "I Tuoi Esercizi",
-        tableHeaderName: "Nome",
-        tableHeaderMuscleGroup: "Gruppo Muscolare",
-        tableHeaderType: "Tipo",
-        tableHeaderActions: "Azioni",
-        dialogAddTitle: "Aggiungi Nuovo Esercizio",
-        dialogAddDescription: "Inserisci i dettagli per il tuo nuovo esercizio.",
-        dialogEditTitle: "Modifica Esercizio",
-        dialogEditDescription: "Aggiorna i dettagli del tuo esercizio.",
-        formNameLabel: "Nome",
-        formDescriptionLabel: "Descrizione",
-        formMuscleGroupLabel: "Gruppo Muscolare",
-        selectMuscleGroupPlaceholder: "Seleziona gruppo muscolare",
-        muscleGroupChest: "Petto",
-        muscleGroupBack: "Schiena",
-        muscleGroupLegs: "Gambe",
-        muscleGroupShoulders: "Spalle",
-        muscleGroupBiceps: "Bicipiti",
-        muscleGroupTriceps: "Tricipiti",
-        muscleGroupAbs: "Addominali",
-        muscleGroupCardio: "Cardio",
-        muscleGroupOther: "Altro",
-        formTypeLabel: "Tipo",
-        selectExerciseTypePlaceholder: "Seleziona tipo di esercizio",
-        typeStrength: "Forza",
-        typeCardio: "Cardio",
-        typeFlexibility: "Flessibilità",
-        typePlyometrics: "Pliometria",
-        typeOther: "Altro",
-        cancelButton: "Annulla",
-        saveExerciseButton: "Salva Esercizio",
-    },
+    // exercisesPage translations removed
     progressPage: {
         title: "Monitoraggio Progressi",
         description: "Visualizza il tuo percorso di fitness e celebra i tuoi traguardi.",
@@ -751,14 +686,15 @@ const translations: Record<Language, Translations> = {
         title: "Schede Allenamento",
         description: "Crea, gestisci e condividi i tuoi programmi di allenamento.",
         createNewPlanButton: "Crea Nuova Scheda",
-        exercisesLabel: "Esercizi",
+        // exercisesLabel: "Esercizi", // Non più usato direttamente nella card
         involvedMusclesLabel: "Muscoli Coinvolti:",
         startButton: "Inizia",
         dialogEditTitle: "Modifica Scheda Allenamento",
-        dialogEditDescription: "Aggiorna i dettagli della tua scheda di allenamento.",
+        // dialogEditDescription: "Aggiorna i dettagli della tua scheda di allenamento.", // Rimosso
         dialogCreateTitle: "Crea Nuova Scheda Allenamento",
-        dialogCreateDescription: "Progetta la tua nuova scheda di allenamento.",
+        // dialogCreateDescription: "Progetta la tua nuova scheda di allenamento.", // Rimosso
         planNameLabel: "Nome Scheda",
+        descriptionLabel: "Descrizione", // Aggiunto per il dialogo
         planDurationLabel: "Durata Stima (es. 60 min)",
         exerciseNameLabel: "Esercizio",
         setsLabel: "Serie",
@@ -784,6 +720,9 @@ const translations: Record<Language, Translations> = {
         newExerciseNameLabel: "Nome Nuovo Esercizio",
         newExerciseNamePlaceholder: "es. Curl Bicipiti Personalizzato",
         errorNewExerciseNameRequired: "Inserisci un nome per il nuovo esercizio.",
+        errorSelectedExerciseNotFound: "Esercizio selezionato non trovato.",
+        errorExerciseDetailsRequired: "Compila nome esercizio, serie e ripetizioni.",
+        errorPlanNameRequired: "Il nome della scheda è obbligatorio.",
     },
     startWorkoutPage: {
       title: "Inizia Nuovo Allenamento",
@@ -875,12 +814,13 @@ const translations: Record<Language, Translations> = {
         enableAllNotificationsAria: "Attiva/disattiva tutte le notifiche degli integratori",
         enableNotificationAria: "Abilita notifica per {name}",
         disableNotificationAria: "Disabilita notifica per {name}",
+        // enableNotificationForSupplement: "Abilita notifica per questo integratore" // Rimosso
     }
   },
   es: { 
     nav: {
       home: 'Inicio',
-      exercises: 'Ejercicios',
+      // exercises: 'Ejercicios', // Eliminado
       workoutPlans: 'Planes de Entrenamiento',
       calendar: 'Calendario',
       progress: 'Progreso',
@@ -1075,42 +1015,7 @@ const translations: Record<Language, Translations> = {
         samplePlan4: "Sesión de Cardio",
         loadingCalendar: "Cargando calendario...",
     },
-     exercisesPage: {
-        title: "Ejercicios Personalizados",
-        description: "Gestiona tu biblioteca de ejercicios personalizados.",
-        addNewExerciseButton: "Añadir Nuevo Ejercicio",
-        yourExercisesCardTitle: "Tus Ejercicios",
-        tableHeaderName: "Nombre",
-        tableHeaderMuscleGroup: "Grupo Muscular",
-        tableHeaderType: "Tipo",
-        tableHeaderActions: "Acciones",
-        dialogAddTitle: "Añadir Nuevo Ejercicio",
-        dialogAddDescription: "Completa los detalles de tu nuevo ejercicio.",
-        dialogEditTitle: "Editar Ejercicio",
-        dialogEditDescription: "Actualiza los detalles de tu ejercicio.",
-        formNameLabel: "Nombre",
-        formDescriptionLabel: "Descripción",
-        formMuscleGroupLabel: "Grupo Muscular",
-        selectMuscleGroupPlaceholder: "Selecciona grupo muscular",
-        muscleGroupChest: "Pecho",
-        muscleGroupBack: "Espalda",
-        muscleGroupLegs: "Piernas",
-        muscleGroupShoulders: "Hombros",
-        muscleGroupBiceps: "Bíceps",
-        muscleGroupTriceps: "Tríceps",
-        muscleGroupAbs: "Abdominales",
-        muscleGroupCardio: "Cardio",
-        muscleGroupOther: "Otro",
-        formTypeLabel: "Tipo",
-        selectExerciseTypePlaceholder: "Selecciona tipo de ejercicio",
-        typeStrength: "Fuerza",
-        typeCardio: "Cardio",
-        typeFlexibility: "Flexibilidad",
-        typePlyometrics: "Pliométricos",
-        typeOther: "Otro",
-        cancelButton: "Cancelar",
-        saveExerciseButton: "Guardar Ejercicio",
-    },
+    // exercisesPage translations removed
     progressPage: {
         title: "Seguimiento de Progreso",
         description: "Visualiza tu viaje de fitness y celebra tus logros.",
@@ -1181,14 +1086,15 @@ const translations: Record<Language, Translations> = {
         title: "Planes de Entrenamiento",
         description: "Crea, gestiona y comparte tus programas de entrenamiento.",
         createNewPlanButton: "Crear Nuevo Plan",
-        exercisesLabel: "Ejercicios",
+        // exercisesLabel: "Ejercicios", // Ya no se usa directamente en la visualización de la tarjeta
         involvedMusclesLabel: "Músculos Involucrados:",
         startButton: "Empezar",
         dialogEditTitle: "Editar Plan de Entrenamiento",
-        dialogEditDescription: "Actualiza los detalles de tu plan de entrenamiento.",
+        // dialogEditDescription: "Actualiza los detalles de tu plan de entrenamiento.", // Eliminado
         dialogCreateTitle: "Crear Nuevo Plan de Entrenamiento",
-        dialogCreateDescription: "Diseña tu nuevo plan de entrenamiento.",
+        // dialogCreateDescription: "Diseña tu nuevo plan de entrenamiento.", // Eliminado
         planNameLabel: "Nombre del Plan",
+        descriptionLabel: "Descripción", // Añadido para el diálogo
         planDurationLabel: "Duración Est. (ej. 60 min)",
         exerciseNameLabel: "Ejercicio",
         setsLabel: "Series",
@@ -1214,6 +1120,9 @@ const translations: Record<Language, Translations> = {
         newExerciseNameLabel: "Nombre Nuevo Ejercicio",
         newExerciseNamePlaceholder: "ej. Curl de Bíceps Personalizado",
         errorNewExerciseNameRequired: "Por favor, introduce un nombre para el nuevo ejercicio.",
+        errorSelectedExerciseNotFound: "Ejercicio seleccionado no encontrado.",
+        errorExerciseDetailsRequired: "Por favor, completa el nombre del ejercicio, series y repeticiones.",
+        errorPlanNameRequired: "El nombre del plan es obligatorio.",
     },
     startWorkoutPage: {
       title: "Empezar Nuevo Entrenamiento",
@@ -1299,12 +1208,13 @@ const translations: Record<Language, Translations> = {
         enableAllNotificationsAria: "Activar/desactivar todas las notificaciones de suplementos",
         enableNotificationAria: "Habilitar notificación para {name}",
         disableNotificationAria: "Deshabilitar notificación para {name}",
+        // enableNotificationForSupplement: "Habilitar notificación para este suplemento" // Eliminado
     }
   },
   fr: { 
     nav: {
       home: 'Accueil',
-      exercises: 'Exercices',
+      // exercises: 'Exercices', // Supprimé
       workoutPlans: 'Programmes',
       calendar: 'Calendrier',
       progress: 'Progrès',
@@ -1499,42 +1409,7 @@ const translations: Record<Language, Translations> = {
         samplePlan4: "Séance Cardio",
         loadingCalendar: "Chargement du calendrier...",
     },
-    exercisesPage: {
-        title: "Exercices Personnalisés",
-        description: "Gérez votre bibliothèque d'exercices personnalisés.",
-        addNewExerciseButton: "Ajouter un Nouvel Exercice",
-        yourExercisesCardTitle: "Vos Exercices",
-        tableHeaderName: "Nom",
-        tableHeaderMuscleGroup: "Groupe Musculaire",
-        tableHeaderType: "Type",
-        tableHeaderActions: "Actions",
-        dialogAddTitle: "Ajouter un Nouvel Exercice",
-        dialogAddDescription: "Remplissez les détails de votre nouvel exercice.",
-        dialogEditTitle: "Modifier l'Exercice",
-        dialogEditDescription: "Mettez à jour les détails de votre exercice.",
-        formNameLabel: "Nom",
-        formDescriptionLabel: "Description",
-        formMuscleGroupLabel: "Groupe Musculaire",
-        selectMuscleGroupPlaceholder: "Sélectionnez un groupe musculaire",
-        muscleGroupChest: "Pectoraux",
-        muscleGroupBack: "Dos",
-        muscleGroupLegs: "Jambes",
-        muscleGroupShoulders: "Épaules",
-        muscleGroupBiceps: "Biceps",
-        muscleGroupTriceps: "Triceps",
-        muscleGroupAbs: "Abdominaux",
-        muscleGroupCardio: "Cardio",
-        muscleGroupOther: "Autre",
-        formTypeLabel: "Type",
-        selectExerciseTypePlaceholder: "Sélectionnez un type d'exercice",
-        typeStrength: "Force",
-        typeCardio: "Cardio",
-        typeFlexibility: "Flexibilité",
-        typePlyometrics: "Pliométrie",
-        typeOther: "Autre",
-        cancelButton: "Annuler",
-        saveExerciseButton: "Enregistrer l'Exercice",
-    },
+    // exercisesPage translations removed
     progressPage: {
         title: "Suivi des Progrès",
         description: "Visualisez votre parcours de fitness et célébrez vos accomplissements.",
@@ -1605,14 +1480,15 @@ const translations: Record<Language, Translations> = {
         title: "Programmes d'Entraînement",
         description: "Créez, gérez et partagez vos programmes d'entraînement.",
         createNewPlanButton: "Créer un Nouveau Programme",
-        exercisesLabel: "Exercices",
+        // exercisesLabel: "Exercices", // Plus utilisé directement dans l'affichage de la carte
         involvedMusclesLabel: "Muscles Impliqués :",
         startButton: "Commencer",
         dialogEditTitle: "Modifier le Programme d'Entraînement",
-        dialogEditDescription: "Mettez à jour les détails de votre programme d'entraînement.",
+        // dialogEditDescription: "Mettez à jour les détails de votre programme d'entraînement.", // Supprimé
         dialogCreateTitle: "Créer un Nouveau Programme d'Entraînement",
-        dialogCreateDescription: "Concevez votre nouveau programme d'entraînement.",
+        // dialogCreateDescription: "Concevez votre nouveau programme d'entraînement.", // Supprimé
         planNameLabel: "Nom du Programme",
+        descriptionLabel: "Description", // Ajouté pour le dialogue
         planDurationLabel: "Durée Est. (ex. 60 min)",
         exerciseNameLabel: "Exercice",
         setsLabel: "Séries",
@@ -1638,6 +1514,9 @@ const translations: Record<Language, Translations> = {
         newExerciseNameLabel: "Nom du Nouvel Exercice",
         newExerciseNamePlaceholder: "ex. Curl Biceps Personnalisé",
         errorNewExerciseNameRequired: "Veuillez entrer un nom pour le nouvel exercice.",
+        errorSelectedExerciseNotFound: "Exercice sélectionné non trouvé.",
+        errorExerciseDetailsRequired: "Veuillez remplir le nom de l'exercice, les séries et les répétitions.",
+        errorPlanNameRequired: "Le nom du programme est obligatoire.",
     },
     startWorkoutPage: {
       title: "Commencer un Nouvel Entraînement",
@@ -1723,6 +1602,7 @@ const translations: Record<Language, Translations> = {
         enableAllNotificationsAria: "Activer/désactiver toutes les notifications de suppléments",
         enableNotificationAria: "Activer la notification pour {name}",
         disableNotificationAria: "Désactiver la notification pour {name}",
+        // enableNotificationForSupplement: "Activer la notification pour ce supplément" // Supprimé
     }
   }
 };
@@ -1831,5 +1711,3 @@ export function useLanguage() {
   }
   return context;
 }
-
-

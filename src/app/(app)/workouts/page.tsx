@@ -4,15 +4,15 @@
 import { useState, type FormEvent } from 'react';
 import Link from 'next/link';
 import Image from 'next/image'; 
-import { Card, CardContent, CardFooter } from '@/components/ui/card'; 
+import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card'; 
 import { PlusCircle, Edit2, Trash2, Share2, PlayCircle, ListChecks, Ban, Clock } from 'lucide-react';
 import {
   Dialog,
   DialogContent,
-  DialogHeader as UIDialogHeader, // Renamed to avoid conflict with CardHeader if used
+  DialogHeader as UIDialogHeader,
   DialogTitle,
   DialogClose,
-  DialogFooter as UIDialogFooter, // Renamed
+  DialogFooter as UIDialogFooter,
 } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -27,20 +27,27 @@ import { Button } from '@/components/ui/button';
 import { PageHeader } from '@/components/shared/page-header'; 
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
-// Mock data from exercises page for the dropdown
-// In a real app, this would likely come from a shared context, state, or API
 const initialExercisesMockForSelect = [
   { id: '1', name: 'Bench Press' },
   { id: '2', name: 'Squat' },
   { id: '3', name: 'Deadlift' },
   { id: '4', name: 'Overhead Press' },
-  { id: '5', name: 'Running' },
-  // Add more common exercises
+  { id: '5', name: 'Barbell Row' },
   { id: '6', name: 'Bicep Curl' },
   { id: '7', name: 'Tricep Pushdown' },
   { id: '8', name: 'Leg Press' },
   { id: '9', name: 'Lateral Raise' },
   { id: '10', name: 'Plank' },
+  { id: '11', name: 'Pull-up' },
+  { id: '12', name: 'Dip' },
+  { id: '13', name: 'Lunge' },
+  { id: '14', name: 'Calf Raise' },
+  { id: '15', name: 'Running (Cardio)' },
+  { id: '16', name: 'Cycling (Cardio)' },
+  { id: '17', name: 'Dumbbell Shoulder Press'},
+  { id: '18', name: 'Dumbbell Flyes'},
+  { id: '19', name: 'Leg Extension'},
+  { id: '20', name: 'Leg Curl'},
 ];
 const CREATE_NEW_EXERCISE_VALUE = '__create_new__';
 
@@ -231,7 +238,7 @@ export default function WorkoutPlansPage() {
   return (
     <>
       <PageHeader
-        title={t('nav.workoutPlans')} // Using nav key for "Schede"
+        title={t('nav.workoutPlans')}
         actions={
           <Button onClick={() => openDialog()} disabled={!!(activeWorkoutIsClient && activePlanId)}>
             <PlusCircle className="w-4 h-4 mr-2" /> {t('workoutPlansPage.createNewPlanButton')}
@@ -240,13 +247,13 @@ export default function WorkoutPlansPage() {
       />
       {activeWorkoutIsClient && activePlanId && (
           <Card className="mb-6 shadow-md border-destructive bg-destructive/10">
-            <UIDialogHeader className="p-4"> {/* Re-using UIDialogHeader for consistent styling with Dialog headers */}
+            <CardHeader className="p-4">
               <h3 className="text-destructive flex items-center font-semibold"> 
                 <Ban className="w-5 h-5 mr-2" />
                 {t('activeWorkoutPage.workoutInProgressTitle', { default: 'Workout In Progress' })}
               </h3>
-            </UIDialogHeader>
-            <CardContent className="p-4 pt-0"> {/* Adjust padding if header already has it */}
+            </CardHeader>
+            <CardContent className="p-4 pt-0">
               <p className="text-sm text-destructive-foreground mt-2">
                  {t('activeWorkoutPage.finishCurrentWorkoutPrompt', { default: 'You have an active workout. Please finish or abandon it before starting a new one or creating/editing plans.' })}
               </p>
@@ -260,7 +267,7 @@ export default function WorkoutPlansPage() {
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
         {plans.map((plan) => (
           <Card key={plan.id} className="flex flex-col shadow-lg hover:shadow-xl transition-shadow duration-300">
-            <CardContent className="flex-grow p-4 relative"> {/* Added relative for absolute positioning of duration */}
+            <CardContent className="flex-grow p-4 relative">
               <div className="flex flex-col sm:flex-row items-start gap-4">
                 <div className="relative w-full sm:w-36 h-48 flex-shrink-0">
                   <Image 
@@ -284,17 +291,19 @@ export default function WorkoutPlansPage() {
                 <div className="flex-grow flex flex-col">
                   <h3 className="text-xl font-semibold text-primary mb-2">{plan.name}</h3>
                   
-                  <div className="mb-3"> 
-                    <h4 className="text-sm font-semibold text-muted-foreground mb-0.5">
-                        {t('workoutPlansPage.involvedMusclesLabel', { default: "Muscles Involved:"})}
-                    </h4>
-                    {plan.muscleGroups && plan.muscleGroups.length > 0 ? (
-                        <ul className="list-disc list-inside text-xs space-y-0.5 pl-4 text-muted-foreground">
-                            {plan.muscleGroups.map(group => <li key={group}>{t(`exercisesPage.muscleGroup${group.replace(/\s+/g, '')}`, {default: group})}</li>)}
-                        </ul>
-                    ) : (
-                        <p className="text-xs text-muted-foreground">{t('workoutPlansPage.noMuscleGroupsSpecified', {default: 'N/A'})}</p>
-                    )}
+                  <div className="grid grid-cols-1 md:grid-cols-1"> {/* Changed to single column for details */}
+                    <div>
+                        <h4 className="text-sm font-semibold text-muted-foreground mb-0.5">
+                            {t('workoutPlansPage.involvedMusclesLabel', { default: "Muscles Involved:"})}
+                        </h4>
+                        {plan.muscleGroups && plan.muscleGroups.length > 0 ? (
+                            <ul className="list-disc list-inside text-xs space-y-0.5 pl-4 text-muted-foreground">
+                                {plan.muscleGroups.map(group => <li key={group}>{t(`exercisesPage.muscleGroup${group.replace(/\s+/g, '')}`, {default: group})}</li>)}
+                            </ul>
+                        ) : (
+                            <p className="text-xs text-muted-foreground">{t('workoutPlansPage.noMuscleGroupsSpecified', {default: 'N/A'})}</p>
+                        )}
+                    </div>
                   </div>
                 </div>
               </div>
@@ -366,14 +375,12 @@ export default function WorkoutPlansPage() {
                   />
                 </div>
                 
-                <Card className="mt-4">
-                  <UIDialogHeader className="pb-2 p-4 border-b">
-                    <h4 className="text-base flex items-center font-semibold">
-                        <ListChecks className="w-4 h-4 mr-2" />
-                        {t('workoutPlansPage.addExerciseButton')}
-                    </h4>
-                  </UIDialogHeader>
-                  <CardContent className="space-y-3 p-4">
+                <div className="mt-4 border rounded-md p-4">
+                  <h4 className="text-base flex items-center font-semibold mb-3">
+                      <ListChecks className="w-4 h-4 mr-2" />
+                      {t('workoutPlansPage.addExerciseButton')}
+                  </h4>
+                  <div className="space-y-3">
                     <div>
                       <Label htmlFor="selectExercise">{t('workoutPlansPage.exerciseNameLabel')}</Label>
                       <Select 
@@ -421,8 +428,8 @@ export default function WorkoutPlansPage() {
                         <PlusCircle className="w-4 h-4 mr-2" /> {t('workoutPlansPage.addThisExerciseButton')}
                         </Button>
                     </div>
-                  </CardContent>
-                </Card>
+                  </div>
+                </div>
 
                 {currentPlan.exerciseDetails && currentPlan.exerciseDetails.length > 0 && (
                   <div className="mt-4 space-y-2">
@@ -458,5 +465,3 @@ export default function WorkoutPlansPage() {
     </>
   );
 }
-
-    
