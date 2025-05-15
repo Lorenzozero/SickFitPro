@@ -12,12 +12,7 @@ export interface NavItem {
 }
 
 export const navItems: NavItem[] = [
-  {
-    titleKey: 'nav.home',
-    href: '/',
-    icon: LayoutDashboard,
-  },
-  // Voce Esercizi rimossa
+  // Voce Home rimossa
   {
     titleKey: 'nav.workoutPlans', // "Schede"
     href: '/workouts',
@@ -39,3 +34,4 @@ export const navItems: NavItem[] = [
     icon: Utensils,
   },
 ];
+

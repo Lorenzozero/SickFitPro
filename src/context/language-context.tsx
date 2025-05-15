@@ -16,8 +16,7 @@ interface Translations {
 const translations: Record<Language, Translations> = {
   en: {
     nav: {
-      home: 'Home',
-      // exercises: 'Exercises', // Removed
+      // home: 'Home', // Removed
       workoutPlans: 'Workout Plans',
       calendar: 'Calendar',
       progress: 'Progress',
@@ -74,6 +73,8 @@ const translations: Record<Language, Translations> = {
       reminderHourly: "Hourly",
       hydrationReminderSettingsAriaLabel: "Hydration Reminder Settings",
       hydrationReminderTooltip: "Set hydration reminder",
+      settingsIconAriaLabel: "Water Goal Settings",
+      settingsIconTooltip: "Set your daily water goal",
     },
     macroTrackingCard: {
         title: "Macro Tracking",
@@ -96,15 +97,12 @@ const translations: Record<Language, Translations> = {
         weeklyTab: "Weekly",
         monthlyTab: "Monthly",
         weekLabel: "Week {weekNum}",
-        macroReminderSettingsAriaLabel: "Macro reminder settings",
-        macroReminderTooltip: "Set macro logging reminder",
         goalSettingsButtonAriaLabel: "Macro Goal Settings", 
         goalSettingsTooltip: "Set weekly macro goals", 
     },
     aiHealthAdvisor: {
         cardTitle: "AI Health Advisor",
         dataUsageInfo: "Your stored macro goals, water intake goal, body measurements, and training summary will be automatically used by the AI to provide personalized advice. You can also ask a specific question below.",
-        userQueryLabel: "Your Specific Question (Optional)",
         userQueryPlaceholder: "e.g., How can I improve my sleep? or What are some good exercises for lower back pain?",
         userQueryDescription: "Ask a specific question or leave blank for general advice based on your data.",
         userQueryMinError: "If asking a question, please provide at least 10 characters.",
@@ -212,7 +210,48 @@ const translations: Record<Language, Translations> = {
         errorSelectDayAndPlan: "Please select a day and a workout plan.",
         errorPlanNotFound: "Selected plan not found.",
     },
-    // exercisesPage translations removed
+    exercisesPage: {
+      // title: "Exercise Library", // Removed
+      // description: "Browse and manage your custom exercises.", // Removed
+      // createNewExerciseButton: "Create New Exercise", // Removed
+      // muscleGroupFilterLabel: "Filter by Muscle Group", // Removed
+      // allMuscleGroups: "All Muscle Groups", // Removed
+      // searchPlaceholder: "Search exercises...", // Removed
+      // dialogEditTitle: "Edit Exercise", // Removed
+      // dialogCreateTitle: "Create New Exercise", // Removed
+      // exerciseNameLabel: "Exercise Name", // Removed
+      // muscleGroupLabel: "Main Muscle Group", // Removed
+      // selectMuscleGroupPlaceholder: "Select muscle group", // Removed
+      // equipmentLabel: "Equipment (optional)", // Removed
+      // instructionsLabel: "Instructions (optional)", // Removed
+      // gifUrlLabel: "GIF URL (optional)", // Removed
+      // cancelButton: "Cancel", // Removed
+      // saveExerciseButton: "Save Exercise", // Removed
+      // toastExerciseUpdatedTitle: "Exercise Updated", // Removed
+      // toastExerciseUpdatedDescription: "\"{exerciseName}\" has been updated.", // Removed
+      // toastExerciseCreatedTitle: "Exercise Created", // Removed
+      // toastExerciseCreatedDescription: "\"{exerciseName}\" has been created.", // Removed
+      // toastExerciseDeletedTitle: "Exercise Deleted", // Removed
+      // toastExerciseDeletedDescription: "\"{exerciseName}\" has been deleted.", // Removed
+      // tableHeaderName: "Name", // Removed
+      // tableHeaderMuscleGroup: "Muscle Group", // Removed
+      // tableHeaderEquipment: "Equipment", // Removed
+      // tableHeaderActions: "Actions", // Removed
+      // muscleGroupChest: "Chest", // Removed
+      // muscleGroupBack: "Back", // Removed
+      // muscleGroupLegs: "Legs", // Removed
+      // muscleGroupShoulders: "Shoulders", // Removed
+      // muscleGroupBiceps: "Biceps", // Removed
+      // muscleGroupTriceps: "Triceps", // Removed
+      // muscleGroupAbs: "Abs", // Removed
+      // muscleGroupCore: "Core", // Removed
+      // muscleGroupCardio: "Cardio", // Removed
+      // muscleGroupFullBody: "Full Body", // Removed
+      // muscleGroupUpperBody: "Upper Body", // Removed
+      // muscleGroupLowerBody: "Lower Body", // Removed
+      // errorExerciseNameRequired: "Exercise name is required.", // Removed
+      // errorMuscleGroupRequired: "Muscle group is required.", // Removed
+    },
     progressPage: {
         title: "Progress Tracking",
         description: "Visualize your fitness journey and celebrate your achievements.",
@@ -282,17 +321,16 @@ const translations: Record<Language, Translations> = {
     },
     workoutPlansPage: {
         title: "Workout Plans",
-        description: "Create, manage, and share your training programs.",
+        // description: "Create, manage, and share your training programs.", // Removed
         createNewPlanButton: "Create New Plan",
-        // exercisesLabel: "Exercises", // No longer directly used in card display
         involvedMusclesLabel: "Muscles Involved:",
+        // estDurationLabel: "Est. Duration:", // Removed
+        // exercisesLabel: "Exercises", // Removed
         startButton: "Start",
         dialogEditTitle: "Edit Workout Plan",
-        // dialogEditDescription: "Update the details of your workout plan.", // Removed
         dialogCreateTitle: "Create New Workout Plan",
-        // dialogCreateDescription: "Design your new workout plan.", // Removed
         planNameLabel: "Plan Name",
-        descriptionLabel: "Description", // Added for dialog
+        descriptionLabel: "Description", 
         planDurationLabel: "Est. Duration (e.g., 60 min)",
         exerciseNameLabel: "Exercise",
         setsLabel: "Sets",
@@ -413,13 +451,11 @@ const translations: Record<Language, Translations> = {
         enableAllNotificationsAria: "Toggle all supplement notifications",
         enableNotificationAria: "Enable notification for {name}",
         disableNotificationAria: "Disable notification for {name}",
-        // enableNotificationForSupplement: "Enable notification for this supplement" // Removed due to UI change
     }
   },
   it: {
     nav: {
-      home: 'Home', 
-      // exercises: 'Esercizi', // Rimosso
+      // home: 'Home', // Rimosso
       workoutPlans: 'Schede', 
       calendar: 'Calendario',
       progress: 'Progressi',
@@ -476,6 +512,8 @@ const translations: Record<Language, Translations> = {
       reminderHourly: "Ogni ora",
       hydrationReminderSettingsAriaLabel: "Impostazioni Promemoria Idratazione",
       hydrationReminderTooltip: "Imposta promemoria idratazione",
+      settingsIconAriaLabel: "Impostazioni Obiettivo Idrico",
+      settingsIconTooltip: "Imposta il tuo obiettivo idrico giornaliero",
     },
     macroTrackingCard: {
         title: "Monitoraggio Macro",
@@ -498,15 +536,12 @@ const translations: Record<Language, Translations> = {
         weeklyTab: "Settimanale",
         monthlyTab: "Mensile",
         weekLabel: "Sett. {weekNum}",
-        macroReminderSettingsAriaLabel: "Impostazioni promemoria macro",
-        macroReminderTooltip: "Imposta promemoria monitoraggio macro",
         goalSettingsButtonAriaLabel: "Impostazioni Obiettivi Macro", 
         goalSettingsTooltip: "Imposta gli obiettivi macro settimanali", 
     },
      aiHealthAdvisor: {
         cardTitle: "Consulente Salute AI",
         dataUsageInfo: "I tuoi obiettivi macro, l'obiettivo di assunzione di acqua, le misurazioni corporee e il riepilogo degli allenamenti memorizzati verranno utilizzati automaticamente dall'AI per fornire consigli più personalizzati. Puoi anche porre una domanda specifica qui sotto.",
-        userQueryLabel: "La Tua Domanda Specifica (Opzionale)",
         userQueryPlaceholder: "es. Come posso migliorare il sonno? o Quali sono degli esercizi per il mal di schiena?",
         userQueryDescription: "Poni una domanda specifica o lascia vuoto per consigli generali basati sui tuoi dati.",
         userQueryMinError: "Se poni una domanda, fornisci almeno 10 caratteri.",
@@ -614,7 +649,9 @@ const translations: Record<Language, Translations> = {
         errorSelectDayAndPlan: "Seleziona un giorno e una scheda di allenamento.",
         errorPlanNotFound: "Scheda selezionata non trovata.",
     },
-    // exercisesPage translations removed
+    exercisesPage: {
+      // Contenuto rimosso
+    },
     progressPage: {
         title: "Monitoraggio Progressi",
         description: "Visualizza il tuo percorso di fitness e celebra i tuoi traguardi.",
@@ -684,17 +721,16 @@ const translations: Record<Language, Translations> = {
     },
      workoutPlansPage: {
         title: "Schede Allenamento",
-        description: "Crea, gestisci e condividi i tuoi programmi di allenamento.",
+        // description: "Crea, gestisci e condividi i tuoi programmi di allenamento.", // Rimosso
         createNewPlanButton: "Crea Nuova Scheda",
-        // exercisesLabel: "Esercizi", // Non più usato direttamente nella card
         involvedMusclesLabel: "Muscoli Coinvolti:",
+        // estDurationLabel: "Durata Stima:", // Rimosso
+        // exercisesLabel: "Esercizi:", // Rimosso
         startButton: "Inizia",
         dialogEditTitle: "Modifica Scheda Allenamento",
-        // dialogEditDescription: "Aggiorna i dettagli della tua scheda di allenamento.", // Rimosso
         dialogCreateTitle: "Crea Nuova Scheda Allenamento",
-        // dialogCreateDescription: "Progetta la tua nuova scheda di allenamento.", // Rimosso
         planNameLabel: "Nome Scheda",
-        descriptionLabel: "Descrizione", // Aggiunto per il dialogo
+        descriptionLabel: "Descrizione", 
         planDurationLabel: "Durata Stima (es. 60 min)",
         exerciseNameLabel: "Esercizio",
         setsLabel: "Serie",
@@ -814,13 +850,11 @@ const translations: Record<Language, Translations> = {
         enableAllNotificationsAria: "Attiva/disattiva tutte le notifiche degli integratori",
         enableNotificationAria: "Abilita notifica per {name}",
         disableNotificationAria: "Disabilita notifica per {name}",
-        // enableNotificationForSupplement: "Abilita notifica per questo integratore" // Rimosso
     }
   },
   es: { 
     nav: {
-      home: 'Inicio',
-      // exercises: 'Ejercicios', // Eliminado
+      // home: 'Inicio', // Eliminado
       workoutPlans: 'Planes de Entrenamiento',
       calendar: 'Calendario',
       progress: 'Progreso',
@@ -918,6 +952,8 @@ const translations: Record<Language, Translations> = {
       tooltipAddAmount: "+{amount}ml",
       hydrationReminderSettingsAriaLabel: "Configuración de Recordatorio de Hidratación",
       hydrationReminderTooltip: "Establecer recordatorio de hidratación",
+      settingsIconAriaLabel: "Configuración de Meta de Agua",
+      settingsIconTooltip: "Establece tu meta diaria de consumo de agua",
     },
     macroTrackingCard: {
         title: "Seguimiento de Macros",
@@ -940,15 +976,12 @@ const translations: Record<Language, Translations> = {
         weeklyTab: "Semanal",
         monthlyTab: "Mensual",
         weekLabel: "Semana {weekNum}",
-        macroReminderSettingsAriaLabel: "Configuración de recordatorio de macros",
-        macroReminderTooltip: "Establecer recordatorio de registro de macros",
         goalSettingsButtonAriaLabel: "Configuración de Metas de Macros",
         goalSettingsTooltip: "Establecer metas semanales de macronutrientes",
     },
     aiHealthAdvisor: {
         cardTitle: "Asesor de Salud IA",
         dataUsageInfo: "Tus metas de macronutrientes, meta de ingesta de agua, mediciones corporales y resumen de entrenamiento almacenados se utilizarán automáticamente por la IA para proporcionar consejos más personalizados. También puedes hacer una pregunta específica a continuación.",
-        userQueryLabel: "Tu Pregunta Específica (Opcional)",
         userQueryPlaceholder: "Ej: ¿Cómo puedo mejorar mi sueño? o ¿Cuáles son buenos ejercicios para el dolor lumbar?",
         userQueryDescription: "Haz una pregunta específica o déjalo en blanco para obtener consejos generales basados en tus datos.",
         userQueryMinError: "Si haces una pregunta, proporciona al menos 10 caracteres.",
@@ -1015,7 +1048,9 @@ const translations: Record<Language, Translations> = {
         samplePlan4: "Sesión de Cardio",
         loadingCalendar: "Cargando calendario...",
     },
-    // exercisesPage translations removed
+    exercisesPage: {
+        // Contenido eliminado
+    },
     progressPage: {
         title: "Seguimiento de Progreso",
         description: "Visualiza tu viaje de fitness y celebra tus logros.",
@@ -1084,17 +1119,16 @@ const translations: Record<Language, Translations> = {
     },
     workoutPlansPage: {
         title: "Planes de Entrenamiento",
-        description: "Crea, gestiona y comparte tus programas de entrenamiento.",
+        // description: "Crea, gestiona y comparte tus programas de entrenamiento.", // Eliminado
         createNewPlanButton: "Crear Nuevo Plan",
-        // exercisesLabel: "Ejercicios", // Ya no se usa directamente en la visualización de la tarjeta
         involvedMusclesLabel: "Músculos Involucrados:",
+        // estDurationLabel: "Duración Est.:", // Eliminado
+        // exercisesLabel: "Ejercicios:", // Eliminado
         startButton: "Empezar",
         dialogEditTitle: "Editar Plan de Entrenamiento",
-        // dialogEditDescription: "Actualiza los detalles de tu plan de entrenamiento.", // Eliminado
         dialogCreateTitle: "Crear Nuevo Plan de Entrenamiento",
-        // dialogCreateDescription: "Diseña tu nuevo plan de entrenamiento.", // Eliminado
         planNameLabel: "Nombre del Plan",
-        descriptionLabel: "Descripción", // Añadido para el diálogo
+        descriptionLabel: "Descripción", 
         planDurationLabel: "Duración Est. (ej. 60 min)",
         exerciseNameLabel: "Ejercicio",
         setsLabel: "Series",
@@ -1208,13 +1242,11 @@ const translations: Record<Language, Translations> = {
         enableAllNotificationsAria: "Activar/desactivar todas las notificaciones de suplementos",
         enableNotificationAria: "Habilitar notificación para {name}",
         disableNotificationAria: "Deshabilitar notificación para {name}",
-        // enableNotificationForSupplement: "Habilitar notificación para este suplemento" // Eliminado
     }
   },
   fr: { 
     nav: {
-      home: 'Accueil',
-      // exercises: 'Exercices', // Supprimé
+      // home: 'Accueil', // Supprimé
       workoutPlans: 'Programmes',
       calendar: 'Calendrier',
       progress: 'Progrès',
@@ -1312,6 +1344,8 @@ const translations: Record<Language, Translations> = {
       tooltipAddAmount: "+{amount}ml",
       hydrationReminderSettingsAriaLabel: "Paramètres du Rappel d'Hydratation",
       hydrationReminderTooltip: "Définir le rappel d'hydratation",
+      settingsIconAriaLabel: "Paramètres de l'Objectif d'Eau",
+      settingsIconTooltip: "Définissez votre objectif quotidien d'apport en eau",
     },
     macroTrackingCard: {
         title: "Suivi des Macros",
@@ -1334,15 +1368,12 @@ const translations: Record<Language, Translations> = {
         weeklyTab: "Hebdomadaire",
         monthlyTab: "Mensuel",
         weekLabel: "Sem. {weekNum}",
-        macroReminderSettingsAriaLabel: "Paramètres de rappel des macros",
-        macroReminderTooltip: "Définir le rappel de suivi des macros",
         goalSettingsButtonAriaLabel: "Paramètres des Objectifs Macros",
         goalSettingsTooltip: "Définir les objectifs macros hebdomadaires",
     },
      aiHealthAdvisor: {
         cardTitle: "Conseiller Santé IA",
         dataUsageInfo: "Vos objectifs macro, votre objectif d'apport en eau, vos mesures corporelles et votre résumé d'entraînement stockés seront automatiquement utilisés par l'IA pour fournir des conseils plus personnalisés. Vous pouvez également poser une question spécifique ci-dessous.",
-        userQueryLabel: "Votre Question Spécifique (Optionnel)",
         userQueryPlaceholder: "Ex: Comment puis-je améliorer mon sommeil ? ou Quels sont les bons exercices pour le mal de dos ?",
         userQueryDescription: "Posez une question spécifique ou laissez vide pour des conseils généraux basés sur vos données.",
         userQueryMinError: "Si vous posez une question, veuillez fournir au moins 10 caractères.",
@@ -1409,7 +1440,9 @@ const translations: Record<Language, Translations> = {
         samplePlan4: "Séance Cardio",
         loadingCalendar: "Chargement du calendrier...",
     },
-    // exercisesPage translations removed
+    exercisesPage: {
+      // Contenu supprimé
+    },
     progressPage: {
         title: "Suivi des Progrès",
         description: "Visualisez votre parcours de fitness et célébrez vos accomplissements.",
@@ -1478,17 +1511,16 @@ const translations: Record<Language, Translations> = {
     },
     workoutPlansPage: {
         title: "Programmes d'Entraînement",
-        description: "Créez, gérez et partagez vos programmes d'entraînement.",
+        // description: "Créez, gérez et partagez vos programmes d'entraînement.", // Supprimé
         createNewPlanButton: "Créer un Nouveau Programme",
-        // exercisesLabel: "Exercices", // Plus utilisé directement dans l'affichage de la carte
         involvedMusclesLabel: "Muscles Impliqués :",
+        // estDurationLabel: "Durée Est.:", // Supprimé
+        // exercisesLabel: "Exercices :", // Supprimé
         startButton: "Commencer",
         dialogEditTitle: "Modifier le Programme d'Entraînement",
-        // dialogEditDescription: "Mettez à jour les détails de votre programme d'entraînement.", // Supprimé
         dialogCreateTitle: "Créer un Nouveau Programme d'Entraînement",
-        // dialogCreateDescription: "Concevez votre nouveau programme d'entraînement.", // Supprimé
         planNameLabel: "Nom du Programme",
-        descriptionLabel: "Description", // Ajouté pour le dialogue
+        descriptionLabel: "Description", 
         planDurationLabel: "Durée Est. (ex. 60 min)",
         exerciseNameLabel: "Exercice",
         setsLabel: "Séries",
@@ -1602,7 +1634,6 @@ const translations: Record<Language, Translations> = {
         enableAllNotificationsAria: "Activer/désactiver toutes les notifications de suppléments",
         enableNotificationAria: "Activer la notification pour {name}",
         disableNotificationAria: "Désactiver la notification pour {name}",
-        // enableNotificationForSupplement: "Activer la notification pour ce supplément" // Supprimé
     }
   }
 };
@@ -1711,3 +1742,4 @@ export function useLanguage() {
   }
   return context;
 }
+
