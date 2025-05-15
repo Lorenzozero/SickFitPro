@@ -25,7 +25,6 @@ import {
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { useLanguage } from '@/context/language-context';
 import { useToast } from '@/hooks/use-toast';
-// import { MuscleGroupIcons } from '@/components/shared/muscle-group-icons'; // Rimosso import
 import { useWeeklySchedule, type ScheduledWorkout, type WorkoutPlanOption, dayKeys } from '@/context/weekly-schedule-context';
 
 interface DayScheduleContentProps {
@@ -61,7 +60,6 @@ const DayScheduleContent: React.FC<DayScheduleContentProps> = ({
                     <Trash2 className="h-3 w-3" />
                   </Button>
                 </div>
-                {/* {planDetails && <MuscleGroupIcons muscleGroups={planDetails.muscleGroups} className="mt-0.5" iconClassName="w-2.5 h-2.5" />} Removed MuscleGroupIcons */}
               </li>
             );
           })
