@@ -4,12 +4,11 @@
 import { useState, type FormEvent } from 'react';
 import Link from 'next/link';
 import Image from 'next/image'; 
-import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card'; 
+import { Card, CardContent, CardFooter } from '@/components/ui/card'; 
 import { PlusCircle, Edit2, Trash2, Share2, PlayCircle, ListChecks, Ban, Clock } from 'lucide-react';
 import {
   Dialog,
   DialogContent,
-  DialogDescription,
   DialogHeader as UIDialogHeader, 
   DialogTitle,
   DialogClose,
@@ -205,12 +204,12 @@ export default function WorkoutPlansPage() {
       />
       {activeWorkoutIsClient && activePlanId && (
           <Card className="mb-6 shadow-md border-destructive bg-destructive/10">
-            <CardHeader className="p-4"> 
+            <UIDialogHeader className="pb-2 p-4"> 
               <h3 className="text-destructive flex items-center font-semibold"> 
                 <Ban className="w-5 h-5 mr-2" />
                 {t('activeWorkoutPage.workoutInProgressTitle', { default: 'Workout In Progress' })}
               </h3>
-            </CardHeader>
+            </UIDialogHeader>
             <CardContent>
               <p className="text-sm text-destructive-foreground">
                  {t('activeWorkoutPage.finishCurrentWorkoutPrompt', { default: 'You have an active workout. Please finish or abandon it before starting a new one or creating/editing plans.' })}
@@ -249,23 +248,22 @@ export default function WorkoutPlansPage() {
                 <div className="flex-grow flex flex-col">
                   <h3 className="text-xl font-semibold text-primary mb-2">{plan.name}</h3>
                   
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-x-4 gap-y-1 mb-3">
-                    <div>
-                      <h4 className="text-sm font-semibold text-muted-foreground mb-0.5">
-                          {t('workoutPlansPage.involvedMusclesLabel', { default: "Muscles Involved:"})}
-                      </h4>
-                      {plan.muscleGroups && plan.muscleGroups.length > 0 ? (
-                          <ul className="list-disc list-inside text-xs space-y-0.5 pl-4 text-muted-foreground">
-                              {plan.muscleGroups.map(group => <li key={group}>{t(`exercisesPage.muscleGroup${group.replace(/\s+/g, '')}`, {default: group})}</li>)}
-                          </ul>
-                      ) : (
-                          <p className="text-xs text-muted-foreground">{t('workoutPlansPage.noMuscleGroupsSpecified', {default: 'N/A'})}</p>
-                      )}
-                    </div>
+                  <div className="mb-3"> 
+                    <h4 className="text-sm font-semibold text-muted-foreground mb-0.5">
+                        {t('workoutPlansPage.involvedMusclesLabel', { default: "Muscles Involved:"})}
+                    </h4>
+                    {plan.muscleGroups && plan.muscleGroups.length > 0 ? (
+                        <ul className="list-disc list-inside text-xs space-y-0.5 pl-4 text-muted-foreground">
+                            {plan.muscleGroups.map(group => <li key={group}>{t(`exercisesPage.muscleGroup${group.replace(/\s+/g, '')}`, {default: group})}</li>)}
+                        </ul>
+                    ) : (
+                        <p className="text-xs text-muted-foreground">{t('workoutPlansPage.noMuscleGroupsSpecified', {default: 'N/A'})}</p>
+                    )}
                   </div>
-                  <div className="mt-auto ml-auto flex items-center text-sm text-muted-foreground pt-2">
-                      <Clock className="w-3.5 h-3.5 mr-1.5 shrink-0" /> 
-                      <span>{plan.duration}</span>
+
+                  <div className="mt-auto ml-auto flex items-center text-sm text-muted-foreground pt-2"> 
+                    <Clock className="w-3.5 h-3.5 mr-1.5 shrink-0" /> 
+                    <span>{plan.duration}</span>
                   </div>
                 </div>
               </div>
@@ -300,9 +298,7 @@ export default function WorkoutPlansPage() {
         <DialogContent className="sm:max-w-lg">
           <UIDialogHeader> 
             <DialogTitle>{currentPlan?.id ? t('workoutPlansPage.dialogEditTitle') : t('workoutPlansPage.dialogCreateTitle')}</DialogTitle>
-            <DialogDescription>
-              {currentPlan?.id ? t('workoutPlansPage.dialogEditDescription') : t('workoutPlansPage.dialogCreateDescription')}
-            </DialogDescription>
+            
           </UIDialogHeader>
           <form onSubmit={handleSavePlan}>
             <ScrollArea className="max-h-[calc(100vh-20rem)]">
