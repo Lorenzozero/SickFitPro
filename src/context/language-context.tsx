@@ -20,6 +20,7 @@ const translations: Record<Language, Translations> = {
       calendar: 'Calendar',
       progress: 'Progress',
       diet: 'Diet',
+      home: 'Home',
     },
     userDropdown: {
       myAccount: 'My Account',
@@ -29,6 +30,7 @@ const translations: Record<Language, Translations> = {
     header: {
       toggleTheme: 'Toggle theme',
       openMenu: 'Open menu',
+      mobileNavTitle: 'Navigation Menu', // Added
     },
     dashboard: {
       welcomeTitle: 'Welcome to SickFit Pro!',
@@ -201,7 +203,7 @@ const translations: Record<Language, Translations> = {
         errorSelectDayAndPlan: "Please select a day and a workout plan.",
         errorPlanNotFound: "Selected plan not found.",
     },
-    exercisesPage: { // Anche se la pagina è rimossa, le chiavi per i gruppi muscolari sono ancora utili
+    exercisesPage: { 
       muscleGroupChest: "Chest",
       muscleGroupBack: "Back",
       muscleGroupLegs: "Legs",
@@ -320,7 +322,7 @@ const translations: Record<Language, Translations> = {
         errorSelectedExerciseNotFound: "Selected exercise not found.",
         errorExerciseDetailsRequired: "Please fill in exercise name, sets, and reps.",
         errorPlanNameRequired: "Plan name is required.",
-        muscleGroupsLabel: "Muscle Groups", // Nuova chiave
+        muscleGroupsLabel: "Muscle Groups", 
     },
      startWorkoutPage: {
       title: "Start New Workout",
@@ -421,6 +423,7 @@ const translations: Record<Language, Translations> = {
       calendar: 'Calendario',
       progress: 'Progressi',
       diet: 'Dieta',
+      home: 'Home',
     },
     userDropdown: {
       myAccount: 'Il Mio Account',
@@ -430,6 +433,7 @@ const translations: Record<Language, Translations> = {
     header: {
       toggleTheme: 'Cambia tema',
       openMenu: 'Apri menu',
+      mobileNavTitle: 'Menu Navigazione', // Added
     },
     dashboard: {
       welcomeTitle: 'Benvenuto in SickFit Pro!',
@@ -602,7 +606,7 @@ const translations: Record<Language, Translations> = {
         errorSelectDayAndPlan: "Seleziona un giorno e una scheda di allenamento.",
         errorPlanNotFound: "Scheda selezionata non trovata.",
     },
-     exercisesPage: { // Anche se la pagina è rimossa, le chiavi per i gruppi muscolari sono ancora utili
+     exercisesPage: { 
       muscleGroupChest: "Petto",
       muscleGroupBack: "Schiena",
       muscleGroupLegs: "Gambe",
@@ -721,7 +725,7 @@ const translations: Record<Language, Translations> = {
         errorSelectedExerciseNotFound: "Esercizio selezionato non trovato.",
         errorExerciseDetailsRequired: "Compila nome esercizio, serie e ripetizioni.",
         errorPlanNameRequired: "Il nome della scheda è obbligatorio.",
-        muscleGroupsLabel: "Gruppi Muscolari", // Nuova chiave
+        muscleGroupsLabel: "Gruppi Muscolari", 
     },
     startWorkoutPage: {
       title: "Inizia Nuovo Allenamento",
@@ -821,6 +825,7 @@ const translations: Record<Language, Translations> = {
       calendar: 'Calendario',
       progress: 'Progreso',
       diet: 'Dieta',
+      home: 'Inicio',
     },
     userDropdown: {
         myAccount: 'Mi Cuenta',
@@ -830,6 +835,7 @@ const translations: Record<Language, Translations> = {
     header: {
         toggleTheme: 'Cambiar tema',
         openMenu: 'Abrir menú',
+        mobileNavTitle: 'Menú de Navegación', // Added
     },
      dashboard: {
       welcomeTitle: '¡Bienvenido a SickFit Pro!',
@@ -1121,7 +1127,7 @@ const translations: Record<Language, Translations> = {
         errorSelectedExerciseNotFound: "Ejercicio seleccionado no encontrado.",
         errorExerciseDetailsRequired: "Por favor, completa el nombre del ejercicio, series y repeticiones.",
         errorPlanNameRequired: "El nombre del plan es obligatorio.",
-        muscleGroupsLabel: "Grupos Musculares", // Nuova chiave
+        muscleGroupsLabel: "Grupos Musculares", 
     },
     startWorkoutPage: {
       title: "Empezar Nuevo Entrenamiento",
@@ -1215,6 +1221,7 @@ const translations: Record<Language, Translations> = {
       calendar: 'Calendrier',
       progress: 'Progrès',
       diet: 'Diète',
+      home: 'Accueil',
     },
     userDropdown: {
         myAccount: 'Mon Compte',
@@ -1224,6 +1231,7 @@ const translations: Record<Language, Translations> = {
     header: {
         toggleTheme: 'Changer de thème',
         openMenu: 'Ouvrir le menu',
+        mobileNavTitle: 'Menu de Navigation', // Added
     },
      dashboard: {
       welcomeTitle: 'Bienvenue sur SickFit Pro !',
@@ -1515,7 +1523,7 @@ const translations: Record<Language, Translations> = {
         errorSelectedExerciseNotFound: "Exercice sélectionné non trouvé.",
         errorExerciseDetailsRequired: "Veuillez remplir le nom de l'exercice, les séries et les répétitions.",
         errorPlanNameRequired: "Le nom du programme est obligatoire.",
-        muscleGroupsLabel: "Groupes Musculaires", // Nuova chiave
+        muscleGroupsLabel: "Groupes Musculaires", 
     },
     startWorkoutPage: {
       title: "Commencer un Nouvel Entraînement",

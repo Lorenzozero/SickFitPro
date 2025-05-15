@@ -19,7 +19,7 @@ import {
 import { useTheme } from '@/components/theme-provider';
 import { useLanguage } from '@/context/language-context';
 import ResumeWorkoutButton from '@/components/shared/resume-workout-button';
-import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
+import { Sheet, SheetContent, SheetTrigger, SheetTitle } from '@/components/ui/sheet'; // Added SheetTitle
 
 export default function AppLayout({ children }: { children: ReactNode }) {
   const { setTheme, resolvedTheme } = useTheme();
@@ -45,7 +45,6 @@ export default function AppLayout({ children }: { children: ReactNode }) {
             <span>{isClient ? t('userDropdown.settings') : 'Settings'}</span>
           </Link>
         </DropdownMenuItem>
-        {/* Removed Theme Submenu */}
         <DropdownMenuSeparator />
         <DropdownMenuItem>
           <LogOut className="w-4 h-4 mr-2" />
@@ -93,6 +92,7 @@ export default function AppLayout({ children }: { children: ReactNode }) {
                 </Button>
               </SheetTrigger>
               <SheetContent side="left" className="w-[300px] sm:w-[340px] p-0 flex flex-col">
+                 <SheetTitle className="sr-only">{isClient ? t('header.mobileNavTitle', { default: 'Navigation Menu' }) : 'Navigation Menu'}</SheetTitle>
                  <div className="p-6 border-b">
                     <Link href="/" className="block group" aria-label={isClient ? t('nav.home', { default: "Home"}) : 'Home'}>
                       <Logo />
@@ -131,7 +131,7 @@ export default function AppLayout({ children }: { children: ReactNode }) {
         </div>
       </header>
 
-      <main className="flex-1 p-4 md:p-6 text-center"> {/* Applied text-center here */}
+      <main className="flex-1 p-4 md:p-6 text-center">
         {children}
       </main>
       <ResumeWorkoutButton />
