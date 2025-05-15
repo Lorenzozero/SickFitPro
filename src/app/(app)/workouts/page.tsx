@@ -4,16 +4,15 @@
 import { useState, type FormEvent } from 'react';
 import Link from 'next/link';
 import Image from 'next/image'; 
-import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card'; 
+import { Card, CardContent, CardFooter } from '@/components/ui/card'; 
 import { PlusCircle, Edit2, Trash2, Share2, PlayCircle, ListChecks, Ban, Clock } from 'lucide-react';
 import {
   Dialog,
   DialogContent,
   DialogHeader as UIDialogHeader, 
   DialogTitle,
-  DialogDescription,
   DialogClose,
-  DialogFooter as UIDialogFooter, // Renamed to avoid conflict if DialogFooter is also imported
+  DialogFooter as UIDialogFooter,
 } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -26,6 +25,17 @@ import { useRouter } from 'next/navigation';
 import type { MuscleGroup } from '@/components/shared/muscle-group-icons'; 
 import { Button } from '@/components/ui/button';
 import { PageHeader } from '@/components/shared/page-header'; 
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+
+// Mock data from exercises page for the dropdown
+const initialExercisesMockForSelect = [
+  { id: '1', name: 'Bench Press' },
+  { id: '2', name: 'Squat' },
+  { id: '3', name: 'Deadlift' },
+  { id: '4', name: 'Overhead Press' },
+  { id: '5', name: 'Running' },
+];
+const CREATE_NEW_EXERCISE_VALUE = '__create_new__';
 
 interface ExerciseDetail {
   id: string;
@@ -85,7 +95,8 @@ export default function WorkoutPlansPage() {
   
   const [currentPlan, setCurrentPlan] = useState<Partial<WorkoutPlan> & { exerciseDetails: ExerciseDetail[], muscleGroups?: MuscleGroup[] }>({ name: '', description: '', exerciseDetails: [], duration: 'N/A', muscleGroups: [] });
   
-  const [newExerciseName, setNewExerciseName] = useState('');
+  const [selectedExerciseIdOrAction, setSelectedExerciseIdOrAction] = useState<string>('');
+  const [newExerciseManualName, setNewExerciseManualName] = useState('');
   const [newExerciseSets, setNewExerciseSets] = useState('');
   const [newExerciseReps, setNewExerciseReps] = useState('');
 
@@ -97,28 +108,51 @@ export default function WorkoutPlansPage() {
     } else {
       setCurrentPlan({ name: '', description: '', exerciseDetails: [], duration: 'N/A', muscleGroups: [] });
     }
-    setNewExerciseName('');
+    setSelectedExerciseIdOrAction(initialExercisesMockForSelect[0]?.id || '');
+    setNewExerciseManualName('');
     setNewExerciseSets('');
     setNewExerciseReps('');
     setIsDialogOpen(true);
   };
 
   const handleAddExerciseToCurrentPlan = () => {
-    if (!newExerciseName.trim() || !newExerciseSets.trim() || !newExerciseReps.trim()) {
+    let exerciseNameToAdd = '';
+
+    if (selectedExerciseIdOrAction === CREATE_NEW_EXERCISE_VALUE) {
+      if (!newExerciseManualName.trim()) {
+        toast({ title: t('toastErrorTitle'), description: t('workoutPlansPage.errorNewExerciseNameRequired', { default: "Please enter a name for the new exercise." }), variant: "destructive" });
+        return;
+      }
+      exerciseNameToAdd = newExerciseManualName.trim();
+    } else {
+      const selectedExercise = initialExercisesMockForSelect.find(ex => ex.id === selectedExerciseIdOrAction);
+      if (!selectedExercise) {
+         toast({ title: t('toastErrorTitle'), description: "Selected exercise not found.", variant: "destructive" });
+        return;
+      }
+      exerciseNameToAdd = selectedExercise.name;
+    }
+
+    if (!exerciseNameToAdd || !newExerciseSets.trim() || !newExerciseReps.trim()) {
       toast({ title: t('toastErrorTitle'), description: "Please fill in exercise name, sets, and reps.", variant: "destructive" });
       return;
     }
-    const newExercise: ExerciseDetail = {
+
+    const newExerciseDetail: ExerciseDetail = {
       id: String(Date.now()), 
-      name: newExerciseName,
+      name: exerciseNameToAdd,
       sets: newExerciseSets,
       reps: newExerciseReps,
     };
+
     setCurrentPlan(prev => ({
       ...prev,
-      exerciseDetails: [...(prev.exerciseDetails || []), newExercise]
+      exerciseDetails: [...(prev.exerciseDetails || []), newExerciseDetail]
     }));
-    setNewExerciseName('');
+
+    // Reset fields for next exercise addition
+    setSelectedExerciseIdOrAction(initialExercisesMockForSelect[0]?.id || '');
+    setNewExerciseManualName('');
     setNewExerciseSets('');
     setNewExerciseReps('');
   };
@@ -191,7 +225,7 @@ export default function WorkoutPlansPage() {
   return (
     <>
       <PageHeader
-        title={t('nav.workoutPlans')} 
+        title={t('nav.workoutPlans')}
         actions={
           <Button onClick={() => openDialog()} disabled={!!(activeWorkoutIsClient && activePlanId)}>
             <PlusCircle className="w-4 h-4 mr-2" /> {t('workoutPlansPage.createNewPlanButton')}
@@ -200,14 +234,12 @@ export default function WorkoutPlansPage() {
       />
       {activeWorkoutIsClient && activePlanId && (
           <Card className="mb-6 shadow-md border-destructive bg-destructive/10">
-            <CardHeader className="p-4">
+            <CardContent className="p-4">
               <h3 className="text-destructive flex items-center font-semibold"> 
                 <Ban className="w-5 h-5 mr-2" />
                 {t('activeWorkoutPage.workoutInProgressTitle', { default: 'Workout In Progress' })}
               </h3>
-            </CardHeader>
-            <CardContent>
-              <p className="text-sm text-destructive-foreground">
+              <p className="text-sm text-destructive-foreground mt-2">
                  {t('activeWorkoutPage.finishCurrentWorkoutPrompt', { default: 'You have an active workout. Please finish or abandon it before starting a new one or creating/editing plans.' })}
               </p>
                <Button asChild variant="outline" className="mt-3">
@@ -220,7 +252,7 @@ export default function WorkoutPlansPage() {
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
         {plans.map((plan) => (
           <Card key={plan.id} className="flex flex-col shadow-lg hover:shadow-xl transition-shadow duration-300">
-            <CardContent className="flex-grow p-4 relative"> {/* Added relative positioning */}
+            <CardContent className="flex-grow p-4 relative">
               <div className="flex flex-col sm:flex-row items-start gap-4">
                 <div className="relative w-full sm:w-36 h-48 flex-shrink-0">
                   <Image 
@@ -256,10 +288,8 @@ export default function WorkoutPlansPage() {
                         <p className="text-xs text-muted-foreground">{t('workoutPlansPage.noMuscleGroupsSpecified', {default: 'N/A'})}</p>
                     )}
                   </div>
-                  {/* Duration is now absolutely positioned */}
                 </div>
               </div>
-              {/* Absolutely positioned duration */}
               <div className="absolute bottom-4 right-4 flex items-center text-sm text-muted-foreground"> 
                 <Clock className="w-3.5 h-3.5 mr-1.5 shrink-0" /> 
                 <span>{plan.duration}</span>
@@ -295,9 +325,7 @@ export default function WorkoutPlansPage() {
         <DialogContent className="sm:max-w-lg">
           <UIDialogHeader> 
             <DialogTitle>{currentPlan?.id ? t('workoutPlansPage.dialogEditTitle') : t('workoutPlansPage.dialogCreateTitle')}</DialogTitle>
-            <DialogDescription>
-              {currentPlan?.id ? t('workoutPlansPage.dialogEditDescription') : t('workoutPlansPage.dialogCreateDescription')}
-            </DialogDescription>
+            {/* DialogDescription removed as per user request */}
           </UIDialogHeader>
           <form onSubmit={handleSavePlan}>
             <ScrollArea className="max-h-[calc(100vh-20rem)]">
@@ -331,7 +359,6 @@ export default function WorkoutPlansPage() {
                   />
                 </div>
                 
-
                 <Card className="mt-4">
                   <UIDialogHeader className="pb-2 p-4">
                     <h4 className="text-base flex items-center font-semibold">
@@ -341,9 +368,37 @@ export default function WorkoutPlansPage() {
                   </UIDialogHeader>
                   <CardContent className="space-y-3 p-4">
                     <div>
-                      <Label htmlFor="newExerciseName">{t('workoutPlansPage.exerciseNameLabel')}</Label>
-                      <Input id="newExerciseName" value={newExerciseName} onChange={(e) => setNewExerciseName(e.target.value)} placeholder="es. Squat" />
+                      <Label htmlFor="selectExercise">{t('workoutPlansPage.exerciseNameLabel')}</Label>
+                      <Select 
+                        value={selectedExerciseIdOrAction} 
+                        onValueChange={setSelectedExerciseIdOrAction}
+                      >
+                        <SelectTrigger id="selectExercise">
+                          <SelectValue placeholder={t('workoutPlansPage.selectExercisePlaceholder', { default: "Select an exercise" })} />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {initialExercisesMockForSelect.map(ex => (
+                            <SelectItem key={ex.id} value={ex.id}>{ex.name}</SelectItem>
+                          ))}
+                          <SelectItem value={CREATE_NEW_EXERCISE_VALUE}>
+                            {t('workoutPlansPage.createNewExerciseInDialog', { default: "Create New Exercise..."})}
+                          </SelectItem>
+                        </SelectContent>
+                      </Select>
                     </div>
+
+                    {selectedExerciseIdOrAction === CREATE_NEW_EXERCISE_VALUE && (
+                      <div>
+                        <Label htmlFor="newExerciseManualName">{t('workoutPlansPage.newExerciseNameLabel', { default: 'New Exercise Name' })}</Label>
+                        <Input 
+                          id="newExerciseManualName" 
+                          value={newExerciseManualName} 
+                          onChange={(e) => setNewExerciseManualName(e.target.value)} 
+                          placeholder={t('workoutPlansPage.newExerciseNamePlaceholder', { default: "e.g., Custom Bicep Curl"})}
+                        />
+                      </div>
+                    )}
+
                     <div className="grid grid-cols-2 gap-3">
                       <div>
                         <Label htmlFor="newExerciseSets">{t('workoutPlansPage.setsLabel')}</Label>
