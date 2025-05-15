@@ -1,3 +1,4 @@
+
 'use client';
 
 import Link from 'next/link';
@@ -8,6 +9,7 @@ import { PlayCircle, Ban } from 'lucide-react';
 import { useLanguage } from '@/context/language-context';
 import { useActiveWorkout } from '@/context/active-workout-context';
 import { useRouter } from 'next/navigation';
+import { Skeleton } from '@/components/ui/skeleton';
 
 // Mock data - similar to initialWorkoutPlans in workouts/page.tsx for consistency
 const availablePlans = [
@@ -17,7 +19,7 @@ const availablePlans = [
 ];
 
 export default function StartWorkoutPage() {
-  const { t } = useLanguage();
+  const { t, isClient: languageContextIsClient } = useLanguage();
   const { activePlanId, isClient: activeWorkoutIsClient, startActiveWorkout: contextStartWorkout } = useActiveWorkout();
   const router = useRouter();
 
@@ -30,6 +32,31 @@ export default function StartWorkoutPage() {
     router.push(`/workouts/${planId}/active`);
   };
 
+  if (!languageContextIsClient || !activeWorkoutIsClient) {
+    return (
+      <>
+        <PageHeader
+          title={languageContextIsClient ? t('startWorkoutPage.title') : "Start New Workout"}
+          description={languageContextIsClient ? t('startWorkoutPage.description') : "Choose a plan to start or begin an ad-hoc session."}
+        />
+        <div className="space-y-6">
+          <Card className="shadow-lg">
+            <CardHeader><Skeleton className="h-6 w-1/2" /></CardHeader>
+            <CardContent className="space-y-4">
+              {[1,2].map(i => (
+                <Card key={i} className="p-4">
+                  <Skeleton className="h-5 w-3/4 mb-1" />
+                  <Skeleton className="h-4 w-full mb-3" />
+                  <Skeleton className="h-9 w-24" />
+                </Card>
+              ))}
+            </CardContent>
+          </Card>
+        </div>
+      </>
+    );
+  }
+
   return (
     <>
       <PageHeader
@@ -38,7 +65,7 @@ export default function StartWorkoutPage() {
       />
 
       <div className="space-y-6">
-        {activeWorkoutIsClient && activePlanId && (
+        {activePlanId && (
           <Card className="shadow-md border-destructive bg-destructive/10">
             <CardHeader>
               <CardTitle className="text-destructive flex items-center">
@@ -71,7 +98,7 @@ export default function StartWorkoutPage() {
                     </div>
                     <Button 
                       size="sm" 
-                      disabled={!!(activeWorkoutIsClient && activePlanId)}
+                      disabled={!!activePlanId}
                       className="w-full sm:w-auto"
                       onClick={() => handleStartPlan(plan.id, plan.name)}
                     >

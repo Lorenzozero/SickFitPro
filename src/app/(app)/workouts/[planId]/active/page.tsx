@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useParams, useRouter } from 'next/navigation';
@@ -25,11 +26,11 @@ const mockWorkoutPlans = [
     name: 'Full Body Blast', 
     description: 'A comprehensive full-body workout for strength and endurance.', 
     exercises: [
-      { id: 'ex1', name: 'Squats', targetSets: 3, targetReps: '8-12', gifUrl: 'https://picsum.photos/300/200?random=1' },
-      { id: 'ex2', name: 'Bench Press', targetSets: 3, targetReps: '8-12', gifUrl: 'https://picsum.photos/300/200?random=2' },
-      { id: 'ex3', name: 'Deadlifts', targetSets: 1, targetReps: '5', gifUrl: 'https://picsum.photos/300/200?random=3' },
-      { id: 'ex4', name: 'Overhead Press', targetSets: 3, targetReps: '8-12', gifUrl: 'https://picsum.photos/300/200?random=4' },
-      { id: 'ex5', name: 'Rows', targetSets: 3, targetReps: '8-12', gifUrl: 'https://picsum.photos/300/200?random=5' },
+      { id: 'ex1', name: 'Squats', targetSets: 3, targetReps: '8-12', gifUrl: 'https://placehold.co/300x200.png' , dataAiHint: "squat exercise"},
+      { id: 'ex2', name: 'Bench Press', targetSets: 3, targetReps: '8-12', gifUrl: 'https://placehold.co/300x200.png', dataAiHint: "bench press" },
+      { id: 'ex3', name: 'Deadlifts', targetSets: 1, targetReps: '5', gifUrl: 'https://placehold.co/300x200.png', dataAiHint: "deadlift variation" },
+      { id: 'ex4', name: 'Overhead Press', targetSets: 3, targetReps: '8-12', gifUrl: 'https://placehold.co/300x200.png', dataAiHint: "shoulder press" },
+      { id: 'ex5', name: 'Rows', targetSets: 3, targetReps: '8-12', gifUrl: 'https://placehold.co/300x200.png', dataAiHint: "back row" },
     ] 
   },
   { 
@@ -37,9 +38,9 @@ const mockWorkoutPlans = [
     name: 'Upper Body Power', 
     description: 'Focus on building strength in your chest, back, and arms.',
     exercises: [
-      { id: 'ex6', name: 'Bench Press', targetSets: 4, targetReps: '6-10', gifUrl: 'https://picsum.photos/300/200?random=6' },
-      { id: 'ex7', name: 'Pull-ups', targetSets: 4, targetReps: 'AMRAP', gifUrl: 'https://picsum.photos/300/200?random=7' },
-      { id: 'ex8', name: 'Dips', targetSets: 3, targetReps: '10-15', gifUrl: 'https://picsum.photos/300/200?random=8' },
+      { id: 'ex6', name: 'Bench Press', targetSets: 4, targetReps: '6-10', gifUrl: 'https://placehold.co/300x200.png', dataAiHint: "bench press" },
+      { id: 'ex7', name: 'Pull-ups', targetSets: 4, targetReps: 'AMRAP', gifUrl: 'https://placehold.co/300x200.png', dataAiHint: "pull up" },
+      { id: 'ex8', name: 'Dips', targetSets: 3, targetReps: '10-15', gifUrl: 'https://placehold.co/300x200.png', dataAiHint: "tricep dip" },
     ]
   },
   { 
@@ -47,8 +48,8 @@ const mockWorkoutPlans = [
     name: 'Leg Day Domination', 
     description: 'Intense leg workout to build lower body strength and size.',
     exercises: [
-      { id: 'ex12', name: 'Squats', targetSets: 5, targetReps: '5', gifUrl: 'https://picsum.photos/300/200?random=9' },
-      { id: 'ex13', name: 'Romanian Deadlifts', targetSets: 3, targetReps: '8-12', gifUrl: 'https://picsum.photos/300/200?random=10' },
+      { id: 'ex12', name: 'Squats', targetSets: 5, targetReps: '5', gifUrl: 'https://placehold.co/300x200.png', dataAiHint: "barbell squat" },
+      { id: 'ex13', name: 'Romanian Deadlifts', targetSets: 3, targetReps: '8-12', gifUrl: 'https://placehold.co/300x200.png', dataAiHint: "romanian deadlift" },
     ]
   },
 ];
@@ -59,6 +60,7 @@ interface ExerciseMock {
   targetSets: number;
   targetReps: string;
   gifUrl?: string;
+  dataAiHint?: string;
 }
 
 interface WorkoutPlan {
@@ -134,7 +136,7 @@ function ExerciseCard({ exercise, onLogSet, onDeleteSet, isCurrentlyVisible, exe
               width={300} 
               height={200} 
               className="rounded-md object-cover shadow-md"
-              data-ai-hint="exercise movement"
+              data-ai-hint={exercise.dataAiHint || "exercise movement"}
             />
           ) : (
             <div className="w-full h-[200px] flex items-center justify-center bg-muted rounded-md text-muted-foreground">
@@ -236,17 +238,16 @@ function ExerciseCard({ exercise, onLogSet, onDeleteSet, isCurrentlyVisible, exe
 
 
 export default function ActiveWorkoutPage() {
-  const params = useParams();
+  const paramsProp = useParams();
   const router = useRouter();
-  const { t } = useLanguage();
+  const { t, isClient: languageContextIsClient } = useLanguage();
   const { toast } = useToast();
   const { 
     activePlanId: contextActivePlanId,
     activeWorkoutStartTime: contextStartTimeFromProvider, 
     clearActiveWorkout, 
-    isClient: activeWorkoutIsClient 
+    isClient: activeWorkoutContextIsClient 
   } = useActiveWorkout();
-
 
   const [plan, setPlan] = useState<WorkoutPlan | null | undefined>(undefined);
   const [activeWorkout, setActiveWorkout] = useState<ActiveExercise[] | null>(null);
@@ -258,23 +259,23 @@ export default function ActiveWorkoutPage() {
   const [visibleExerciseId, setVisibleExerciseId] = useState<string | null>(null);
   
   const exerciseRefs = useRef<(HTMLDivElement | null)[]>([]);
-  const planIdFromRoute = typeof params.planId === 'string' ? params.planId : undefined;
+  const planIdFromRoute = typeof paramsProp.planId === 'string' ? paramsProp.planId : undefined;
 
-  // Effect 1: Load plan details and initialize local exercise state.
-  // Validates if the current route's planId matches the one in context.
   useEffect(() => {
-    if (!activeWorkoutIsClient || !planIdFromRoute) {
-      setPlan(null);
+    if (!activeWorkoutContextIsClient || !planIdFromRoute) {
+      setPlan(null); 
       setActiveWorkout(null);
       return;
     }
 
     if (!contextActivePlanId || contextActivePlanId !== planIdFromRoute) {
-      toast({ 
-        title: t('activeWorkoutPage.planNotFound', { default: "Workout Mismatch"}), 
-        description: t('activeWorkoutPage.planNotFoundDescription', { default: "No active workout for this plan or mismatch. Redirecting..."}), 
-        variant: "destructive" 
-      });
+      if(languageContextIsClient) { // Ensure t() is ready
+        toast({ 
+          title: t('activeWorkoutPage.planNotFound', { default: "Workout Mismatch"}), 
+          description: t('activeWorkoutPage.planNotFoundDescription', { default: "No active workout for this plan or mismatch. Redirecting..."}), 
+          variant: "destructive" 
+        });
+      }
       router.push('/start-workout'); 
       setPlan(null);
       setActiveWorkout(null);
@@ -285,8 +286,6 @@ export default function ActiveWorkoutPage() {
     setPlan(foundPlan || null);
 
     if (foundPlan) {
-      // TODO: Implement loading of logged sets if resuming a workout session.
-      // This currently always starts fresh.
       const initialActiveWorkout = foundPlan.exercises.map(ex => ({ ...ex, loggedSets: [] }));
       setActiveWorkout(initialActiveWorkout);
       if (initialActiveWorkout.length > 0) {
@@ -295,31 +294,30 @@ export default function ActiveWorkoutPage() {
       }
     } else {
       setActiveWorkout(null); 
-      toast({ 
-        title: t('activeWorkoutPage.planNotFound', { default: "Plan Not Found"}), 
-        description: t('activeWorkoutPage.planNotFoundDescription', { default: "The workout plan could not be loaded."}), 
-        variant: "destructive" 
-      });
-      router.push('/workouts');
+      if(languageContextIsClient) { // Ensure t() is ready
+        toast({ 
+          title: t('activeWorkoutPage.planNotFound', { default: "Plan Not Found"}), 
+          description: t('activeWorkoutPage.planNotFoundDescription', { default: "The workout plan could not be loaded."}), 
+          variant: "destructive" 
+        });
+      }
+      router.push('/workouts'); // Redirect to workout plans list
     }
-  }, [planIdFromRoute, activeWorkoutIsClient, contextActivePlanId, router, toast, t]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [planIdFromRoute, activeWorkoutContextIsClient, contextActivePlanId, router, toast, languageContextIsClient]); // Added languageContextIsClient
 
-
-  // Effect 2: Set up local timer based on context's start time.
   useEffect(() => {
-    if (plan && activeWorkoutIsClient && contextStartTimeFromProvider) {
+    if (plan && activeWorkoutContextIsClient && contextStartTimeFromProvider) {
       setComponentWorkoutStartTime(new Date(contextStartTimeFromProvider));
       setIsTimerRunning(true); 
     } else {
       setIsTimerRunning(false); 
     }
-  }, [plan, contextStartTimeFromProvider, activeWorkoutIsClient]);
+  }, [plan, contextStartTimeFromProvider, activeWorkoutContextIsClient]);
 
-
-  // Effect for elapsedTime string update
   useEffect(() => {
     let interval: NodeJS.Timeout | undefined;
-    if (isTimerRunning && componentWorkoutStartTime && activeWorkoutIsClient) {
+    if (isTimerRunning && componentWorkoutStartTime && activeWorkoutContextIsClient) {
       interval = setInterval(() => {
         const now = new Date();
         const diff = now.getTime() - componentWorkoutStartTime.getTime();
@@ -333,11 +331,10 @@ export default function ActiveWorkoutPage() {
     return () => {
       if (interval) clearInterval(interval);
     };
-  }, [isTimerRunning, componentWorkoutStartTime, activeWorkoutIsClient]);
+  }, [isTimerRunning, componentWorkoutStartTime, activeWorkoutContextIsClient]);
 
-  // Effect for IntersectionObserver
   useEffect(() => {
-    if (!activeWorkout || activeWorkout.length === 0 || !activeWorkoutIsClient) return;
+    if (!activeWorkout || activeWorkout.length === 0 || !activeWorkoutContextIsClient) return;
 
     const observer = new IntersectionObserver(
       (entries) => {
@@ -360,8 +357,7 @@ export default function ActiveWorkoutPage() {
       });
       observer.disconnect();
     };
-  }, [activeWorkout, activeWorkoutIsClient]);
-
+  }, [activeWorkout, activeWorkoutContextIsClient]);
 
   const updateExerciseData = (exerciseId: string, updatedLoggedSets: LoggedSet[]) => {
     setActiveWorkout(prevWorkout => {
@@ -371,13 +367,12 @@ export default function ActiveWorkoutPage() {
             ? { ...ex, loggedSets: updatedLoggedSets } 
             : ex
         );
-        // TODO: Persist newWorkoutState for resume functionality if desired
         return newWorkoutState;
     });
   };
 
   const handleLogSet = (exerciseId: string, setData: { reps: string; weight: string }) => {
-    if (!activeWorkout) return;
+    if (!activeWorkout || !languageContextIsClient) return;
     const targetExercise = activeWorkout.find(ex => ex.id === exerciseId);
     if (!targetExercise) return;
 
@@ -397,7 +392,7 @@ export default function ActiveWorkoutPage() {
   };
 
   const handleDeleteSet = (exerciseId: string, setId: string) => {
-    if (!activeWorkout) return;
+    if (!activeWorkout || !languageContextIsClient) return;
     const targetExercise = activeWorkout.find(ex => ex.id === exerciseId);
     if (!targetExercise) return;
 
@@ -408,6 +403,7 @@ export default function ActiveWorkoutPage() {
   };
 
   const handleFinishWorkout = () => {
+    if (!languageContextIsClient) return;
     setIsTimerRunning(false);
     setIsFinished(true);
     clearActiveWorkout(); 
@@ -415,7 +411,6 @@ export default function ActiveWorkoutPage() {
         title: t('activeWorkoutPage.toastWorkoutFinishedTitle'), 
         description: t('activeWorkoutPage.toastWorkoutFinishedDescription', { duration: elapsedTime }) 
     });
-    // TODO: Save completed workout data to history
   };
   
   const overallProgress = activeWorkout && activeWorkout.length > 0 && activeWorkout.reduce((acc, ex) => acc + ex.targetSets, 0) > 0
@@ -423,11 +418,12 @@ export default function ActiveWorkoutPage() {
        activeWorkout.reduce((acc, ex) => acc + ex.targetSets, 0)) * 100 
     : 0;
 
-
-  if (!activeWorkoutIsClient || plan === undefined) { 
+  if (!activeWorkoutContextIsClient || !languageContextIsClient || plan === undefined) { 
+    const loadingTitle = languageContextIsClient ? t('activeWorkoutPage.loadingWorkout') : "Loading Workout...";
+    const loadingDescription = languageContextIsClient ? t('activeWorkoutPage.loadingDescription') : "Please wait while we fetch the plan details.";
     return (
         <>
-            <PageHeader title={t('activeWorkoutPage.loadingWorkout')} description={t('activeWorkoutPage.loadingDescription')} />
+            <PageHeader title={loadingTitle} description={loadingDescription} />
             <Skeleton className="h-8 w-full mb-6" />
             <div className="space-y-8">
                 {[1,2,3].map(i => (
@@ -450,7 +446,7 @@ export default function ActiveWorkoutPage() {
     );
   }
 
-  if (!plan || !activeWorkout) { // Plan might be null if not found or if context mismatch occurred
+  if (!plan || !activeWorkout) {
     return <PageHeader title={t('activeWorkoutPage.planNotFound')} description={t('activeWorkoutPage.planNotFoundDescription')} />;
   }
   
@@ -467,7 +463,6 @@ export default function ActiveWorkoutPage() {
       </div>
     );
   }
-
 
   return (
     <>

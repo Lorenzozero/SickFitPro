@@ -26,6 +26,8 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { useLanguage } from '@/context/language-context';
 import { useToast } from '@/hooks/use-toast';
 import { useWeeklySchedule, type ScheduledWorkout, type WorkoutPlanOption, dayKeys } from '@/context/weekly-schedule-context';
+import { Skeleton } from '@/components/ui/skeleton';
+
 
 interface DayScheduleContentProps {
   dayKey: string;
@@ -48,12 +50,12 @@ const DayScheduleContent: React.FC<DayScheduleContentProps> = ({
 }) => {
   return (
     <div className="flex flex-col h-full">
-      <ul className={`space-y-0.5 flex-grow overflow-y-auto mb-1.5 ${isMobile ? 'max-h-[100px]' : ''}`}> {/* Reduced space-y and mb, further reduced max-h */}
+      <ul className={`space-y-0.5 flex-grow overflow-y-auto mb-1.5 ${isMobile ? 'max-h-[100px]' : ''}`}>
         {workouts && workouts.length > 0 ? (
           workouts.map(workout => {
             const planDetails = availableWorkoutPlans.find(p => p.id === workout.planId);
             return (
-              <li key={workout.id} className="p-1 rounded-md bg-secondary text-xs"> {/* Reduced p-1.5 to p-1 */}
+              <li key={workout.id} className="p-1 rounded-md bg-secondary text-xs">
                 <div className="flex justify-between items-center gap-1">
                   <span className="font-semibold text-secondary-foreground truncate flex-grow min-w-0">{workout.planName}</span>
                   <Button variant="ghost" size="icon" className="h-5 w-5 text-destructive shrink-0" onClick={() => onDeleteWorkout(dayKey, workout.id)}>
@@ -64,7 +66,7 @@ const DayScheduleContent: React.FC<DayScheduleContentProps> = ({
             );
           })
         ) : (
-          <p className="text-xs text-center text-muted-foreground pt-1"> {/* Reduced pt */}
+          <p className="text-xs text-center text-muted-foreground pt-1">
             {t('calendarPage.noWorkoutsForDayOfWeek', { dayOfWeek: t(`calendarPage.days.${dayKey}`)})}
           </p>
         )}
@@ -73,7 +75,7 @@ const DayScheduleContent: React.FC<DayScheduleContentProps> = ({
         onClick={() => onOpenDialog(dayKey)} 
         size="sm" 
         variant={isMobile ? "default" : "outline"} 
-        className="w-full mt-auto text-xs px-2 py-1 h-auto" // Kept compact button
+        className="w-full mt-auto text-xs px-2 py-1 h-auto"
       >
         <PlusCircle className="w-3 h-3 mr-1 shrink-0" /> <span className="truncate">{t('calendarPage.addWorkoutToDay')}</span>
       </Button>
@@ -83,7 +85,7 @@ const DayScheduleContent: React.FC<DayScheduleContentProps> = ({
 
 
 export default function CalendarPage() {
-  const { t } = useLanguage();
+  const { t, isClient: languageContextIsClient } = useLanguage();
   const { toast } = useToast();
   const { 
     weeklySchedule, 
@@ -135,16 +137,22 @@ export default function CalendarPage() {
   }
 
 
-  if (!scheduleIsClient) {
+  if (!scheduleIsClient || !languageContextIsClient) {
     return (
       <>
         <PageHeader
-          title={t('calendarPage.weeklyScheduleTitle')}
-          description={t('calendarPage.weeklyScheduleDescription')}
+          title={languageContextIsClient ? t('calendarPage.weeklyScheduleTitle') : "Weekly Training Schedule"}
+          description={languageContextIsClient ? t('calendarPage.weeklyScheduleDescription') : "Set up your typical training week. This schedule will repeat automatically."}
         />
         <Card className="shadow-lg">
-          <CardContent>
-            <p>{t('calendarPage.loadingCalendar')}</p>
+          <CardContent className="p-4">
+            <Skeleton className="h-8 w-3/4 mb-4" />
+            <div className="hidden md:block">
+              <Skeleton className="h-48 w-full" />
+            </div>
+            <div className="md:hidden space-y-2">
+              {[...Array(3)].map((_, i) => <Skeleton key={i} className="h-24 w-full" />)}
+            </div>
           </CardContent>
         </Card>
       </>
@@ -160,13 +168,13 @@ export default function CalendarPage() {
       <Card className="shadow-lg">
         <CardContent className="p-0">
           {/* Mobile View */}
-          <div className="md:hidden flex flex-col gap-2 p-2"> {/* Further reduced gap and padding */}
+          <div className="md:hidden flex flex-col gap-2 p-2">
             {dayKeys.map(dayKey => (
               <Card key={`mobile-${dayKey}`} className="shadow-sm border">
-                <CardHeader className="p-2"> {/* Further reduced padding */}
-                  <CardTitle className="text-base capitalize text-center font-semibold">{t(`calendarPage.days.${dayKey}`)}</CardTitle> {/* text-base from md */}
+                <CardHeader className="p-2"> 
+                  <CardTitle className="text-base capitalize text-center font-semibold">{t(`calendarPage.days.${dayKey}`)}</CardTitle> 
                 </CardHeader>
-                <CardContent className="p-2 pt-0 min-h-[100px]"> {/* Reduced padding and min-height */}
+                <CardContent className="p-2 pt-0 min-h-[100px]"> 
                   <DayScheduleContent
                     dayKey={dayKey}
                     workouts={weeklySchedule[dayKey] || []}
@@ -188,7 +196,7 @@ export default function CalendarPage() {
               <TableHeader>
                 <TableRow>
                   {dayKeys.map(dayKey => (
-                    <TableHead key={`desktop-head-${dayKey}`} className="text-center capitalize p-1.5 md:p-2 w-[14.28%] min-w-[100px] md:min-w-[80px]"> {/* Further reduced padding and min-width */}
+                    <TableHead key={`desktop-head-${dayKey}`} className="text-center capitalize p-1.5 md:p-2 w-[14.28%] min-w-[100px] md:min-w-[80px]"> 
                       {t(`calendarPage.days.${dayKey}`)}
                     </TableHead>
                   ))}
@@ -197,7 +205,7 @@ export default function CalendarPage() {
               <TableBody>
                 <TableRow className="align-top">
                   {dayKeys.map(dayKey => (
-                    <TableCell key={`desktop-cell-${dayKey}`} className="p-1 md:p-1.5 h-36 md:h-40 border align-top"> {/* Further reduced height */}
+                    <TableCell key={`desktop-cell-${dayKey}`} className="p-1 md:p-1.5 h-36 md:h-40 border align-top">
                       <DayScheduleContent
                         dayKey={dayKey}
                         workouts={weeklySchedule[dayKey] || []}

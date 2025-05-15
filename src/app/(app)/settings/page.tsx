@@ -4,7 +4,7 @@
 import { useState, useEffect, type ChangeEvent } from 'react';
 import Image from 'next/image';
 import { PageHeader } from '@/components/shared/page-header';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
 import {
   Select,
@@ -16,24 +16,25 @@ import {
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Switch } from '@/components/ui/switch';
-import { Languages, Bell, Save, UserCircle, Shield, Eye, EyeOff, Weight } from 'lucide-react'; // Added Weight
+import { Languages, Bell, Save, UserCircle, Shield, Eye, EyeOff, Weight } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { useLanguage, type Language } from '@/context/language-context';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Skeleton } from '@/components/ui/skeleton';
 
 
 export default function SettingsPage() {
   const { language, setLanguage, t, isClient: languageContextIsClient } = useLanguage();
   const [enableNotifications, setEnableNotifications] = useState(true);
   const { toast } = useToast();
-  const [isClient, setIsClient] = useState(false);
+  const [isClient, setIsClient] = useState(false); // Local client mount state
 
   const [profilePicture, setProfilePicture] = useState<string | null>(null);
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [profilePictureFile, setProfilePictureFile] = useState<File | null>(null);
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
-  const [currentWeight, setCurrentWeight] = useState<string>(''); // New state for current weight
+  const [currentWeight, setCurrentWeight] = useState<string>('');
 
   const [currentPassword, setCurrentPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
@@ -44,7 +45,7 @@ export default function SettingsPage() {
 
 
   useEffect(() => {
-    setIsClient(true);
+    setIsClient(true); // Indicate component has mounted on client
     if (typeof window !== 'undefined') {
         const storedNotificationPref = localStorage.getItem('app-notifications-enabled');
         if (storedNotificationPref !== null) {
@@ -78,7 +79,7 @@ export default function SettingsPage() {
   };
 
   const handleSaveChanges = () => {
-    if (!isClient) return;
+    if (!isClient) return; // Ensure this runs only on client
     let changesMade = false;
     const updatedPreferences: string[] = [];
 
@@ -101,13 +102,11 @@ export default function SettingsPage() {
         updatedPreferences.push(t('settingsPage.uploadProfilePictureLabel'));
         changesMade = true;
     }
-    // Save current weight
     if (currentWeight.trim() !== (localStorage.getItem('app-user-current-weight') || '')) {
         localStorage.setItem('app-user-current-weight', currentWeight.trim());
         updatedPreferences.push(t('settingsPage.currentWeightLabel', {default: "Current Weight"}));
         changesMade = true;
     }
-
 
     if (newPassword && currentPassword) {
         if (newPassword !== confirmNewPassword) {
@@ -118,7 +117,7 @@ export default function SettingsPage() {
             });
             return;
         }
-        console.log('Attempting to change password...');
+        console.log('Attempting to change password...'); // Replace with actual password change logic
         localStorage.setItem('app-user-password-placeholder', newPassword); 
         setCurrentPassword('');
         setNewPassword('');
@@ -134,7 +133,6 @@ export default function SettingsPage() {
         return;
     }
 
-
     if (changesMade) {
         toast({
           title: t('settingsPage.settingsSaved'),
@@ -148,19 +146,19 @@ export default function SettingsPage() {
     }
   };
 
-  if (!isClient) {
+  if (!isClient || !languageContextIsClient) { // Use both local isClient and languageContextIsClient for loading state
     return (
       <>
-        <PageHeader title={t('settingsPage.title')} />
+        <PageHeader title={languageContextIsClient ? t('settingsPage.title') : "Settings"} />
         <div className="space-y-8">
-          <Card className="shadow-lg"><CardContent className="p-6 h-40 animate-pulse bg-muted rounded-lg"></CardContent></Card>
-          <Card className="shadow-lg"><CardContent className="p-6 h-56 animate-pulse bg-muted rounded-lg"></CardContent></Card>
-          <Card className="shadow-lg"><CardContent className="p-6 h-32 animate-pulse bg-muted rounded-lg"></CardContent></Card>
-          <Card className="shadow-lg"><CardContent className="p-6 h-24 animate-pulse bg-muted rounded-lg"></CardContent></Card>
+          <Card className="shadow-lg"><CardContent className="p-6"><Skeleton className="h-32 w-full" /></CardContent></Card>
+          <Card className="shadow-lg"><CardContent className="p-6"><Skeleton className="h-48 w-full" /></CardContent></Card>
+          <Card className="shadow-lg"><CardContent className="p-6"><Skeleton className="h-24 w-full" /></CardContent></Card>
+          <Card className="shadow-lg"><CardContent className="p-6"><Skeleton className="h-16 w-full" /></CardContent></Card>
            <div className="flex justify-center">
              <Button size="lg" disabled>
                 <Save className="w-4 h-4 mr-2" />
-                {t('settingsPage.saveChanges')}
+                {languageContextIsClient ? t('settingsPage.saveChanges') : "Save Changes"}
             </Button>
            </div>
         </div>
@@ -232,7 +230,6 @@ export default function SettingsPage() {
                 readOnly
                 className="mt-1 bg-muted/50 cursor-not-allowed"
               />
-              <CardDescription className="mt-1 text-xs">{t('settingsPage.emailCannotBeChanged')}</CardDescription>
             </div>
           </CardContent>
         </Card>
@@ -305,9 +302,8 @@ export default function SettingsPage() {
                  <Label htmlFor="language-select" className="whitespace-nowrap text-sm font-medium">{t('settingsPage.language')}</Label>
                 <div className="w-auto">
                     <Select
-                        value={languageContextIsClient ? language : 'en'}
+                        value={language}
                         onValueChange={(value) => setLanguage(value as Language)}
-                        disabled={!languageContextIsClient}
                     >
                         <SelectTrigger id="language-select" className="min-w-[200px]" aria-label={t('settingsPage.selectLanguage')}>
                             <SelectValue placeholder={t('settingsPage.selectLanguage')} />
@@ -335,7 +331,6 @@ export default function SettingsPage() {
               aria-label={t('settingsPage.allNotificationsLabel')}
               checked={enableNotifications}
               onCheckedChange={setEnableNotifications}
-              disabled={!isClient}
             />
           </CardHeader>
           <CardContent className="pt-0">
@@ -343,7 +338,7 @@ export default function SettingsPage() {
         </Card>
 
         <div className="flex justify-center">
-          <Button onClick={handleSaveChanges} disabled={!isClient} size="lg">
+          <Button onClick={handleSaveChanges} size="lg">
             <Save className="w-4 h-4 mr-2" />
             {t('settingsPage.saveChanges')}
           </Button>
@@ -352,4 +347,3 @@ export default function SettingsPage() {
     </>
   );
 }
-
