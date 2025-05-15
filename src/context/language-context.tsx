@@ -29,7 +29,6 @@ const translations: Record<Language, Translations> = {
     header: {
       toggleTheme: 'Toggle theme',
       openMenu: 'Open menu',
-      home: 'Home',
     },
     dashboard: {
       welcomeTitle: 'Welcome to SickFit Pro!',
@@ -98,7 +97,6 @@ const translations: Record<Language, Translations> = {
         cardTitle: "AI Health Advisor",
         dataUsageInfo: "Your stored macro goals, water intake goal, body measurements, and training summary will be automatically used by the AI to provide personalized advice. You can also ask a specific question below.",
         userQueryPlaceholder: "e.g., How can I improve my sleep? or What are some good exercises for lower back pain?",
-        userQueryDescription: "Ask a specific question or leave blank for general advice based on your data.",
         userQueryMinError: "If asking a question, please provide at least 10 characters.",
         getAdviceButton: "Get AI Health Advice",
         adviceReadyTitle: "Health Advice Ready!",
@@ -294,7 +292,6 @@ const translations: Record<Language, Translations> = {
         dialogEditTitle: "Edit Workout Plan",
         dialogCreateTitle: "Create New Workout Plan",
         planNameLabel: "Plan Name",
-        descriptionLabel: "Description", 
         planDurationLabel: "Est. Duration (e.g., 60 min)",
         exerciseNameLabel: "Exercise",
         setsLabel: "Sets",
@@ -325,7 +322,6 @@ const translations: Record<Language, Translations> = {
         errorSelectedExerciseNotFound: "Selected exercise not found.",
         errorExerciseDetailsRequired: "Please fill in exercise name, sets, and reps.",
         errorPlanNameRequired: "Plan name is required.",
-        // description: "Create, manage, and share your training programs.", // Removed
     },
      startWorkoutPage: {
       title: "Start New Workout",
@@ -435,7 +431,6 @@ const translations: Record<Language, Translations> = {
     header: {
       toggleTheme: 'Cambia tema',
       openMenu: 'Apri menu',
-      home: 'Home',
     },
     dashboard: {
       welcomeTitle: 'Benvenuto in SickFit Pro!',
@@ -504,7 +499,6 @@ const translations: Record<Language, Translations> = {
         cardTitle: "Consulente Salute AI",
         dataUsageInfo: "I tuoi obiettivi macro, l'obiettivo di assunzione di acqua, le misurazioni corporee e il riepilogo degli allenamenti memorizzati verranno utilizzati automaticamente dall'AI per fornire consigli più personalizzati. Puoi anche porre una domanda specifica qui sotto.",
         userQueryPlaceholder: "es. Come posso migliorare il sonno? o Quali sono degli esercizi per il mal di schiena?",
-        userQueryDescription: "Poni una domanda specifica o lascia vuoto per consigli generali basati sui tuoi dati.",
         userQueryMinError: "Se poni una domanda, fornisci almeno 10 caratteri.",
         getAdviceButton: "Ottieni Consulenza Salute AI",
         adviceReadyTitle: "Consulenza Salute Pronta!",
@@ -700,7 +694,6 @@ const translations: Record<Language, Translations> = {
         dialogEditTitle: "Modifica Scheda Allenamento",
         dialogCreateTitle: "Crea Nuova Scheda Allenamento",
         planNameLabel: "Nome Scheda",
-        descriptionLabel: "Descrizione", 
         planDurationLabel: "Durata Stima (es. 60 min)",
         exerciseNameLabel: "Esercizio",
         setsLabel: "Serie",
@@ -839,7 +832,6 @@ const translations: Record<Language, Translations> = {
     header: {
         toggleTheme: 'Cambiar tema',
         openMenu: 'Abrir menú',
-        home: 'Inicio',
     },
      dashboard: {
       welcomeTitle: '¡Bienvenido a SickFit Pro!',
@@ -949,7 +941,6 @@ const translations: Record<Language, Translations> = {
         cardTitle: "Asesor de Salud IA",
         dataUsageInfo: "Tus metas de macronutrientes, meta de ingesta de agua, mediciones corporales y resumen de entrenamiento almacenados se utilizarán automáticamente por la IA para proporcionar consejos más personalizados. También puedes hacer una pregunta específica a continuación.",
         userQueryPlaceholder: "Ej: ¿Cómo puedo mejorar mi sueño? o ¿Cuáles son buenos ejercicios para el dolor lumbar?",
-        userQueryDescription: "Haz una pregunta específica o déjalo en blanco para obtener consejos generales basados en tus datos.",
         userQueryMinError: "Si haces una pregunta, proporciona al menos 10 caracteres.",
         getAdviceButton: "Obtener Consejo de Salud IA",
         adviceReadyTitle: "¡Consejo de Salud Listo!",
@@ -1103,7 +1094,6 @@ const translations: Record<Language, Translations> = {
         dialogEditTitle: "Editar Plan de Entrenamiento",
         dialogCreateTitle: "Crear Nuevo Plan de Entrenamiento",
         planNameLabel: "Nombre del Plan",
-        descriptionLabel: "Descripción", 
         planDurationLabel: "Duración Est. (ej. 60 min)",
         exerciseNameLabel: "Ejercicio",
         setsLabel: "Series",
@@ -1236,7 +1226,6 @@ const translations: Record<Language, Translations> = {
     header: {
         toggleTheme: 'Changer de thème',
         openMenu: 'Ouvrir le menu',
-        home: 'Accueil',
     },
      dashboard: {
       welcomeTitle: 'Bienvenue sur SickFit Pro !',
@@ -1346,7 +1335,6 @@ const translations: Record<Language, Translations> = {
         cardTitle: "Conseiller Santé IA",
         dataUsageInfo: "Vos objectifs macro, votre objectif d'apport en eau, vos mesures corporelles et votre résumé d'entraînement stockés seront automatiquement utilisés par l'IA pour fournir des conseils plus personnalisés. Vous pouvez également poser une question spécifique ci-dessous.",
         userQueryPlaceholder: "Ex: Comment puis-je améliorer mon sommeil ? ou Quels sont les bons exercices pour le mal de dos ?",
-        userQueryDescription: "Posez une question spécifique ou laissez vide pour des conseils généraux basés sur vos données.",
         userQueryMinError: "Si vous posez une question, veuillez fournir au moins 10 caractères.",
         getAdviceButton: "Obtenir Conseil Santé IA",
         adviceReadyTitle: "Conseil Santé Prêt !",
@@ -1500,7 +1488,6 @@ const translations: Record<Language, Translations> = {
         dialogEditTitle: "Modifier le Programme d'Entraînement",
         dialogCreateTitle: "Créer un Nouveau Programme d'Entraînement",
         planNameLabel: "Nom du Programme",
-        descriptionLabel: "Description", 
         planDurationLabel: "Durée Est. (ex. 60 min)",
         exerciseNameLabel: "Exercice",
         setsLabel: "Séries",
