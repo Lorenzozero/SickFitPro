@@ -35,7 +35,7 @@ export const formatTrainingDataToString = (data: Array<{ date: string; exercise:
 
 export function AiSplitForm() {
   const { t } = useLanguage();
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(true); // Start loading immediately
   const [result, setResult] = useState<SuggestTrainingSplitOutput | null>(null);
   const { toast } = useToast();
   const [isClient, setIsClient] = useState(false);
@@ -74,7 +74,15 @@ export function AiSplitForm() {
     }
   };
   
-  if (!isClient) {
+  useEffect(() => {
+    if (isClient) {
+      handleGenerateAdvice();
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isClient]); // Run only when isClient becomes true
+
+
+  if (!isClient) { // Show skeleton or a more basic loading state during SSR or before client mount
     return (
         <Card className="shadow-lg">
             <CardHeader className="flex flex-row items-center justify-between">
@@ -86,6 +94,7 @@ export function AiSplitForm() {
             </CardHeader>
             <CardContent>
                 <Skeleton className="h-10 w-full" />
+                 <Skeleton className="mt-4 h-20 w-full" />
             </CardContent>
         </Card>
     );
@@ -140,3 +149,4 @@ export function AiSplitForm() {
     </div>
   );
 }
+
