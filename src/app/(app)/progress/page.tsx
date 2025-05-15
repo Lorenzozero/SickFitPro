@@ -359,7 +359,7 @@ export default function ProgressPage() {
                     <RechartsPrimitiveBarChart data={initialBodyCompositionChartData}>
                         <CartesianGrid vertical={false} />
                         <XAxis dataKey="month" tickLine={false} tickMargin={10} axisLine={false} tickFormatter={(value) => getMonthAbbreviation(value)} />
-                        <YAxis dataKey="weight" />
+                        <YAxis dataKey="weight" domain={[40, 'auto']} />
                         <RechartsTooltip content={<ChartTooltipContent indicator="dot" />} />
                         <RechartsLegend content={<ChartLegendContent />} />
                         <Bar dataKey="weight" fill="var(--color-weight)" radius={4} name={bodyCompositionChartConfig.weight?.label?.toString()} />
