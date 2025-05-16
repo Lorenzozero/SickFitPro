@@ -113,6 +113,10 @@ export default function DashboardPage() {
           scheduledForDay.forEach(scheduledWorkout => {
             const planDetails = availableWorkoutPlans.find(p => p.id === scheduledWorkout.planId);
             if (planDetails) {
+              // Skip adding today's workout to upcoming list if it's already displayed in "Today's Focus"
+              if (i === 0 && todaysWorkoutsDetails.some(tw => tw.id === scheduledWorkout.id)) {
+                return;
+              }
               workouts.push({
                 id: `${formatDateFn(currentDate, 'yyyy-MM-dd')}-${scheduledWorkout.id}`,
                 date: currentDate,
@@ -125,11 +129,17 @@ export default function DashboardPage() {
           });
         }
       }
-      setUpcomingWorkouts(workouts.slice(0, 5)); // Limit to show, e.g., next 5 scheduled instances found within 7 days
+      // Show the next 5 upcoming workouts, excluding today's if it's already covered
+      setUpcomingWorkouts(workouts.filter(w => {
+          const workoutDate = new Date(w.date);
+          const todaySimple = new Date(todayDate.getFullYear(), todayDate.getMonth(), todayDate.getDate());
+          const workoutDateSimple = new Date(workoutDate.getFullYear(), workoutDate.getMonth(), workoutDate.getDate());
+          return workoutDateSimple > todaySimple;
+      }).slice(0, 5));
     };
 
     calculateUpcomingWorkouts();
-  }, [isMounted, scheduleIsClient, languageContextIsClient, weeklySchedule, availableWorkoutPlans, language, t]);
+  }, [isMounted, scheduleIsClient, languageContextIsClient, weeklySchedule, availableWorkoutPlans, language, t, todaysWorkoutsDetails]);
 
 
   const totalScheduledWorkoutsThisWeek = useMemo(() => {
@@ -187,8 +197,8 @@ export default function DashboardPage() {
               </Link>
             </Button>
           </CardHeader>
-          <CardContent>
-            <div className="relative p-4 text-center border-2 border-dashed rounded-lg border-border min-h-[180px] flex flex-col justify-center" data-ai-hint="workout routine">
+          <CardContent className="relative"> {/* Added relative for positioning CalendarDays icon */}
+            <div className="text-center border-2 border-dashed rounded-lg border-border min-h-[120px] flex flex-col justify-center p-4" data-ai-hint="workout routine">
               {isMounted && scheduleIsClient && languageContextIsClient ? (
                 todaysWorkoutsDetails.length > 0 ? (
                   <>
@@ -216,10 +226,35 @@ export default function DashboardPage() {
                   <p className="font-semibold">{t('dashboard.viewCalendarToSeeWorkout')}</p>
                  </>
               )}
-              <Link href="/calendar" className="absolute bottom-3 right-3 text-primary hover:text-accent transition-colors" aria-label={t('dashboard.viewFullSchedule', { default: "View Full Schedule"})}>
-                <CalendarDays className="w-6 h-6" />
-              </Link>
             </div>
+            
+            {isMounted && languageContextIsClient && upcomingWorkouts.length > 0 && (
+              <>
+                <Separator className="my-4" />
+                <h4 className="text-md font-semibold text-center mb-3">
+                  {t('dashboard.upcomingWorkoutsTitle', { default: 'Upcoming Workouts' })}
+                </h4>
+                <div className="grid gap-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-2 xl:grid-cols-3"> {/* Adjusted grid for inside card */}
+                  {upcomingWorkouts.map(workout => (
+                    <Card key={workout.id} className="p-2.5 bg-secondary/50 hover:shadow-md transition-shadow text-xs">
+                      <div className="text-center">
+                        <p className="font-semibold text-primary uppercase tracking-wider">{workout.dayOfWeek}</p>
+                        <p className="text-lg font-bold text-foreground">{workout.dayOfMonth}</p>
+                        <p className="text-muted-foreground uppercase">{workout.month}</p>
+                      </div>
+                      <Separator className="my-1.5" />
+                      <p className="mt-1 font-medium text-center truncate" title={workout.planName}>
+                        {workout.planName}
+                      </p>
+                    </Card>
+                  ))}
+                </div>
+              </>
+            )}
+
+            <Link href="/calendar" className="absolute bottom-3 right-3 text-primary hover:text-accent transition-colors" aria-label={t('dashboard.viewFullSchedule', { default: "View Full Schedule"})}>
+              <CalendarDays className="w-6 h-6" />
+            </Link>
           </CardContent>
         </Card>
 
@@ -263,30 +298,6 @@ export default function DashboardPage() {
           )}
         </Card>
       </div>
-
-      {/* Upcoming Workouts Section */}
-      {isMounted && languageContextIsClient && upcomingWorkouts.length > 0 && (
-        <Card className="mt-6 shadow-lg">
-          <CardHeader>
-            <CardTitle>{t('dashboard.upcomingWorkoutsTitle', { default: 'Upcoming Workouts' })}</CardTitle>
-          </CardHeader>
-          <CardContent className="grid gap-3 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
-            {upcomingWorkouts.map(workout => (
-              <Card key={workout.id} className="p-3 bg-secondary/50 hover:shadow-md transition-shadow">
-                <div className="text-center">
-                  <p className="text-xs font-semibold text-primary uppercase tracking-wider">{workout.dayOfWeek}</p>
-                  <p className="text-2xl font-bold text-foreground">{workout.dayOfMonth}</p>
-                  <p className="text-xs text-muted-foreground uppercase">{workout.month}</p>
-                </div>
-                <Separator className="my-2" />
-                <p className="mt-1 text-sm font-medium text-center truncate" title={workout.planName}>
-                  {workout.planName}
-                </p>
-              </Card>
-            ))}
-          </CardContent>
-        </Card>
-      )}
     </>
   );
 }
