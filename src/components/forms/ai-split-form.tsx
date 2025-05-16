@@ -9,9 +9,8 @@ import { Loader2, Wand2 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { useLanguage } from '@/context/language-context';
 import { Skeleton } from '@/components/ui/skeleton';
-import React from 'react'; // Import React
+import React from 'react'; 
 
-// Mock functions for fetching and formatting user training data
 export const mockGetUserTrainingData = async (): Promise<Array<{ date: string; exercise: string; sets: Array<{ reps: number; weight: number }> }>> => {
   await new Promise(resolve => setTimeout(resolve, 300)); 
   return [
@@ -37,50 +36,93 @@ const formatAiResponse = (text: string): React.ReactNode[] => {
   const lines = text.split('\n');
   
   let currentListItems: React.ReactNode[] = [];
+  let inTable = false;
+  let tableHeaders: React.ReactNode[] = [];
+  let tableRows: React.ReactNode[][] = [];
 
   function flushList() {
     if (currentListItems.length > 0) {
-      elements.push(<ul key={`ul-${elements.length}`} className="my-2 ml-4 space-y-1 list-disc">{currentListItems}</ul>);
+      elements.push(<ul key={`ul-${elements.length}`} className="my-2 ml-6 space-y-1 list-disc">{currentListItems}</ul>);
       currentListItems = [];
     }
   }
 
+  function flushTable() {
+    if (tableHeaders.length > 0 || tableRows.length > 0) {
+      elements.push(
+        <div key={`table-wrapper-${elements.length}`} className="my-4 overflow-x-auto rounded-md border border-border">
+          <table className="min-w-full border-collapse">
+            {tableHeaders.length > 0 && <thead className="bg-muted/50"><tr>{tableHeaders}</tr></thead>}
+            {tableRows.length > 0 && <tbody>{tableRows.map((row, i) => <tr key={`tr-${i}`} className="border-b border-border last:border-b-0 hover:bg-muted/20">{row}</tr>)}</tbody>}
+          </table>
+        </div>
+      );
+    }
+    inTable = false;
+    tableHeaders = [];
+    tableRows = [];
+  }
+  
   function processInlineFormatting(lineContent: string): React.ReactNode {
-    const parts = lineContent.split(/(\*\*.*?\*\*)/g); // Splitta per **testo**, mantenendo i delimitatori
+    const parts = lineContent.split(/(\*\*.*?\*\*)/g); 
     return parts.filter(Boolean).map((part, index) => {
       if (part.startsWith('**') && part.endsWith('**')) {
-        return <strong key={`strong-part-${index}`}>{part.substring(2, part.length - 2)}</strong>;
+        return <strong key={`strong-part-${index}-${Math.random()}`}>{part.substring(2, part.length - 2)}</strong>;
       }
       return part; 
     });
   }
 
-  lines.forEach((line) => {
+  lines.forEach((line, lineIndex) => {
     const trimmedLine = line.trim();
 
-    if (trimmedLine.startsWith('* ') || trimmedLine.startsWith('- ')) {
-      const listItemText = trimmedLine.substring(trimmedLine.startsWith('* ') ? 2 : (trimmedLine.startsWith('- ') ? 2 : 0));
-      currentListItems.push(<li key={`li-${elements.length}-${currentListItems.length}`}>{processInlineFormatting(listItemText)}</li>);
-    } else {
-      flushList(); 
-      if (trimmedLine) { 
-        elements.push(<p key={`p-${elements.length}`} className="my-2">{processInlineFormatting(trimmedLine)}</p>);
-      } else if (elements.length > 0) {
-        // Potremmo aggiungere un <br /> o uno spazio maggiore se una riga vuota tra paragrafi è desiderata
-        // Per ora, i margini di <p> dovrebbero bastare
+    if (trimmedLine.startsWith('|') && trimmedLine.endsWith('|')) {
+      if (!inTable) {
+        flushList();
+        inTable = true;
+      }
+      const cells = trimmedLine.split('|').slice(1, -1).map(cell => cell.trim());
+      
+      if (cells.every(cell => cell.match(/^--+$/))) {
+        // Riga di separazione Markdown, non la renderizziamo direttamente ma la usiamo come flag
+        if (tableHeaders.length === 0 && tableRows.length > 0) { // Potrebbe essere una tabella senza header esplicito ma con dati
+            // Tentativo di usare la prima riga di dati come header se non c'è stata una riga di separazione dopo un header
+            tableHeaders = tableRows[0].map((cellContent, i) => <th key={`th-implicit-${i}`} className="p-2 border-b border-r border-border text-left font-semibold text-sm last:border-r-0">{cellContent}</th>);
+            tableRows.shift(); // Rimuovi la riga usata come header dai dati
+        }
+      } else if (tableHeaders.length === 0 && tableRows.length === 0) { // Presumibilmente riga di intestazione
+        tableHeaders = cells.map((cell, i) => <th key={`th-${lineIndex}-${i}`} className="p-2 border-b border-r border-border text-left font-semibold text-sm last:border-r-0">{processInlineFormatting(cell)}</th>);
+      } else { // Riga di dati
+        tableRows.push(cells.map((cell, i) => <td key={`td-${lineIndex}-${i}`} className="p-2 border-r border-border text-sm last:border-r-0">{processInlineFormatting(cell)}</td>));
+      }
+    } else { // Non è una riga di tabella
+      if (inTable) {
+        flushTable();
+      }
+      if (trimmedLine.startsWith('* ') || trimmedLine.startsWith('- ')) {
+        const listItemText = trimmedLine.substring(trimmedLine.startsWith('* ') ? 2 : 1).trimStart();
+        currentListItems.push(<li key={`li-${lineIndex}`} className="text-sm">{processInlineFormatting(listItemText)}</li>);
+      } else {
+        flushList();
+        if (trimmedLine) {
+          elements.push(<p key={`p-${lineIndex}`} className="my-2 text-sm">{processInlineFormatting(trimmedLine)}</p>);
+        } else if (elements.length > 0 && !(elements[elements.length -1].type === 'ul' || elements[elements.length-1].key?.toString().startsWith('table-wrapper'))) {
+            // Aggiunge spazio solo se la riga precedente non era una lista o una tabella
+        }
       }
     }
   });
 
-  flushList(); 
+  flushTable(); // Assicurati che l'ultima tabella venga renderizzata se il testo finisce con una tabella
+  flushList(); // Assicurati che l'ultima lista venga renderizzata
 
   return elements;
 };
 
 
 export function AiSplitForm() {
-  const { t, isClient: languageContextIsClient } = useLanguage(); // Use languageContextIsClient
-  const [isLoading, setIsLoading] = useState(true); // Start loading immediately
+  const { t, isClient: languageContextIsClient } = useLanguage();
+  const [isLoading, setIsLoading] = useState(true); 
   const [result, setResult] = useState<SuggestTrainingSplitOutput | null>(null);
   const { toast } = useToast();
 
@@ -98,7 +140,7 @@ export function AiSplitForm() {
 
       const response = await suggestTrainingSplit(input);
       setResult(response);
-      if (languageContextIsClient) { // Ensure toast is called only on client
+      if (languageContextIsClient) {
         toast({
           title: t('aiSplitForm.toastSuggestionReadyTitle'),
           description: t('aiSplitForm.toastSuggestionReadyDescription'),
@@ -119,14 +161,14 @@ export function AiSplitForm() {
   };
   
   useEffect(() => {
-    if (languageContextIsClient) { // Ensure this runs only when context is ready on client
+    if (languageContextIsClient) { 
       handleGenerateAdvice();
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [languageContextIsClient]); // Depend on languageContextIsClient
+  }, [languageContextIsClient]); 
 
 
-  if (!languageContextIsClient) { 
+  if (!languageContextIsClient && !result) { // Mostra skeleton solo se il contesto non è pronto E non ci sono risultati (es. primo caricamento)
     return (
         <Card className="shadow-lg">
             <CardHeader className="flex flex-row items-center justify-between">
@@ -137,8 +179,10 @@ export function AiSplitForm() {
                 <Skeleton className="h-10 w-36" /> 
             </CardHeader>
             <CardContent>
-                <Skeleton className="h-10 w-full" />
-                 <Skeleton className="mt-4 h-20 w-full" />
+                <Skeleton className="h-8 w-1/3 mb-4" />
+                <Skeleton className="h-16 w-full mb-4" />
+                 <Skeleton className="h-8 w-1/3 mb-4" />
+                 <Skeleton className="h-24 w-full" />
             </CardContent>
         </Card>
     );
@@ -177,16 +221,16 @@ export function AiSplitForm() {
           )}
 
           {result && !isLoading && (
-            <div className="space-y-4 pt-4">
+            <div className="space-y-6 pt-4">
               <div>
-                <h3 className="mb-1 text-lg font-semibold">{t('aiSplitForm.suggestedKeyPointsLabel')}</h3>
-                <div className="p-3 rounded-md bg-secondary/50 text-sm">
+                <h3 className="mb-2 text-lg font-semibold text-primary">{t('aiSplitForm.suggestedKeyPointsLabel')}</h3>
+                <div className="p-3 rounded-md bg-secondary/50 prose prose-sm max-w-none">
                   {formatAiResponse(result.suggestedSplit)}
                 </div>
               </div>
               <div>
-                <h3 className="mb-1 text-lg font-semibold">{t('aiSplitForm.detailedAnalysisLabel')}</h3>
-                 <div className="p-3 rounded-md bg-secondary/50 text-sm">
+                <h3 className="mb-2 text-lg font-semibold text-primary">{t('aiSplitForm.detailedAnalysisLabel')}</h3>
+                 <div className="p-3 rounded-md bg-secondary/50 prose prose-sm max-w-none">
                   {formatAiResponse(result.reasoning)}
                 </div>
               </div>
@@ -197,4 +241,3 @@ export function AiSplitForm() {
     </div>
   );
 }
-
