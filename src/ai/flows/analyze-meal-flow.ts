@@ -70,7 +70,7 @@ const healthAdvicePrompt = ai.definePrompt({
             | Leggero Taglio| Sett. 3-4 | ~2000-2200      | 2.0-2.2         | 2.5-3.5            | 0.7-0.9       |
             \`\`\`
     *   **Se non viene posta una domanda specifica sui macro o integratori, e i dati sono sufficienti**, fornisci consigli generali su come l'utente potrebbe ottimizzare la sua idratazione, i suoi macro in relazione all'allenamento, o l'importanza del tracciamento delle misurazioni.
-    *   Se la risposta a una `userQuery` implica una lista di più di 3 passaggi o elementi, considera di formattarla come una tabella Markdown con una colonna.
+    *   Se la risposta a una 'userQuery' implica una lista di più di 3 passaggi o elementi, considera di formattarla come una tabella Markdown con una colonna.
 
 **Stile e Tono:**
 *   **Esperto e Autorevole:** Dimostra profonda conoscenza.
@@ -109,3 +109,4 @@ const healthAdvisorFlow = ai.defineFlow(
     return output;
   }
 );
+
