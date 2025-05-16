@@ -12,12 +12,14 @@ import { Progress } from '@/components/ui/progress';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
 import { CheckCircle, XCircle, Timer, Play, Pause, PlusCircle, Trash2, Award } from 'lucide-react';
 import { useLanguage } from '@/context/language-context';
-import { useEffect, useState, useRef, useMemo } from 'react'; // Added useMemo
+import { useEffect, useState, useMemo } from 'react';
 import Image from 'next/image';
 import { useToast } from '@/hooks/use-toast';
 import { cn } from '@/lib/utils';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useActiveWorkout } from '@/context/active-workout-context';
+
+const WORKOUT_HISTORY_STORAGE_KEY = 'sickfit-pro-workoutHistory';
 
 // Mock data for workout plans
 const mockWorkoutPlans = [
@@ -85,6 +87,15 @@ interface SessionPBs {
   maxWeight: number;
   maxReps: number;
 }
+
+export interface CompletedWorkout {
+  id: string;
+  planId: string;
+  planName: string;
+  completionDate: string; // YYYY-MM-DD
+  duration: string;
+}
+
 
 interface ExerciseCardProps {
   exercise: ActiveExercise;
@@ -244,6 +255,7 @@ export default function ActiveWorkoutPage() {
   const { toast } = useToast();
   const {
     activePlanId: contextActivePlanId,
+    activePlanName: contextActivePlanName,
     activeWorkoutStartTime: contextStartTimeFromProvider,
     clearActiveWorkout,
     isClient: activeWorkoutContextIsClient
@@ -298,7 +310,7 @@ export default function ActiveWorkoutPage() {
       router.push('/workouts');
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [planIdFromRoute, activeWorkoutContextIsClient, contextActivePlanId, router, toast, languageContextIsClient]);
+  }, [planIdFromRoute, activeWorkoutContextIsClient, contextActivePlanId, router, toast]); // languageContextIsClient removed as it was causing re-runs
 
   useEffect(() => {
     if (plan && activeWorkoutContextIsClient && contextStartTimeFromProvider) {
@@ -378,7 +390,32 @@ export default function ActiveWorkoutPage() {
   };
 
   const handleFinishWorkout = () => {
-    if (!languageContextIsClient) return;
+    if (!languageContextIsClient || !plan) return;
+
+    const completedWorkoutData: CompletedWorkout = {
+      id: String(Date.now()),
+      planId: plan.id,
+      planName: contextActivePlanName || plan.name, // Use contextActivePlanName if available
+      completionDate: new Date().toISOString().split('T')[0],
+      duration: elapsedTime,
+      // Potentially add loggedSets data here if needed for detailed history
+    };
+
+    if (typeof window !== 'undefined') {
+      const existingHistoryString = localStorage.getItem(WORKOUT_HISTORY_STORAGE_KEY);
+      let history: CompletedWorkout[] = [];
+      if (existingHistoryString) {
+        try {
+          history = JSON.parse(existingHistoryString);
+        } catch (e) {
+          console.error("Error parsing workout history from localStorage", e);
+          history = [];
+        }
+      }
+      history.unshift(completedWorkoutData); // Add to the beginning
+      localStorage.setItem(WORKOUT_HISTORY_STORAGE_KEY, JSON.stringify(history.slice(0, 20))); // Keep last 20
+    }
+    
     setIsTimerRunning(false);
     setIsFinished(true);
     clearActiveWorkout();

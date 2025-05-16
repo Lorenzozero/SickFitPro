@@ -95,7 +95,7 @@ const translations: Record<Language, Translations> = {
         goalSettingsButtonAriaLabel: "Macro Goal Settings", 
         goalSettingsTooltip: "Set weekly macro goals", 
     },
-    aiHealthAdvisor: {
+     aiHealthAdvisor: {
         cardTitle: "AI Health Advisor",
         userQueryPlaceholder: "Ask for supplement advice (e.g., for nails/memory) or how to reprogram monthly macros (even in a table)...",
         userQueryMinError: "If asking a question, please provide at least 10 characters.",
@@ -106,7 +106,7 @@ const translations: Record<Language, Translations> = {
         errorDescription: "Failed to get AI health advice. Please try again.",
         resultsTitle: "AI Health Advisor Results",
         overallAssessment: "Overall Assessment",
-        specificAdvice: "Specific Advice",
+        specificAdvice: "Specific Advice Points",
         generatingAdviceDescription: "AI is processing your advice...",
     },
     settingsPage: {
@@ -123,7 +123,7 @@ const translations: Record<Language, Translations> = {
       settingsSaved: 'Settings Saved',
       preferencesUpdated: 'Your preferences have been updated',
       profileInformationTitle: 'Profile Information',
-      uploadProfilePictureLabel: 'Profile Picture', // Kept for consistency if needed elsewhere, but not shown directly
+      uploadProfilePictureLabel: 'Profile Picture', 
       changeProfilePictureAriaLabel: 'Change profile picture',
       clickAvatarToChangePhoto: 'Click on the avatar to change your photo.',
       profilePictureAlt: 'Profile Picture',
@@ -148,7 +148,7 @@ const translations: Record<Language, Translations> = {
       currentWeightLabel: 'Current Weight (kg)',
       currentWeightPlaceholder: 'e.g., 70.5',
     },
-    aiSplitForm: {
+    aiSplitForm: { 
         cardTitle: "AI Fitness Advisor",
         generateAdviceButton: "Generate Advice",
         generatingSplitTitle: "Generating your advice...",
@@ -273,7 +273,7 @@ const translations: Record<Language, Translations> = {
         photoUploadedSuccess: "Photo uploaded successfully!",
         noPhotoAvailable: "No photo available",
     },
-    workoutPlansPage: {
+     workoutPlansPage: {
         title: "Workout Plans",
         createNewPlanButton: "Create New Plan",
         involvedMusclesLabel: "Muscles Involved:",
@@ -313,7 +313,7 @@ const translations: Record<Language, Translations> = {
         errorPlanNameRequired: "Plan name is required.",
         muscleGroupsLabel: "Muscle Groups", 
     },
-     startWorkoutPage: {
+    startWorkoutPage: {
       title: "Start New Workout",
       description: "Choose a plan to start or begin an ad-hoc session.",
       selectPlanTitle: "Select a Plan",
@@ -514,7 +514,7 @@ const translations: Record<Language, Translations> = {
       settingsSaved: 'Impostazioni Salvate',
       preferencesUpdated: 'Le tue preferenze sono state aggiornate',
       profileInformationTitle: 'Informazioni Profilo',
-      uploadProfilePictureLabel: 'Immagine Profilo', // Mantenuto per coerenza, ma non mostrato direttamente
+      uploadProfilePictureLabel: 'Immagine Profilo', 
       changeProfilePictureAriaLabel: 'Cambia immagine profilo',
       clickAvatarToChangePhoto: 'Clicca sull\'avatar per cambiare la tua foto.',
       profilePictureAlt: 'Immagine del Profilo',
@@ -672,7 +672,7 @@ const translations: Record<Language, Translations> = {
         dialogEditTitle: "Modifica Scheda Allenamento",
         dialogCreateTitle: "Crea Nuova Scheda Allenamento",
         planNameLabel: "Nome Scheda",
-        planDurationLabel: "Durata Stimata",
+        planDurationLabel: "Durata Stima",
         planDurationPlaceholder: "es. 60 min",
         exerciseNameLabel: "Esercizio",
         setsLabel: "Serie",
@@ -844,7 +844,7 @@ const translations: Record<Language, Translations> = {
       settingsSaved: 'Configuración Guardada',
       preferencesUpdated: 'Tus preferencias han sido actualizadas',
       profileInformationTitle: 'Información del Perfil',
-      uploadProfilePictureLabel: 'Foto de Perfil', // Mantenido por consistencia, pero no se muestra directamente
+      uploadProfilePictureLabel: 'Foto de Perfil', 
       changeProfilePictureAriaLabel: 'Cambiar foto de perfil',
       clickAvatarToChangePhoto: 'Haz clic en el avatar para cambiar tu foto.',
       profilePictureAlt: 'Foto de Perfil',
@@ -1236,7 +1236,7 @@ const translations: Record<Language, Translations> = {
       settingsSaved: 'Paramètres Enregistrés',
       preferencesUpdated: 'Vos préférences ont été mises à jour',
       profileInformationTitle: 'Informations du Profil',
-      uploadProfilePictureLabel: 'Photo de Profil', // Conservé pour la cohérence, mais non affiché directement
+      uploadProfilePictureLabel: 'Photo de Profil', 
       changeProfilePictureAriaLabel: 'Changer de photo de profil',
       clickAvatarToChangePhoto: 'Cliquez sur l\'avatar pour changer votre photo.',
       profilePictureAlt: 'Photo de Profil',
@@ -1574,7 +1574,7 @@ const translations: Record<Language, Translations> = {
         errorAllFieldsRequired: "Le nom, le moment et la quantité sont requis.",
         noSupplementsAdded: "Aucun supplément ajouté pour le moment. Cliquez sur \"Ajouter un Supplément\" pour commencer.",
         enableAllNotificationsLabel: "Toutes les Notifications",
-        enableAllNotificationsAria: "Activer/désactiver toutes les notifications de suppléments",
+        enableAllNotificationsAria: "Activer/désactiver toutes les notitications de suppléments",
         enableNotificationForSupplement: "Activer la notification pour ce supplément",
         enableNotificationAria: "Activer la notification pour {name}",
         disableNotificationAria: "Désactiver la notification pour {name}",
@@ -1686,4 +1686,3 @@ export function useLanguage() {
   }
   return context;
 }
-
