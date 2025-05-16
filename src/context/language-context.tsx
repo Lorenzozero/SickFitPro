@@ -123,7 +123,9 @@ const translations: Record<Language, Translations> = {
       settingsSaved: 'Settings Saved',
       preferencesUpdated: 'Your preferences have been updated',
       profileInformationTitle: 'Profile Information',
-      uploadProfilePictureLabel: 'Profile Picture',
+      uploadProfilePictureLabel: 'Profile Picture', // Kept for consistency if needed elsewhere, but not shown directly
+      changeProfilePictureAriaLabel: 'Change profile picture',
+      clickAvatarToChangePhoto: 'Click on the avatar to change your photo.',
       profilePictureAlt: 'Profile Picture',
       photoSizeError: 'Photo size should not exceed 2MB.',
       photoSizeLimit: 'Max 2MB. Recommended square aspect ratio.',
@@ -273,7 +275,6 @@ const translations: Record<Language, Translations> = {
     },
     workoutPlansPage: {
         title: "Workout Plans",
-        description: "Create, manage, and share your training programs.",
         createNewPlanButton: "Create New Plan",
         involvedMusclesLabel: "Muscles Involved:",
         startButton: "Start",
@@ -513,7 +514,9 @@ const translations: Record<Language, Translations> = {
       settingsSaved: 'Impostazioni Salvate',
       preferencesUpdated: 'Le tue preferenze sono state aggiornate',
       profileInformationTitle: 'Informazioni Profilo',
-      uploadProfilePictureLabel: 'Immagine Profilo',
+      uploadProfilePictureLabel: 'Immagine Profilo', // Mantenuto per coerenza, ma non mostrato direttamente
+      changeProfilePictureAriaLabel: 'Cambia immagine profilo',
+      clickAvatarToChangePhoto: 'Clicca sull\'avatar per cambiare la tua foto.',
       profilePictureAlt: 'Immagine del Profilo',
       photoSizeError: 'La dimensione della foto non deve superare i 2MB.',
       photoSizeLimit: 'Max 2MB. Formato quadrato consigliato.',
@@ -663,7 +666,6 @@ const translations: Record<Language, Translations> = {
     },
      workoutPlansPage: {
         title: "Schede Allenamento",
-        description: "Crea, gestisci e condividi i tuoi programmi di allenamento.",
         createNewPlanButton: "Crea Nuova Scheda",
         involvedMusclesLabel: "Muscoli Coinvolti:",
         startButton: "Inizia",
@@ -842,7 +844,9 @@ const translations: Record<Language, Translations> = {
       settingsSaved: 'Configuración Guardada',
       preferencesUpdated: 'Tus preferencias han sido actualizadas',
       profileInformationTitle: 'Información del Perfil',
-      uploadProfilePictureLabel: 'Foto de Perfil',
+      uploadProfilePictureLabel: 'Foto de Perfil', // Mantenido por consistencia, pero no se muestra directamente
+      changeProfilePictureAriaLabel: 'Cambiar foto de perfil',
+      clickAvatarToChangePhoto: 'Haz clic en el avatar para cambiar tu foto.',
       profilePictureAlt: 'Foto de Perfil',
       photoSizeError: 'El tamaño de la foto no debe exceder los 2MB.',
       photoSizeLimit: 'Máx 2MB. Se recomienda relación de aspecto cuadrada.',
@@ -1059,7 +1063,6 @@ const translations: Record<Language, Translations> = {
     },
     workoutPlansPage: {
         title: "Planes de Entrenamiento",
-        description: "Crea, gestiona y comparte tus programas de entrenamiento.",
         createNewPlanButton: "Crear Nuevo Plan",
         involvedMusclesLabel: "Músculos Involucrados:",
         startButton: "Empezar",
@@ -1233,7 +1236,9 @@ const translations: Record<Language, Translations> = {
       settingsSaved: 'Paramètres Enregistrés',
       preferencesUpdated: 'Vos préférences ont été mises à jour',
       profileInformationTitle: 'Informations du Profil',
-      uploadProfilePictureLabel: 'Photo de Profil',
+      uploadProfilePictureLabel: 'Photo de Profil', // Conservé pour la cohérence, mais non affiché directement
+      changeProfilePictureAriaLabel: 'Changer de photo de profil',
+      clickAvatarToChangePhoto: 'Cliquez sur l\'avatar pour changer votre photo.',
       profilePictureAlt: 'Photo de Profil',
       photoSizeError: 'La taille de la photo ne doit pas dépasser 2 Mo.',
       photoSizeLimit: 'Max 2Mo. Format carré recommandé.',
@@ -1450,7 +1455,6 @@ const translations: Record<Language, Translations> = {
     },
     workoutPlansPage: {
         title: "Programmes d'Entraînement",
-        description: "Créez, gérez et partagez vos programmes d'entraînement.",
         createNewPlanButton: "Créer un Nouveau Programme",
         involvedMusclesLabel: "Muscles Impliqués :",
         startButton: "Commencer",

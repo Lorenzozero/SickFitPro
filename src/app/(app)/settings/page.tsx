@@ -1,7 +1,7 @@
 
 'use client';
 
-import { useState, useEffect, type ChangeEvent } from 'react';
+import { useState, useEffect, type ChangeEvent, useRef } from 'react'; // Added useRef
 import Image from 'next/image';
 import { PageHeader } from '@/components/shared/page-header';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -16,7 +16,7 @@ import {
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Switch } from '@/components/ui/switch';
-import { Languages, Bell, Save, UserCircle, Shield, Eye, EyeOff, Weight } from 'lucide-react';
+import { Languages, Bell, Save, UserCircle, Shield, Eye, EyeOff, Weight, Camera } from 'lucide-react'; // Added Camera
 import { useToast } from '@/hooks/use-toast';
 import { useLanguage, type Language } from '@/context/language-context';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -27,7 +27,7 @@ export default function SettingsPage() {
   const { language, setLanguage, t, isClient: languageContextIsClient } = useLanguage();
   const [enableNotifications, setEnableNotifications] = useState(true);
   const { toast } = useToast();
-  const [isClient, setIsClient] = useState(false); // Local client mount state
+  const [isClient, setIsClient] = useState(false);
 
   const [profilePicture, setProfilePicture] = useState<string | null>(null);
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -43,9 +43,10 @@ export default function SettingsPage() {
   const [showNewPassword, setShowNewPassword] = useState(false);
   const [showConfirmNewPassword, setShowConfirmNewPassword] = useState(false);
 
+  const fileInputRef = useRef<HTMLInputElement>(null); // Ref for the hidden file input
 
   useEffect(() => {
-    setIsClient(true); // Indicate component has mounted on client
+    setIsClient(true);
     if (typeof window !== 'undefined') {
         const storedNotificationPref = localStorage.getItem('app-notifications-enabled');
         if (storedNotificationPref !== null) {
@@ -78,8 +79,12 @@ export default function SettingsPage() {
     }
   };
 
+  const handleAvatarClick = () => {
+    fileInputRef.current?.click();
+  };
+
   const handleSaveChanges = () => {
-    if (!isClient) return; // Ensure this runs only on client
+    if (!isClient) return;
     let changesMade = false;
     const updatedPreferences: string[] = [];
 
@@ -117,7 +122,7 @@ export default function SettingsPage() {
             });
             return;
         }
-        console.log('Attempting to change password...'); // Replace with actual password change logic
+        console.log('Attempting to change password...'); 
         localStorage.setItem('app-user-password-placeholder', newPassword); 
         setCurrentPassword('');
         setNewPassword('');
@@ -146,7 +151,7 @@ export default function SettingsPage() {
     }
   };
 
-  if (!isClient || !languageContextIsClient) { // Use both local isClient and languageContextIsClient for loading state
+  if (!isClient || !languageContextIsClient) {
     return (
       <>
         <PageHeader title={languageContextIsClient ? t('settingsPage.title') : "Settings"} />
@@ -168,9 +173,7 @@ export default function SettingsPage() {
 
   return (
     <>
-      <PageHeader
-        title={t('settingsPage.title')}
-      />
+      <PageHeader title={t('settingsPage.title')} />
       <div className="space-y-8">
         <Card className="shadow-lg">
           <CardHeader>
@@ -181,20 +184,34 @@ export default function SettingsPage() {
           </CardHeader>
           <CardContent className="space-y-6">
             <div className="flex flex-col items-center gap-4 sm:flex-row">
-              <Avatar className="w-24 h-24 text-lg">
-                <AvatarImage src={profilePicture || undefined} alt={t('settingsPage.profilePictureAlt')} data-ai-hint="profile avatar" />
-                <AvatarFallback>{name ? name.charAt(0).toUpperCase() : 'U'}</AvatarFallback>
-              </Avatar>
-              <div className="flex-grow w-full sm:w-auto">
-                <Label htmlFor="profile-picture-upload" className="text-sm font-medium">{t('settingsPage.uploadProfilePictureLabel')}</Label>
+              <button
+                type="button"
+                onClick={handleAvatarClick}
+                className="relative group rounded-full focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 cursor-pointer"
+                aria-label={t('settingsPage.changeProfilePictureAriaLabel', {default: 'Change profile picture'})}
+              >
+                <Avatar className="w-24 h-24 text-lg">
+                  <AvatarImage src={profilePicture || undefined} alt={t('settingsPage.profilePictureAlt')} data-ai-hint="profile avatar" />
+                  <AvatarFallback>{name ? name.charAt(0).toUpperCase() : 'U'}</AvatarFallback>
+                </Avatar>
+                <div className="absolute inset-0 flex items-center justify-center bg-black/40 rounded-full opacity-0 group-hover:opacity-100 group-focus-within:opacity-100 transition-opacity duration-200">
+                  <Camera className="w-8 h-8 text-white" />
+                </div>
+              </button>
+              <div className="flex-grow w-full sm:w-auto text-center sm:text-left">
                 <Input
                   id="profile-picture-upload"
                   type="file"
                   accept="image/*"
                   onChange={handleProfilePictureChange}
-                  className="mt-1 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-primary file:text-primary-foreground hover:file:bg-primary/90"
+                  ref={fileInputRef}
+                  className="hidden" 
                 />
-                <p className="mt-1 text-xs text-muted-foreground">{t('settingsPage.photoSizeLimit')}</p>
+                <p className="mt-1 text-sm text-muted-foreground">
+                  {t('settingsPage.clickAvatarToChangePhoto', {default: 'Click on the avatar to change your photo.'})}
+                  <br />
+                  {t('settingsPage.photoSizeLimit')}
+                </p>
               </div>
             </div>
             <div>
@@ -304,6 +321,7 @@ export default function SettingsPage() {
                     <Select
                         value={language}
                         onValueChange={(value) => setLanguage(value as Language)}
+                        
                     >
                         <SelectTrigger id="language-select" className="min-w-[200px]" aria-label={t('settingsPage.selectLanguage')}>
                             <SelectValue placeholder={t('settingsPage.selectLanguage')} />
@@ -347,3 +365,4 @@ export default function SettingsPage() {
     </>
   );
 }
+
