@@ -12,7 +12,7 @@ import { Progress } from '@/components/ui/progress';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
 import { CheckCircle, XCircle, Timer, Play, Pause, PlusCircle, Trash2, Award } from 'lucide-react';
 import { useLanguage } from '@/context/language-context';
-import { useEffect, useState, useRef } from 'react';
+import { useEffect, useState, useRef, useMemo } from 'react'; // Added useMemo
 import Image from 'next/image';
 import { useToast } from '@/hooks/use-toast';
 import { cn } from '@/lib/utils';
@@ -21,21 +21,21 @@ import { useActiveWorkout } from '@/context/active-workout-context';
 
 // Mock data for workout plans
 const mockWorkoutPlans = [
-  { 
-    id: '1', 
-    name: 'Full Body Blast', 
-    description: 'A comprehensive full-body workout for strength and endurance.', 
+  {
+    id: '1',
+    name: 'Full Body Blast',
+    description: 'A comprehensive full-body workout for strength and endurance.',
     exercises: [
       { id: 'ex1', name: 'Squats', targetSets: 3, targetReps: '8-12', gifUrl: 'https://placehold.co/300x200.png' , dataAiHint: "squat exercise"},
       { id: 'ex2', name: 'Bench Press', targetSets: 3, targetReps: '8-12', gifUrl: 'https://placehold.co/300x200.png', dataAiHint: "bench press" },
       { id: 'ex3', name: 'Deadlifts', targetSets: 1, targetReps: '5', gifUrl: 'https://placehold.co/300x200.png', dataAiHint: "deadlift variation" },
       { id: 'ex4', name: 'Overhead Press', targetSets: 3, targetReps: '8-12', gifUrl: 'https://placehold.co/300x200.png', dataAiHint: "shoulder press" },
       { id: 'ex5', name: 'Rows', targetSets: 3, targetReps: '8-12', gifUrl: 'https://placehold.co/300x200.png', dataAiHint: "back row" },
-    ] 
+    ]
   },
-  { 
-    id: '2', 
-    name: 'Upper Body Power', 
+  {
+    id: '2',
+    name: 'Upper Body Power',
     description: 'Focus on building strength in your chest, back, and arms.',
     exercises: [
       { id: 'ex6', name: 'Bench Press', targetSets: 4, targetReps: '6-10', gifUrl: 'https://placehold.co/300x200.png', dataAiHint: "bench press" },
@@ -43,9 +43,9 @@ const mockWorkoutPlans = [
       { id: 'ex8', name: 'Dips', targetSets: 3, targetReps: '10-15', gifUrl: 'https://placehold.co/300x200.png', dataAiHint: "tricep dip" },
     ]
   },
-  { 
-    id: '3', 
-    name: 'Leg Day Domination', 
+  {
+    id: '3',
+    name: 'Leg Day Domination',
     description: 'Intense leg workout to build lower body strength and size.',
     exercises: [
       { id: 'ex12', name: 'Squats', targetSets: 5, targetReps: '5', gifUrl: 'https://placehold.co/300x200.png', dataAiHint: "barbell squat" },
@@ -120,7 +120,7 @@ function ExerciseCard({ exercise, onLogSet, onDeleteSet, isCurrentlyVisible, exe
   }, { maxWeight: 0, maxReps: 0 });
 
   return (
-    <Card 
+    <Card
         className={cn(
             "shadow-xl overflow-hidden bg-card/80 backdrop-blur-sm transition-opacity duration-500 ease-in-out mb-8",
             isCurrentlyVisible ? 'opacity-100' : 'opacity-60'
@@ -130,11 +130,11 @@ function ExerciseCard({ exercise, onLogSet, onDeleteSet, isCurrentlyVisible, exe
       <div className="md:grid md:grid-cols-3">
         <div className="md:col-span-1 p-4 bg-muted/30 flex items-center justify-center">
           {exercise.gifUrl ? (
-            <Image 
-              src={exercise.gifUrl} 
-              alt={`${exercise.name} ${t('activeWorkoutPage.exerciseDemoAlt')}`} 
-              width={300} 
-              height={200} 
+            <Image
+              src={exercise.gifUrl}
+              alt={`${exercise.name} ${t('activeWorkoutPage.exerciseDemoAlt')}`}
+              width={300}
+              height={200}
               className="rounded-md object-cover shadow-md"
               data-ai-hint={exercise.dataAiHint || "exercise movement"}
             />
@@ -215,7 +215,7 @@ function ExerciseCard({ exercise, onLogSet, onDeleteSet, isCurrentlyVisible, exe
             {exercise.loggedSets.length === 0 && (
                 <p className="text-sm text-center text-muted-foreground py-4">{t('activeWorkoutPage.noSetsLoggedYet')}</p>
             )}
-            
+
             {sessionPBs.maxWeight > 0 || sessionPBs.maxReps > 0 ? (
                 <div className="p-3 mt-2 border rounded-md bg-accent/10">
                     <h4 className="mb-2 text-sm font-semibold text-accent-foreground flex items-center">
@@ -242,41 +242,39 @@ export default function ActiveWorkoutPage() {
   const router = useRouter();
   const { t, isClient: languageContextIsClient } = useLanguage();
   const { toast } = useToast();
-  const { 
+  const {
     activePlanId: contextActivePlanId,
-    activeWorkoutStartTime: contextStartTimeFromProvider, 
-    clearActiveWorkout, 
-    isClient: activeWorkoutContextIsClient 
+    activeWorkoutStartTime: contextStartTimeFromProvider,
+    clearActiveWorkout,
+    isClient: activeWorkoutContextIsClient
   } = useActiveWorkout();
 
   const [plan, setPlan] = useState<WorkoutPlan | null | undefined>(undefined);
   const [activeWorkout, setActiveWorkout] = useState<ActiveExercise[] | null>(null);
-  
+
   const [componentWorkoutStartTime, setComponentWorkoutStartTime] = useState<Date | null>(null);
   const [elapsedTime, setElapsedTime] = useState('00:00');
   const [isTimerRunning, setIsTimerRunning] = useState(false);
   const [isFinished, setIsFinished] = useState(false);
-  const [visibleExerciseId, setVisibleExerciseId] = useState<string | null>(null);
-  
-  const exerciseRefs = useRef<(HTMLDivElement | null)[]>([]);
+
   const planIdFromRoute = typeof paramsProp.planId === 'string' ? paramsProp.planId : undefined;
 
   useEffect(() => {
     if (!activeWorkoutContextIsClient || !planIdFromRoute) {
-      setPlan(null); 
+      setPlan(null);
       setActiveWorkout(null);
       return;
     }
 
     if (!contextActivePlanId || contextActivePlanId !== planIdFromRoute) {
-      if(languageContextIsClient) { // Ensure t() is ready
-        toast({ 
-          title: t('activeWorkoutPage.planNotFound', { default: "Workout Mismatch"}), 
-          description: t('activeWorkoutPage.planNotFoundDescription', { default: "No active workout for this plan or mismatch. Redirecting..."}), 
-          variant: "destructive" 
+      if(languageContextIsClient) {
+        toast({
+          title: t('activeWorkoutPage.planNotFound', { default: "Workout Mismatch"}),
+          description: t('activeWorkoutPage.planNotFoundDescription', { default: "No active workout for this plan or mismatch. Redirecting..."}),
+          variant: "destructive"
         });
       }
-      router.push('/start-workout'); 
+      router.push('/start-workout');
       setPlan(null);
       setActiveWorkout(null);
       return;
@@ -288,30 +286,26 @@ export default function ActiveWorkoutPage() {
     if (foundPlan) {
       const initialActiveWorkout = foundPlan.exercises.map(ex => ({ ...ex, loggedSets: [] }));
       setActiveWorkout(initialActiveWorkout);
-      if (initialActiveWorkout.length > 0) {
-        setVisibleExerciseId(initialActiveWorkout[0].id);
-        exerciseRefs.current = initialActiveWorkout.map(() => null);
-      }
     } else {
-      setActiveWorkout(null); 
-      if(languageContextIsClient) { // Ensure t() is ready
-        toast({ 
-          title: t('activeWorkoutPage.planNotFound', { default: "Plan Not Found"}), 
-          description: t('activeWorkoutPage.planNotFoundDescription', { default: "The workout plan could not be loaded."}), 
-          variant: "destructive" 
+      setActiveWorkout(null);
+      if(languageContextIsClient) {
+        toast({
+          title: t('activeWorkoutPage.planNotFound', { default: "Plan Not Found"}),
+          description: t('activeWorkoutPage.planNotFoundDescription', { default: "The workout plan could not be loaded."}),
+          variant: "destructive"
         });
       }
-      router.push('/workouts'); // Redirect to workout plans list
+      router.push('/workouts');
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [planIdFromRoute, activeWorkoutContextIsClient, contextActivePlanId, router, toast, languageContextIsClient]); // Added languageContextIsClient
+  }, [planIdFromRoute, activeWorkoutContextIsClient, contextActivePlanId, router, toast, languageContextIsClient]);
 
   useEffect(() => {
     if (plan && activeWorkoutContextIsClient && contextStartTimeFromProvider) {
       setComponentWorkoutStartTime(new Date(contextStartTimeFromProvider));
-      setIsTimerRunning(true); 
+      setIsTimerRunning(true);
     } else {
-      setIsTimerRunning(false); 
+      setIsTimerRunning(false);
     }
   }, [plan, contextStartTimeFromProvider, activeWorkoutContextIsClient]);
 
@@ -333,38 +327,19 @@ export default function ActiveWorkoutPage() {
     };
   }, [isTimerRunning, componentWorkoutStartTime, activeWorkoutContextIsClient]);
 
-  useEffect(() => {
-    if (!activeWorkout || activeWorkout.length === 0 || !activeWorkoutContextIsClient) return;
 
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach(entry => {
-          if (entry.isIntersecting && entry.intersectionRatio >= 0.5) {
-            setVisibleExerciseId(entry.target.id.replace('exercise-', ''));
-          }
-        });
-      },
-      { threshold: 0.5, rootMargin: "-40% 0px -40% 0px" } 
-    );
+  const firstUncompletedIndex = useMemo(() => {
+    if (!activeWorkout) return -1;
+    return activeWorkout.findIndex(ex => ex.loggedSets.length < ex.targetSets);
+  }, [activeWorkout]);
 
-    exerciseRefs.current.forEach(ref => {
-      if (ref) observer.observe(ref);
-    });
-
-    return () => {
-      exerciseRefs.current.forEach(ref => {
-        if (ref) observer.unobserve(ref);
-      });
-      observer.disconnect();
-    };
-  }, [activeWorkout, activeWorkoutContextIsClient]);
 
   const updateExerciseData = (exerciseId: string, updatedLoggedSets: LoggedSet[]) => {
     setActiveWorkout(prevWorkout => {
         if (!prevWorkout) return null;
-        const newWorkoutState = prevWorkout.map(ex => 
-            ex.id === exerciseId 
-            ? { ...ex, loggedSets: updatedLoggedSets } 
+        const newWorkoutState = prevWorkout.map(ex =>
+            ex.id === exerciseId
+            ? { ...ex, loggedSets: updatedLoggedSets }
             : ex
         );
         return newWorkoutState;
@@ -376,18 +351,18 @@ export default function ActiveWorkoutPage() {
     const targetExercise = activeWorkout.find(ex => ex.id === exerciseId);
     if (!targetExercise) return;
 
-    const newSet: LoggedSet = { 
-        id: String(Date.now()), 
-        reps: setData.reps, 
-        weight: setData.weight, 
-        date: new Date().toLocaleDateString(undefined, { year: 'numeric', month: '2-digit', day: '2-digit' }) 
+    const newSet: LoggedSet = {
+        id: String(Date.now()),
+        reps: setData.reps,
+        weight: setData.weight,
+        date: new Date().toLocaleDateString(undefined, { year: 'numeric', month: '2-digit', day: '2-digit' })
     };
     const updatedLoggedSets = [...targetExercise.loggedSets, newSet];
     updateExerciseData(exerciseId, updatedLoggedSets);
-    
-    toast({ 
-        title: t('activeWorkoutPage.toastSetLoggedTitle'), 
-        description: t('activeWorkoutPage.toastSetLoggedDescription', { exerciseName: targetExercise.name }) 
+
+    toast({
+        title: t('activeWorkoutPage.toastSetLoggedTitle'),
+        description: t('activeWorkoutPage.toastSetLoggedDescription', { exerciseName: targetExercise.name })
     });
   };
 
@@ -406,19 +381,19 @@ export default function ActiveWorkoutPage() {
     if (!languageContextIsClient) return;
     setIsTimerRunning(false);
     setIsFinished(true);
-    clearActiveWorkout(); 
-    toast({ 
-        title: t('activeWorkoutPage.toastWorkoutFinishedTitle'), 
-        description: t('activeWorkoutPage.toastWorkoutFinishedDescription', { duration: elapsedTime }) 
+    clearActiveWorkout();
+    toast({
+        title: t('activeWorkoutPage.toastWorkoutFinishedTitle'),
+        description: t('activeWorkoutPage.toastWorkoutFinishedDescription', { duration: elapsedTime })
     });
   };
-  
+
   const overallProgress = activeWorkout && activeWorkout.length > 0 && activeWorkout.reduce((acc, ex) => acc + ex.targetSets, 0) > 0
-    ? (activeWorkout.reduce((acc, ex) => acc + ex.loggedSets.length, 0) / 
-       activeWorkout.reduce((acc, ex) => acc + ex.targetSets, 0)) * 100 
+    ? (activeWorkout.reduce((acc, ex) => acc + ex.loggedSets.length, 0) /
+       activeWorkout.reduce((acc, ex) => acc + ex.targetSets, 0)) * 100
     : 0;
 
-  if (!activeWorkoutContextIsClient || !languageContextIsClient || plan === undefined) { 
+  if (!activeWorkoutContextIsClient || !languageContextIsClient || plan === undefined) {
     const loadingTitle = languageContextIsClient ? t('activeWorkoutPage.loadingWorkout') : "Loading Workout...";
     const loadingDescription = languageContextIsClient ? t('activeWorkoutPage.loadingDescription') : "Please wait while we fetch the plan details.";
     return (
@@ -449,7 +424,7 @@ export default function ActiveWorkoutPage() {
   if (!plan || !activeWorkout) {
     return <PageHeader title={t('activeWorkoutPage.planNotFound')} description={t('activeWorkoutPage.planNotFoundDescription')} />;
   }
-  
+
   if (isFinished) {
     return (
       <div className="flex flex-col items-center justify-center min-h-[calc(100vh-200px)] text-center p-4">
@@ -503,7 +478,7 @@ export default function ActiveWorkoutPage() {
           </div>
         }
       />
-      
+
       <div className="mb-6">
         <div className="flex items-center justify-between mb-1">
             <span className="text-sm text-muted-foreground">{t('activeWorkoutPage.overallProgressLabel')}</span>
@@ -514,12 +489,12 @@ export default function ActiveWorkoutPage() {
 
       <div className="space-y-8">
         {activeWorkout.map((exercise, index) => (
-          <div key={exercise.id} ref={el => exerciseRefs.current[index] = el} id={`exercise-wrapper-${exercise.id}`}>
+          <div key={exercise.id} id={`exercise-wrapper-${exercise.id}`}>
             <ExerciseCard
               exercise={exercise}
               onLogSet={handleLogSet}
               onDeleteSet={handleDeleteSet}
-              isCurrentlyVisible={exercise.id === visibleExerciseId}
+              isCurrentlyVisible={index === firstUncompletedIndex}
               exerciseIndex={index}
               totalExercises={activeWorkout.length}
               t={t}
@@ -538,4 +513,3 @@ export default function ActiveWorkoutPage() {
     </>
   );
 }
-
