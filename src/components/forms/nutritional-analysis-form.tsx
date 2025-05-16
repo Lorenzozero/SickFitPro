@@ -141,7 +141,7 @@ export default function AiHealthAdvisorForm() {
   const formValidationSchema = useMemo(() => {
     return HealthContextInputSchema.pick({ userQuery: true }).extend({
         userQuery: z.string().optional().refine(val => {
-          if (val && val.length > 0 && val.trim().length > 0) { // Check if not just whitespace
+          if (val && val.trim().length > 0) { // Check if not just whitespace
             return val.trim().length >= 10;
           }
           return true; // Empty or whitespace-only string is valid
@@ -238,6 +238,14 @@ export default function AiHealthAdvisorForm() {
     }
   };
 
+  // Automatically get initial advice when the component mounts
+  useEffect(() => {
+    if (languageContextIsClient && !adviceResult && !isLoading) { // Only if no result yet and not already loading
+      onSubmit({ userQuery: '' }); // Submit with an empty query to get initial advice
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [languageContextIsClient]); // Dependency on languageContextIsClient ensures t() is ready
+
   if (!languageContextIsClient) {
     return (
       <Card className="shadow-lg">
@@ -245,7 +253,6 @@ export default function AiHealthAdvisorForm() {
           <Skeleton className="h-7 w-3/4" />
         </CardHeader>
         <CardContent>
-          <Skeleton className="h-6 w-full mb-4" />
           <Skeleton className="h-24 w-full mb-4" />
           <Skeleton className="h-10 w-1/3 mx-auto" />
         </CardContent>
@@ -262,12 +269,6 @@ export default function AiHealthAdvisorForm() {
         </CardTitle>
       </CardHeader>
       <CardContent>
-        <div className="p-3 mb-6 text-sm border rounded-md bg-accent/10 text-accent-foreground">
-            <div className="flex items-start">
-                <Info className="w-5 h-5 mr-2 shrink-0 mt-0.5" />
-                <p>{t('aiHealthAdvisor.dataUsageInfo')}</p>
-            </div>
-        </div>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
             <FormField
@@ -289,7 +290,7 @@ export default function AiHealthAdvisorForm() {
             
             <div className="flex justify-center">
                 <Button type="submit" disabled={isLoading} className="w-full md:w-auto">
-                {isLoading ? (
+                {isLoading && !adviceResult ? ( // Show loader only if initial advice is loading
                     <Loader2 className="w-4 h-4 mr-2 animate-spin" />
                 ) : (
                     <Wand2 className="w-4 h-4 mr-2" />
@@ -300,14 +301,21 @@ export default function AiHealthAdvisorForm() {
           </form>
         </Form>
 
-        {isLoading && (
+        {isLoading && !adviceResult && ( // Show this loader only during initial advice generation
           <div className="mt-8 space-y-4 text-center">
             <Loader2 className="w-12 h-12 mx-auto animate-spin text-primary" />
             <p className="text-muted-foreground">{t('aiHealthAdvisor.generatingAdviceDescription', { default: "L'AI sta elaborando i tuoi consigli..."})}</p>
           </div>
         )}
+        
+        {isLoading && adviceResult && ( // Show a smaller loader if adviceResult already exists and we are refreshing
+            <div className="mt-8 flex justify-center">
+                <Loader2 className="w-6 h-6 animate-spin text-primary" />
+            </div>
+        )}
 
-        {adviceResult && !isLoading && (
+
+        {adviceResult && ( // Always show results if available, even if isLoading is true for a refresh
           <div className="mt-8 space-y-6 prose prose-sm max-w-none">
             <h3 className="text-xl font-semibold text-center text-primary">{t('aiHealthAdvisor.resultsTitle')}</h3>
             
@@ -332,3 +340,4 @@ export default function AiHealthAdvisorForm() {
     </Card>
   );
 }
+

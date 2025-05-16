@@ -96,7 +96,6 @@ const translations: Record<Language, Translations> = {
     },
     aiHealthAdvisor: {
         cardTitle: "AI Health Advisor",
-        dataUsageInfo: "Your stored macro goals, water intake goal, body measurements, and training summary will be automatically used by the AI to provide personalized advice. You can also ask a specific question below.",
         userQueryPlaceholder: "Ask for supplement advice (e.g., for nails/memory) or how to reprogram monthly macros (even in a table)...",
         userQueryMinError: "If asking a question, please provide at least 10 characters.",
         getAdviceButton: "Get AI Health Advice",
@@ -245,7 +244,6 @@ const translations: Record<Language, Translations> = {
         tableHeaderDate: "Date",
         tableHeaderMeasurementName: "Measurement",
         tableHeaderValue: "Value",
-        measurementReminderLabel: "Measurement Reminder",
         selectReminderFrequencyPlaceholder: "Set reminder frequency",
         reminderOff: "Off",
         reminderWeekly: "Weekly",
@@ -274,6 +272,7 @@ const translations: Record<Language, Translations> = {
     },
     workoutPlansPage: {
         title: "Workout Plans",
+        description: "Create, manage, and share your training programs.",
         createNewPlanButton: "Create New Plan",
         involvedMusclesLabel: "Muscles Involved:",
         startButton: "Start",
@@ -399,6 +398,7 @@ const translations: Record<Language, Translations> = {
         noSupplementsAdded: "No supplements added yet. Click \"Add Supplement\" to start tracking.",
         enableAllNotificationsLabel: "All Notifications",
         enableAllNotificationsAria: "Toggle all supplement notifications",
+        enableNotificationForSupplement: "Enable notification for this supplement",
         enableNotificationAria: "Enable notification for {name}",
         disableNotificationAria: "Disable notification for {name}",
     }
@@ -485,7 +485,6 @@ const translations: Record<Language, Translations> = {
     },
      aiHealthAdvisor: {
         cardTitle: "Consulente Salute AI",
-        dataUsageInfo: "I tuoi obiettivi macro, l'obiettivo di assunzione di acqua, le misurazioni corporee e il riepilogo degli allenamenti memorizzati verranno utilizzati automaticamente dall'AI per fornire consigli più personalizzati. Puoi anche porre una domanda specifica qui sotto.",
         userQueryPlaceholder: "Chiedimi integratori per migliorare unghie/memoria, o come riprogrammare i macro mensili (anche in tabella)...",
         userQueryMinError: "Se poni una domanda, fornisci almeno 10 caratteri.",
         getAdviceButton: "Ottieni Consulenza Salute AI",
@@ -662,6 +661,7 @@ const translations: Record<Language, Translations> = {
     },
      workoutPlansPage: {
         title: "Schede Allenamento",
+        description: "Crea, gestisci e condividi i tuoi programmi di allenamento.",
         createNewPlanButton: "Crea Nuova Scheda",
         involvedMusclesLabel: "Muscoli Coinvolti:",
         startButton: "Inizia",
@@ -787,6 +787,7 @@ const translations: Record<Language, Translations> = {
         noSupplementsAdded: "Nessun integratore aggiunto. Clicca \"Aggiungi Integratore\" per iniziare.",
         enableAllNotificationsLabel: "Tutte le Notifiche",
         enableAllNotificationsAria: "Attiva/disattiva tutte le notifiche degli integratori",
+        enableNotificationForSupplement: "Abilita notifica per questo integratore",
         enableNotificationAria: "Abilita notifica per {name}",
         disableNotificationAria: "Disabilita notifica per {name}",
     }
@@ -911,7 +912,6 @@ const translations: Record<Language, Translations> = {
     },
     aiHealthAdvisor: {
         cardTitle: "Asesor de Salud IA",
-        dataUsageInfo: "Tus metas de macronutrientes, meta de ingesta de agua, mediciones corporales y resumen de entrenamiento almacenados se utilizarán automáticamente por la IA para proporcionar consejos más personalizados. También puedes hacer una pregunta específica a continuación.",
         userQueryPlaceholder: "Pide consejo sobre suplementos (ej. para uñas/memoria) o cómo reprogramar macros mensuales (incluso en tabla)...",
         userQueryMinError: "Si haces una pregunta, proporciona al menos 10 caracteres.",
         getAdviceButton: "Obtener Consejo de Salud IA",
@@ -1056,6 +1056,7 @@ const translations: Record<Language, Translations> = {
     },
     workoutPlansPage: {
         title: "Planes de Entrenamiento",
+        description: "Crea, gestiona y comparte tus programas de entrenamiento.",
         createNewPlanButton: "Crear Nuevo Plan",
         involvedMusclesLabel: "Músculos Involucrados:",
         startButton: "Empezar",
@@ -1176,6 +1177,7 @@ const translations: Record<Language, Translations> = {
         noSupplementsAdded: "Aún no hay suplementos añadidos. Haz clic en \"Añadir Suplemento\" para empezar.",
         enableAllNotificationsLabel: "Todas las Notificaciones",
         enableAllNotificationsAria: "Activar/desactivar todas las notificaciones de suplementos",
+        enableNotificationForSupplement: "Habilitar notificación para este suplemento",
         enableNotificationAria: "Habilitar notificación para {name}",
         disableNotificationAria: "Deshabilitar notificación para {name}",
     }
@@ -1300,7 +1302,6 @@ const translations: Record<Language, Translations> = {
     },
      aiHealthAdvisor: {
         cardTitle: "Conseiller Santé IA",
-        dataUsageInfo: "Vos objectifs macro, votre objectif d'apport en eau, vos mesures corporelles et votre résumé d'entraînement stockés seront automatiquement utilisés par l'IA pour fournir des conseils plus personnalisés. Vous pouvez également poser une question spécifique ci-dessous.",
         userQueryPlaceholder: "Demandez conseil sur les suppléments (ex: ongles/mémoire) ou comment reprogrammer les macros mensuelles (même en tableau)...",
         userQueryMinError: "Si vous posez une question, veuillez fournir au moins 10 caractères.",
         getAdviceButton: "Obtenir Conseil Santé IA",
@@ -1445,6 +1446,7 @@ const translations: Record<Language, Translations> = {
     },
     workoutPlansPage: {
         title: "Programmes d'Entraînement",
+        description: "Créez, gérez et partagez vos programmes d'entraînement.",
         createNewPlanButton: "Créer un Nouveau Programme",
         involvedMusclesLabel: "Muscles Impliqués :",
         startButton: "Commencer",
@@ -1565,6 +1567,7 @@ const translations: Record<Language, Translations> = {
         noSupplementsAdded: "Aucun supplément ajouté pour le moment. Cliquez sur \"Ajouter un Supplément\" pour commencer.",
         enableAllNotificationsLabel: "Toutes les Notifications",
         enableAllNotificationsAria: "Activer/désactiver toutes les notifications de suppléments",
+        enableNotificationForSupplement: "Activer la notification pour ce supplément",
         enableNotificationAria: "Activer la notification pour {name}",
         disableNotificationAria: "Désactiver la notification pour {name}",
     }
@@ -1675,3 +1678,4 @@ export function useLanguage() {
   }
   return context;
 }
+
