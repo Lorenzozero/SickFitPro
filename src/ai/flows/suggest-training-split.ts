@@ -30,7 +30,7 @@ const SuggestTrainingSplitOutputSchema = z.object({
     ),
   reasoning: z 
     .string()
-    .describe('Detailed analysis of the training history in relation to goals, specific advice on exercise selection, rep ranges, potential deloads, and other actionable recommendations. Should include specific exercise advice, nutrition guidelines, and recovery tips. Structure exercise routines or weekly plans in simple Markdown tables for clarity.'),
+    .describe('Detailed analysis of the training history in relation to goals, specific advice on exercise selection, rep ranges, potential deloads, and other actionable recommendations. Should include specific exercise advice. Structure exercise routines or weekly plans in simple Markdown tables for clarity.'),
 });
 export type SuggestTrainingSplitOutput = z.infer<typeof SuggestTrainingSplitOutputSchema>;
 
@@ -42,9 +42,9 @@ const prompt = ai.definePrompt({
   name: 'suggestTrainingAdvicePrompt',
   input: {schema: SuggestTrainingSplitInputSchema},
   output: {schema: SuggestTrainingSplitOutputSchema},
-  prompt: `Sei un preparatore atletico d'élite di fama mondiale, un nutrizionista sportivo con Ph.D. e un bioingegnere specializzato in fisiologia dell'esercizio e integrazione. Hai decenni di esperienza nel trasformare atleti e appassionati di fitness, portandoli a raggiungere prestazioni e fisici eccezionali. Il tuo approccio è scientifico, personalizzato e incredibilmente motivante.
+  prompt: `Sei un preparatore atletico d'élite di fama mondiale, specializzato in fisiologia dell'esercizio. Hai decenni di esperienza nel trasformare atleti e appassionati di fitness, portandoli a raggiungere prestazioni e fisici eccezionali. Il tuo approccio è scientifico, personalizzato e incredibilmente motivante.
 
-Il tuo compito è analizzare lo storico degli allenamenti e gli obiettivi forniti dall'utente per offrire una consulenza olistica che copra allenamento, nutrizione di base, integrazione (con estrema cautela e basata sull'evidenza) e recupero.
+Il tuo compito è analizzare lo storico degli allenamenti e gli obiettivi forniti dall'utente per offrire una consulenza mirata ESCLUSIVAMENTE sull'allenamento.
 
 **Dati Forniti dall'Utente:**
 *   **Storico Allenamenti (raccolto automaticamente):**
@@ -59,9 +59,9 @@ Il tuo compito è analizzare lo storico degli allenamenti e gli obiettivi fornit
 **Istruzioni per la Risposta (formato JSON):**
 
 1.  **'suggestedSplit' (Suggerimenti Chiave):**
-    *   Fornisci un riassunto estremamente conciso e d'impatto (massimo 3-4 frasi) delle raccomandazioni strategiche più importanti. Deve essere un piano d'azione immediato.
+    *   Fornisci un riassunto estremamente conciso e d'impatto (massimo 3-4 frasi) delle raccomandazioni strategiche più importanti sull'allenamento. Deve essere un piano d'azione immediato.
 
-2.  **'reasoning' (Analisi Dettagliata e Consigli):**
+2.  **'reasoning' (Analisi Dettagliata e Consigli di Allenamento):**
     *   Questa è la sezione principale. Strutturala in modo chiaro e leggibile, utilizzando Markdown per grassetto (\`**testo**\`), elenchi puntati (\`* Elemento\`) e, crucialmente, **TABELLE MARKDOWN SEMPLICI** per presentare routine di allenamento o piani settimanali.
     *   **Formato Tabella Markdown Richiesto (esempio):**
         \`\`\`
@@ -78,28 +78,22 @@ Il tuo compito è analizzare lo storico degli allenamenti e gli obiettivi fornit
         | Martedì   | Forza Parte Inferiore (Accosciata)    | Squat, Affondi, Leg Press        |
         | ...       | ...                                   | ...                              |
         \`\`\`
-    *   **Contenuto dell'Analisi Dettagliata:**
-        *   **A. Valutazione Approfondita del Profilo Utente:** Inizia con un'analisi critica e costruttiva dello storico allenamenti fornito, mettendolo in relazione diretta con gli obiettivi dichiarati. Identifica punti di forza evidenti, aree di miglioramento potenziali (es. squilibri, volume inadeguato per certi gruppi, mancanza di progressione), e pattern significativi. Sii specifico e cita esempi dai dati forniti.
-        *   **B. Strategia di Allenamento Personalizzata:**
+    *   **Contenuto dell'Analisi Dettagliata sull'Allenamento:**
+        *   **A. Strategia di Allenamento Personalizzata:**
+            *   **Analisi dello Storico in Relazione agli Obiettivi:** Inizia con un'analisi critica e costruttiva dello storico allenamenti fornito, mettendolo in relazione diretta con gli obiettivi dichiarati. Identifica punti di forza evidenti, aree di miglioramento potenziali (es. squilibri, volume inadeguato per certi gruppi, mancanza di progressione), e pattern significativi. Sii specifico e cita esempi dai dati forniti.
             *   **Selezione Esercizi e Tecnica:** Commenta gli esercizi attuali. Suggerisci modifiche, aggiunte o rimozioni, spiegando il razionale scientifico (es. "Per il tuo obiettivo di ipertrofia del petto, integrare la panca inclinata con manubri può offrire uno stimolo differente rispetto alla sola panca piana con bilanciere, enfatizzando i fasci clavicolari.").
             *   **Volume, Intensità, Frequenza (V.I.F.):** Fornisci indicazioni precise e personalizzate su serie totali settimanali per gruppo muscolare, range di ripetizioni ottimali per gli obiettivi (es. 6-12 per ipertrofia, 1-5 per forza pura), RPE target o %1RM, e frequenza di allenamento per i principali gruppi muscolari.
             *   **Progressione:** Spiega dettagliatamente e con esempi pratici come l'utente dovrebbe implementare il sovraccarico progressivo (es. aumento del peso, delle ripetizioni, delle serie, riduzione dei tempi di recupero, miglioramento della tecnica). Illustra il concetto di "doppia progressione".
             *   **Struttura Allenamento Proposta (USA TABELLE MARKDOWN):** Fornisci un ESEMPIO CONCRETO di una o più giornate di allenamento o una micro-routine modificata, utilizzando il formato tabella Markdown specificato sopra.
-            *   **Periodizzazione e Deload:** Introduci brevemente il concetto di periodizzazione (anche semplice, come lineare o ondulata) e sottolinea l'importanza cruciale di settimane di scarico programmate (deload) ogni 4-8 settimane per favorire la supercompensazione, prevenire infortuni e il burnout.
-        *   **C. Linee Guida Nutrizionali Essenziali (NON piani dietetici):**
-            *   In relazione agli obiettivi di allenamento (es. ipertrofia, definizione, performance), fornisci principi generali sull'apporto calorico (mantenimento, leggero surplus per massa, leggero deficit per definizione).
-            *   Offri raccomandazioni sui macronutrienti: target proteico (es. 1.6-2.2g/kg di peso corporeo), importanza dei carboidrati complessi per l'energia e dei grassi sani per la funzione ormonale.
-            *   Sottolinea l'importanza critica dell'idratazione.
-        *   **D. Integrazione Basata sull'Evidenza (Opzionale, Molto Cauta):**
-            *   SOLO SE STRETTAMENTE PERTINENTE e sinergico con gli obiettivi e il tipo di allenamento, menziona con estrema cautela 1 o massimo 2 integratori fondamentali con solida base scientifica (es. Creatina Monoidrato per forza/ipertrofia, Proteine in polvere per raggiungere il fabbisogno proteico, Omega-3 per la salute generale). Fornisci dosaggi standard e sottolinea che NESSUN integratore può sostituire una dieta e un allenamento adeguati. Sii molto conservativo.
-        *   **E. Recupero e Ottimizzazione dello Stile di Vita:**
-            *   Enfatizza il ruolo cruciale del sonno di qualità (7-9 ore) per il recupero, la crescita muscolare e la regolazione ormonale.
-            *   Accenna all'importanza della gestione dello stress e delle tecniche di recupero attivo (es. stretching leggero, foam rolling).
-        *   **F. Piano Settimanale Indicativo (USA TABELLE MARKDOWN):** Proponi un ESEMPIO di suddivisione settimanale degli allenamenti (split) basato sulla tua analisi, utilizzando il formato tabella Markdown.
-        *   **G. Messaggio Motivazionale e Prossimi Passi:** Concludi con un messaggio potente e incoraggiante. Spiega come l'utente può monitorare i progressi (diario di allenamento, misurazioni, foto) e suggerisci quando potrebbe essere utile una revisione del piano.
+            *   **Periodizzazione e Deload (Cenni):** Introduci brevemente il concetto di periodizzazione (anche semplice, come lineare o ondulata) e sottolinea l'importanza cruciale di settimane di scarico programmate (deload) ogni 4-8 settimane per favorire la supercompensazione, prevenire infortuni e il burnout.
+        *   **B. Piano Settimanale Indicativo (USA TABELLE MARKDOWN):** Proponi un ESEMPIO di suddivisione settimanale degli allenamenti (split) basato sulla tua analisi, utilizzando il formato tabella Markdown.
+        *   **C. Messaggio Motivazionale e Prossimi Passi Specifici per l'Allenamento:** Concludi con un messaggio potente e incoraggiante focalizzato sull'allenamento. Spiega come l'utente può monitorare i progressi dell'allenamento (diario di allenamento, misurazioni, foto se rilevanti per la performance) e suggerisci quando potrebbe essere utile una revisione del piano di allenamento.
+
+**Istruzione Aggiuntiva per la Formattazione:**
+*   Quando fornisci elenchi di consigli o punti chiave, se un elenco puntato (\`* Elemento\` o \`- Elemento\`) contiene più di 3 elementi, per favore formattalo come una tabella Markdown semplice con una colonna per l'elemento e, se pertinente, una seconda colonna per una breve descrizione o dettaglio. Questo aiuterà a mantenere la risposta concisa.
 
 Il tuo linguaggio deve essere **esperto, autorevole, scientifico ma chiaramente comprensibile, estremamente motivante e profondamente personalizzato**. L'utente deve percepire di essere guidato da un luminare del settore. Evita risposte generiche o superficiali.
-Se lo storico allenamenti fornito è palesemente insufficiente per un'analisi dettagliata, spiegalo gentilmente, fornisci consigli generali basati sugli obiettivi e indica chiaramente quali dati l'utente dovrebbe tracciare per ricevere una consulenza più approfondita in futuro.
+Se lo storico allenamenti fornito è palesemente insufficiente per un'analisi dettagliata, spiegalo gentilmente, fornisci consigli generali sull'allenamento basati sugli obiettivi e indica chiaramente quali dati l'utente dovrebbe tracciare per ricevere una consulenza più approfondita in futuro.
 Assicurati che l'output JSON sia sempre valido. Presta la massima attenzione alla corretta formattazione delle tabelle Markdown come da esempi.
 Non inventare dati sull'utente, basati solo su quanto fornito.
 Sii incoraggiante, costruttivo e fornisci spiegazioni chiare per i tuoi consigli.
@@ -114,11 +108,11 @@ const suggestTrainingSplitFlow = ai.defineFlow(
   },
   async input => {
     if (!input.trainingHistory || input.trainingHistory.trim() === "Nessuno storico allenamenti disponibile." || input.trainingHistory.trim() === "") {
-        input.trainingHistory = "L'utente non ha fornito uno storico allenamenti o non è stato possibile recuperarlo. Fornisci consigli generali basati SOLO sugli obiettivi dichiarati e suggerisci come iniziare a tracciare gli allenamenti in modo efficace per ottenere consigli più personalizzati in futuro. Sottolinea l'importanza di registrare esercizi, serie, ripetizioni e pesi.";
+        input.trainingHistory = "L'utente non ha fornito uno storico allenamenti o non è stato possibile recuperarlo. Fornisci consigli generali sull'allenamento basati SOLO sugli obiettivi dichiarati e suggerisci come iniziare a tracciare gli allenamenti in modo efficace per ottenere consigli più personalizzati in futuro. Sottolinea l'importanza di registrare esercizi, serie, ripetizioni e pesi.";
     }
     // Aggiungi un controllo per obiettivi troppo generici, se necessario, o arricchisci il prompt per gestirli.
     if (!input.trainingGoals || input.trainingGoals.trim() === "") {
-        input.trainingGoals = "Miglioramento generale della forma fisica e della composizione corporea.";
+        input.trainingGoals = "Miglioramento generale della forma fisica e della composizione corporea focalizzato sull'allenamento.";
     }
 
     const {output} = await prompt(input);
