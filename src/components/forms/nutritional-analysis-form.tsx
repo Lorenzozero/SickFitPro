@@ -5,7 +5,7 @@ import { useState, type ChangeEvent, useEffect, useMemo } from 'react';
 import { useForm, type SubmitHandler } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Form, FormControl, FormDescription, FormField, FormItem, FormMessage } from '@/components/ui/form';
+import { Form, FormControl, FormField, FormItem, FormMessage } from '@/components/ui/form';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Loader2, Wand2, Info } from 'lucide-react';
@@ -17,6 +17,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import type { BodyMeasurement } from '@/app/(app)/progress/page';
 import { mockGetUserTrainingData, formatTrainingDataToString } from '@/components/forms/ai-split-form';
 import { z } from 'zod';
+import React from 'react';
 
 
 // Type for the fields managed by react-hook-form. User only edits userQuery.
@@ -24,23 +25,128 @@ interface UserEditableFormValues {
   userQuery?: string;
 }
 
+// Funzione per formattare la risposta AI (simile a quella in AiSplitForm)
+const formatHealthAdviceResponse = (text: string): React.ReactNode[] => {
+  if (!text) return [];
+
+  const elements: React.ReactNode[] = [];
+  const lines = text.split('\n');
+  
+  let currentListItems: React.ReactNode[] = [];
+  let inTable = false;
+  let tableHeaders: React.ReactNode[] = [];
+  let tableRows: React.ReactNode[][] = [];
+
+  function flushList() {
+    if (currentListItems.length > 0) {
+      elements.push(<ul key={`ul-${elements.length}-${Math.random()}`} className="my-2 ml-6 list-disc space-y-1">{currentListItems}</ul>);
+      currentListItems = [];
+    }
+  }
+
+  function flushTable() {
+    if (tableHeaders.length > 0 || tableRows.length > 0) {
+      elements.push(
+        <div key={`table-wrapper-${elements.length}-${Math.random()}`} className="my-4 overflow-x-auto rounded-md border border-border">
+          <table className="min-w-full w-full border-collapse text-sm">
+            {tableHeaders.length > 0 && (
+              <thead className="bg-muted/50">
+                <tr>{tableHeaders}</tr>
+              </thead>
+            )}
+            {tableRows.length > 0 && (
+              <tbody>
+                {tableRows.map((row, i) => (
+                  <tr key={`tr-${i}-${Math.random()}`} className="border-b border-border last:border-b-0 hover:bg-muted/20">
+                    {row}
+                  </tr>
+                ))}
+              </tbody>
+            )}
+          </table>
+        </div>
+      );
+    }
+    inTable = false;
+    tableHeaders = [];
+    tableRows = [];
+  }
+  
+  function processInlineFormatting(lineContent: string): React.ReactNode {
+    const parts = lineContent.split(/(\*\*.*?\*\*)/g); 
+    return parts.filter(Boolean).map((part, index) => {
+      if (part.startsWith('**') && part.endsWith('**')) {
+        return <strong key={`strong-part-${index}-${Math.random()}`}>{part.substring(2, part.length - 2)}</strong>;
+      }
+      return part; 
+    });
+  }
+
+  lines.forEach((line, lineIndex) => {
+    const trimmedLine = line.trim();
+
+    if (trimmedLine.startsWith('|') && trimmedLine.endsWith('|')) {
+      if (!inTable) {
+        flushList();
+        inTable = true;
+      }
+      const cells = trimmedLine.split('|').slice(1, -1).map(cell => cell.trim());
+      
+      if (cells.every(cell => cell.match(/^--+$/))) {
+        // Markdown table separator line, only used if headers are not yet set from first data row
+         if (tableHeaders.length === 0 && tableRows.length > 0 && tableRows[0].length === cells.length) {
+            tableHeaders = tableRows[0].map((cellContent, i) => 
+                <th key={`th-implicit-${lineIndex}-${i}-${Math.random()}`} className="p-2 border-b border-r border-border text-left font-semibold last:border-r-0">{cellContent}</th>
+            );
+            tableRows.shift(); 
+        }
+      } else if (tableHeaders.length === 0 && tableRows.length === 0) { 
+        tableHeaders = cells.map((cell, i) => 
+            <th key={`th-${lineIndex}-${i}-${Math.random()}`} className="p-2 border-b border-r border-border text-left font-semibold last:border-r-0">{processInlineFormatting(cell)}</th>
+        );
+      } else { 
+        tableRows.push(cells.map((cell, i) => 
+            <td key={`td-${lineIndex}-${i}-${Math.random()}`} className="p-2 border-r border-border last:border-r-0">{processInlineFormatting(cell)}</td>
+        ));
+      }
+    } else { 
+      if (inTable) {
+        flushTable();
+      }
+      if (trimmedLine.startsWith('* ') || trimmedLine.startsWith('- ')) {
+        const listItemText = trimmedLine.substring(trimmedLine.startsWith('* ') ? 2 : 1).trimStart();
+        currentListItems.push(<li key={`li-${lineIndex}-${Math.random()}`}>{processInlineFormatting(listItemText)}</li>);
+      } else {
+        flushList();
+        if (trimmedLine) {
+          elements.push(<p key={`p-${lineIndex}-${Math.random()}`} className="my-2">{processInlineFormatting(trimmedLine)}</p>);
+        }
+      }
+    }
+  });
+
+  flushTable(); 
+  flushList(); 
+
+  return elements;
+};
+
+
 export default function AiHealthAdvisorForm() {
-  const { t } = useLanguage();
+  const { t, isClient: languageContextIsClient } = useLanguage();
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
   const [adviceResult, setAdviceResult] = useState<HealthAdviceOutput | null>(null);
 
   const formValidationSchema = useMemo(() => {
-    return z.object({
-      userQuery: z.string()
-        .optional()
-        .refine(val => {
-          if (val && val.length > 0) {
-            return val.length >= 10;
+    return HealthContextInputSchema.pick({ userQuery: true }).extend({
+        userQuery: z.string().optional().refine(val => {
+          if (val && val.length > 0 && val.trim().length > 0) { // Check if not just whitespace
+            return val.trim().length >= 10;
           }
-          return true; 
+          return true; // Empty or whitespace-only string is valid
         }, { message: t('aiHealthAdvisor.userQueryMinError') }),
-    });
+      });
   }, [t]);
   
   const form = useForm<UserEditableFormValues>({
@@ -51,10 +157,10 @@ export default function AiHealthAdvisorForm() {
   });
   
   useEffect(() => {
-    if (form.formState.errors.userQuery) {
+    if (form.formState.errors.userQuery && languageContextIsClient) {
         form.trigger('userQuery'); 
     }
-  }, [t, form, formValidationSchema]);
+  }, [t, form, formValidationSchema, languageContextIsClient]);
 
 
   const onSubmit: SubmitHandler<UserEditableFormValues> = async (formData) => {
@@ -102,7 +208,7 @@ export default function AiHealthAdvisorForm() {
     }
 
     const inputData: HealthContextInput = {
-      userQuery: formData.userQuery || undefined, 
+      userQuery: formData.userQuery?.trim() || undefined, 
       userMacroGoalsSummary,
       userWaterGoalMl,
       userBodyMeasurementsSummary,
@@ -112,21 +218,40 @@ export default function AiHealthAdvisorForm() {
     try {
       const response = await getHealthAdvice(inputData);
       setAdviceResult(response);
-      toast({
-        title: t('aiHealthAdvisor.adviceReadyTitle'),
-        description: t('aiHealthAdvisor.adviceReadyDescription'),
-      });
+      if (languageContextIsClient) {
+        toast({
+            title: t('aiHealthAdvisor.adviceReadyTitle'),
+            description: t('aiHealthAdvisor.adviceReadyDescription'),
+        });
+      }
     } catch (error) {
       console.error("Error fetching AI health advice:", error);
-      toast({
-        title: t('aiHealthAdvisor.errorTitle'),
-        description: t('aiHealthAdvisor.errorDescription'),
-        variant: "destructive",
-      });
+      if (languageContextIsClient) {
+        toast({
+            title: t('aiHealthAdvisor.errorTitle'),
+            description: t('aiHealthAdvisor.errorDescription'),
+            variant: "destructive",
+        });
+      }
     } finally {
       setIsLoading(false);
     }
   };
+
+  if (!languageContextIsClient) {
+    return (
+      <Card className="shadow-lg">
+        <CardHeader>
+          <Skeleton className="h-7 w-3/4" />
+        </CardHeader>
+        <CardContent>
+          <Skeleton className="h-6 w-full mb-4" />
+          <Skeleton className="h-24 w-full mb-4" />
+          <Skeleton className="h-10 w-1/3 mx-auto" />
+        </CardContent>
+      </Card>
+    );
+  }
 
   return (
     <Card className="shadow-lg">
@@ -176,32 +301,29 @@ export default function AiHealthAdvisorForm() {
         </Form>
 
         {isLoading && (
-          <div className="mt-8 space-y-4">
-            <Skeleton className="h-8 w-1/2 mx-auto" />
-            <Skeleton className="h-16 w-full" />
-            <Skeleton className="h-24 w-full" />
+          <div className="mt-8 space-y-4 text-center">
+            <Loader2 className="w-12 h-12 mx-auto animate-spin text-primary" />
+            <p className="text-muted-foreground">{t('aiHealthAdvisor.generatingAdviceDescription', { default: "L'AI sta elaborando i tuoi consigli..."})}</p>
           </div>
         )}
 
         {adviceResult && !isLoading && (
-          <div className="mt-8 space-y-6">
+          <div className="mt-8 space-y-6 prose prose-sm max-w-none">
             <h3 className="text-xl font-semibold text-center text-primary">{t('aiHealthAdvisor.resultsTitle')}</h3>
             
             <Card className="bg-secondary/30">
                 <CardHeader><CardTitle className="text-lg">{t('aiHealthAdvisor.overallAssessment')}</CardTitle></CardHeader>
-                <CardContent>
-                    <p className="whitespace-pre-line text-sm">{adviceResult.overallAssessment}</p>
+                <CardContent className="prose prose-sm max-w-none">
+                    {formatHealthAdviceResponse(adviceResult.overallAssessment)}
                 </CardContent>
             </Card>
 
             <Card className="bg-secondary/30">
                 <CardHeader><CardTitle className="text-lg">{t('aiHealthAdvisor.specificAdvice')}</CardTitle></CardHeader>
-                <CardContent>
-                    <ul className="list-disc pl-5 space-y-1 text-sm">
-                        {adviceResult.specificAdvicePoints.map((advice, index) => (
-                            <li key={index}>{advice}</li>
-                        ))}
-                    </ul>
+                <CardContent className="prose prose-sm max-w-none">
+                     {adviceResult.specificAdvicePoints.map((advice, index) => (
+                        <div key={index} className="mb-2">{formatHealthAdviceResponse(advice)}</div>
+                     ))}
                 </CardContent>
             </Card>
           </div>

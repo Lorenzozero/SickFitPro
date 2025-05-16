@@ -20,7 +20,6 @@ const translations: Record<Language, Translations> = {
       calendar: 'Calendar',
       progress: 'Progress',
       diet: 'Diet',
-      home: 'Home',
     },
     userDropdown: {
       myAccount: 'My Account',
@@ -30,7 +29,7 @@ const translations: Record<Language, Translations> = {
     header: {
       toggleTheme: 'Toggle theme',
       openMenu: 'Open menu',
-      mobileNavTitle: 'Navigation Menu', // Added
+      mobileNavTitle: 'Navigation Menu',
     },
     dashboard: {
       welcomeTitle: 'Welcome to SickFit Pro!',
@@ -40,8 +39,6 @@ const translations: Record<Language, Translations> = {
       currentWeight: 'Current Weight',
       logNewWorkout: 'Start Workout',
       todaysFocus: "Today's Focus",
-      todaysFocusDescription: "What's on the agenda for today?",
-      checkCalendarForWorkout: "Check your calendar for today's workout!",
       viewCalendarToSeeWorkout: "Your scheduled workout will appear here.",
       viewFullSchedule: 'View Full Schedule',
       activityAndHistoryTitle: "Activity & History",
@@ -100,7 +97,7 @@ const translations: Record<Language, Translations> = {
     aiHealthAdvisor: {
         cardTitle: "AI Health Advisor",
         dataUsageInfo: "Your stored macro goals, water intake goal, body measurements, and training summary will be automatically used by the AI to provide personalized advice. You can also ask a specific question below.",
-        userQueryPlaceholder: "e.g., How can I improve my sleep? or What are some good exercises for lower back pain?",
+        userQueryPlaceholder: "Ask for supplement advice (e.g., for nails/memory) or how to reprogram monthly macros (even in a table)...",
         userQueryMinError: "If asking a question, please provide at least 10 characters.",
         getAdviceButton: "Get AI Health Advice",
         adviceReadyTitle: "Health Advice Ready!",
@@ -110,6 +107,7 @@ const translations: Record<Language, Translations> = {
         resultsTitle: "AI Health Advisor Results",
         overallAssessment: "Overall Assessment",
         specificAdvice: "Specific Advice",
+        generatingAdviceDescription: "AI is processing your advice...",
     },
     settingsPage: {
       title: 'Settings',
@@ -167,23 +165,6 @@ const translations: Record<Language, Translations> = {
     },
     calendarPage: {
         title: "Workout Calendar",
-        description: "Plan and track your weekly training schedule.",
-        selectADate: "Select a Date",
-        workoutsScheduledForThisDay: "Workouts scheduled for this day.",
-        addWorkoutToDay: "Add Workout",
-        noWorkoutsScheduled: "No workouts scheduled for this day.",
-        selectDateToSeeWorkouts: "Select a date to see scheduled workouts.",
-        dialogAddWorkoutTitle: "Add Workout to {dayOfWeek}",
-        dialogAddWorkoutDescription: "Select a workout plan to schedule for this day of the week.",
-        workoutPlanLabel: "Workout Plan",
-        selectAPlanPlaceholder: "Select a plan",
-        samplePlan1: "Full Body Blast",
-        samplePlan2: "Upper Body Power",
-        samplePlan3: "Leg Day Domination",
-        samplePlan4: "Cardio Session",
-        cancelButton: "Cancel",
-        scheduleWorkoutButton: "Schedule Workout",
-        loadingCalendar: "Loading calendar...",
         weeklyScheduleTitle: "Weekly Training Schedule",
         weeklyScheduleDescription: "Set up your typical training week. This schedule will repeat automatically.",
         days: {
@@ -196,12 +177,23 @@ const translations: Record<Language, Translations> = {
           sunday: "Sunday",
         },
         noWorkoutsForDayOfWeek: "No workouts scheduled for {dayOfWeek}.",
-        addWorkoutTo: "Add to {dayOfWeek}",
+        addWorkoutToDay: "Add Workout",
+        cancelButton: "Cancel",
+        scheduleWorkoutButton: "Schedule Workout",
+        workoutPlanLabel: "Workout Plan",
+        selectAPlanPlaceholder: "Select a plan",
+        dialogAddWorkoutTitle: "Add Workout to {dayOfWeek}",
+        dialogAddWorkoutDescription: "Select a workout plan to schedule for this day of the week.",
         toastWorkoutScheduledTitle: "Workout Scheduled!",
         toastWorkoutScheduledDescriptionNoTime: "{planName} on {dayOfWeek}.",
         toastWorkoutRemovedTitle: "Workout Removed",
         errorSelectDayAndPlan: "Please select a day and a workout plan.",
         errorPlanNotFound: "Selected plan not found.",
+        samplePlan1: "Full Body Blast",
+        samplePlan2: "Upper Body Power",
+        samplePlan3: "Leg Day Domination",
+        samplePlan4: "Cardio Session",
+        loadingCalendar: "Loading calendar...",
     },
     exercisesPage: { 
       muscleGroupChest: "Chest",
@@ -282,11 +274,8 @@ const translations: Record<Language, Translations> = {
     },
     workoutPlansPage: {
         title: "Workout Plans",
-        description: "Create, manage, and share your workout programs.",
         createNewPlanButton: "Create New Plan",
         involvedMusclesLabel: "Muscles Involved:",
-        estDurationLabel: "Est. Duration:",
-        exercisesLabel: "Exercises:",
         startButton: "Start",
         dialogEditTitle: "Edit Workout Plan",
         dialogCreateTitle: "Create New Workout Plan",
@@ -301,7 +290,6 @@ const translations: Record<Language, Translations> = {
         addThisExerciseButton: "Add this Exercise",
         addedExercisesLabel: "Added Exercises:",
         noExercisesAddedYet: "No exercises added to this plan yet.",
-        addExerciseButton: "Add Exercise to Plan",
         cancelButton: "Cancel",
         savePlanButton: "Save Plan",
         toastPlanUpdatedTitle: "Plan Updated",
@@ -328,7 +316,6 @@ const translations: Record<Language, Translations> = {
       title: "Start New Workout",
       description: "Choose a plan to start or begin an ad-hoc session.",
       selectPlanTitle: "Select a Plan",
-      startAdHocButton: "Start Ad-hoc Workout",
       noPlansAvailable: "No workout plans available. Create one first!",
       startPlanButton: "Start Plan",
     },
@@ -358,7 +345,6 @@ const translations: Record<Language, Translations> = {
       setCompletionLabel: "Sets: {completed}/{total}",
       noGifAvailable: "No GIF available",
       exerciseDemoAlt: "exercise demonstration",
-      nextExerciseButton: "Next Exercise",
       completeWorkoutButton: "Complete Workout",
       workoutCompleteTitle: "Workout Complete!",
       workoutCompleteDescription: "You've successfully completed the {planName} workout.",
@@ -423,7 +409,6 @@ const translations: Record<Language, Translations> = {
       calendar: 'Calendario',
       progress: 'Progressi',
       diet: 'Dieta',
-      home: 'Home',
     },
     userDropdown: {
       myAccount: 'Il Mio Account',
@@ -433,7 +418,7 @@ const translations: Record<Language, Translations> = {
     header: {
       toggleTheme: 'Cambia tema',
       openMenu: 'Apri menu',
-      mobileNavTitle: 'Menu Navigazione', // Added
+      mobileNavTitle: 'Menu Navigazione',
     },
     dashboard: {
       welcomeTitle: 'Benvenuto in SickFit Pro!',
@@ -443,8 +428,6 @@ const translations: Record<Language, Translations> = {
       currentWeight: 'Peso Attuale',
       logNewWorkout: 'Inizia Allenamento',
       todaysFocus: "Focus di Oggi",
-      todaysFocusDescription: "Cosa c'è in programma per oggi?",
-      checkCalendarForWorkout: "Controlla il calendario per l'allenamento di oggi!",
       viewCalendarToSeeWorkout: "Il tuo allenamento programmato apparirà qui.",
       viewFullSchedule: 'Visualizza Programma Completo',
       activityAndHistoryTitle: "Attività e Cronologia",
@@ -503,7 +486,7 @@ const translations: Record<Language, Translations> = {
      aiHealthAdvisor: {
         cardTitle: "Consulente Salute AI",
         dataUsageInfo: "I tuoi obiettivi macro, l'obiettivo di assunzione di acqua, le misurazioni corporee e il riepilogo degli allenamenti memorizzati verranno utilizzati automaticamente dall'AI per fornire consigli più personalizzati. Puoi anche porre una domanda specifica qui sotto.",
-        userQueryPlaceholder: "es. Come posso migliorare il sonno? o Quali sono degli esercizi per il mal di schiena?",
+        userQueryPlaceholder: "Chiedimi integratori per migliorare unghie/memoria, o come riprogrammare i macro mensili (anche in tabella)...",
         userQueryMinError: "Se poni una domanda, fornisci almeno 10 caratteri.",
         getAdviceButton: "Ottieni Consulenza Salute AI",
         adviceReadyTitle: "Consulenza Salute Pronta!",
@@ -513,6 +496,7 @@ const translations: Record<Language, Translations> = {
         resultsTitle: "Risultati Consulente Salute AI",
         overallAssessment: "Valutazione Generale",
         specificAdvice: "Consigli Specifici",
+        generatingAdviceDescription: "L'AI sta elaborando i tuoi consigli...",
     },
     settingsPage: {
       title: 'Impostazioni',
@@ -570,23 +554,6 @@ const translations: Record<Language, Translations> = {
     },
     calendarPage: {
         title: "Calendario Allenamenti",
-        description: "Pianifica e monitora il tuo programma di allenamento settimanale.",
-        selectADate: "Seleziona una Data",
-        workoutsScheduledForThisDay: "Allenamenti programmati per questo giorno.",
-        addWorkoutToDay: "Aggiungi Allenamento",
-        noWorkoutsScheduled: "Nessun allenamento programmato per questo giorno.",
-        selectDateToSeeWorkouts: "Seleziona una data per vedere gli allenamenti programmati.",
-        dialogAddWorkoutTitle: "Aggiungi Allenamento a {dayOfWeek}",
-        dialogAddWorkoutDescription: "Seleziona una scheda di allenamento da programmare per questo giorno della settimana.",
-        workoutPlanLabel: "Scheda Allenamento",
-        selectAPlanPlaceholder: "Seleziona una scheda",
-        samplePlan1: "Scheda Total Body",
-        samplePlan2: "Scheda Parte Superiore",
-        samplePlan3: "Scheda Gambe Intensa",
-        samplePlan4: "Sessione Cardio",
-        cancelButton: "Annulla",
-        scheduleWorkoutButton: "Programma Allenamento",
-        loadingCalendar: "Caricamento calendario...",
         weeklyScheduleTitle: "Programma Allenamento Settimanale",
         weeklyScheduleDescription: "Imposta la tua settimana di allenamento tipo. Questo programma si ripeterà automaticamente.",
         days: {
@@ -599,12 +566,23 @@ const translations: Record<Language, Translations> = {
           sunday: "Domenica",
         },
         noWorkoutsForDayOfWeek: "Nessun allenamento programmato per {dayOfWeek}.",
-        addWorkoutTo: "Aggiungi a {dayOfWeek}",
+        addWorkoutToDay: "Aggiungi Allenamento",
+        cancelButton: "Annulla",
+        scheduleWorkoutButton: "Programma Allenamento",
+        workoutPlanLabel: "Scheda Allenamento",
+        selectAPlanPlaceholder: "Seleziona una scheda",
+        dialogAddWorkoutTitle: "Aggiungi Allenamento a {dayOfWeek}",
+        dialogAddWorkoutDescription: "Seleziona una scheda di allenamento da programmare per questo giorno della settimana.",
         toastWorkoutScheduledTitle: "Allenamento Programmato!",
         toastWorkoutScheduledDescriptionNoTime: "{planName} il {dayOfWeek}.",
         toastWorkoutRemovedTitle: "Allenamento Rimosso",
         errorSelectDayAndPlan: "Seleziona un giorno e una scheda di allenamento.",
         errorPlanNotFound: "Scheda selezionata non trovata.",
+        samplePlan1: "Scheda Total Body",
+        samplePlan2: "Scheda Parte Superiore",
+        samplePlan3: "Scheda Gambe Intensa",
+        samplePlan4: "Sessione Cardio",
+        loadingCalendar: "Caricamento calendario...",
     },
      exercisesPage: { 
       muscleGroupChest: "Petto",
@@ -656,7 +634,6 @@ const translations: Record<Language, Translations> = {
         tableHeaderDate: "Data",
         tableHeaderMeasurementName: "Misurazione",
         tableHeaderValue: "Valore",
-        measurementReminderLabel: "Promemoria Misurazioni",
         selectReminderFrequencyPlaceholder: "Seleziona frequenza promemoria",
         reminderOff: "Spento",
         reminderWeekly: "Settimanale",
@@ -685,16 +662,13 @@ const translations: Record<Language, Translations> = {
     },
      workoutPlansPage: {
         title: "Schede Allenamento",
-        description: "Crea, gestisci e condividi i tuoi programmi di allenamento.",
         createNewPlanButton: "Crea Nuova Scheda",
         involvedMusclesLabel: "Muscoli Coinvolti:",
-        estDurationLabel: "Durata Stimata:",
-        exercisesLabel: "Esercizi:",
         startButton: "Inizia",
         dialogEditTitle: "Modifica Scheda Allenamento",
         dialogCreateTitle: "Crea Nuova Scheda Allenamento",
         planNameLabel: "Nome Scheda",
-        planDurationLabel: "Durata Stima",
+        planDurationLabel: "Durata Stimata",
         planDurationPlaceholder: "es. 60 min",
         exerciseNameLabel: "Esercizio",
         setsLabel: "Serie",
@@ -704,7 +678,6 @@ const translations: Record<Language, Translations> = {
         addThisExerciseButton: "Aggiungi Esercizio",
         addedExercisesLabel: "Esercizi Aggiunti:",
         noExercisesAddedYet: "Nessun esercizio aggiunto a questa scheda.",
-        addExerciseButton: "Aggiungi Esercizio alla Scheda",
         cancelButton: "Annulla",
         savePlanButton: "Salva Scheda",
         toastPlanUpdatedTitle: "Scheda Aggiornata",
@@ -760,7 +733,6 @@ const translations: Record<Language, Translations> = {
       setCompletionLabel: "Serie: {completed}/{total}",
       noGifAvailable: "Nessun GIF disponibile",
       exerciseDemoAlt: "dimostrazione esercizio",
-      nextExerciseButton: "Prossimo Esercizio",
       completeWorkoutButton: "Completa Allenamento",
       workoutCompleteTitle: "Allenamento Completato!",
       workoutCompleteDescription: "Hai completato con successo l'allenamento {planName}.",
@@ -825,7 +797,6 @@ const translations: Record<Language, Translations> = {
       calendar: 'Calendario',
       progress: 'Progreso',
       diet: 'Dieta',
-      home: 'Inicio',
     },
     userDropdown: {
         myAccount: 'Mi Cuenta',
@@ -835,7 +806,7 @@ const translations: Record<Language, Translations> = {
     header: {
         toggleTheme: 'Cambiar tema',
         openMenu: 'Abrir menú',
-        mobileNavTitle: 'Menú de Navegación', // Added
+        mobileNavTitle: 'Menú de Navegación',
     },
      dashboard: {
       welcomeTitle: '¡Bienvenido a SickFit Pro!',
@@ -845,8 +816,6 @@ const translations: Record<Language, Translations> = {
       currentWeight: 'Peso Actual',
       logNewWorkout: 'Empezar Entrenamiento',
       todaysFocus: "Enfoque de Hoy",
-      todaysFocusDescription: "¿Qué hay en la agenda para hoy?",
-      checkCalendarForWorkout: "¡Revisa tu calendario para el entrenamiento de hoy!",
       viewCalendarToSeeWorkout: "Tu entrenamiento programado aparecerá aquí.",
       viewFullSchedule: 'Ver Horario Completo',
       activityAndHistoryTitle: "Actividad e Historial",
@@ -943,7 +912,7 @@ const translations: Record<Language, Translations> = {
     aiHealthAdvisor: {
         cardTitle: "Asesor de Salud IA",
         dataUsageInfo: "Tus metas de macronutrientes, meta de ingesta de agua, mediciones corporales y resumen de entrenamiento almacenados se utilizarán automáticamente por la IA para proporcionar consejos más personalizados. También puedes hacer una pregunta específica a continuación.",
-        userQueryPlaceholder: "Ej: ¿Cómo puedo mejorar mi sueño? o ¿Cuáles son buenos ejercicios para el dolor lumbar?",
+        userQueryPlaceholder: "Pide consejo sobre suplementos (ej. para uñas/memoria) o cómo reprogramar macros mensuales (incluso en tabla)...",
         userQueryMinError: "Si haces una pregunta, proporciona al menos 10 caracteres.",
         getAdviceButton: "Obtener Consejo de Salud IA",
         adviceReadyTitle: "¡Consejo de Salud Listo!",
@@ -953,6 +922,7 @@ const translations: Record<Language, Translations> = {
         resultsTitle: "Resultados del Asesor de Salud IA",
         overallAssessment: "Evaluación General",
         specificAdvice: "Consejos Específicos",
+        generatingAdviceDescription: "La IA está procesando tus consejos...",
     },
     dietPage: {
         title: "Seguimiento de Dieta",
@@ -977,7 +947,6 @@ const translations: Record<Language, Translations> = {
     },
     calendarPage: {
         title: "Calendario de Entrenamientos",
-        description: "Planifica y sigue tu horario de entrenamiento semanal.",
         weeklyScheduleTitle: "Horario Semanal de Entrenamiento",
         weeklyScheduleDescription: "Configura tu semana de entrenamiento típica. Este horario se repetirá automáticamente.",
         days: {
@@ -1087,11 +1056,8 @@ const translations: Record<Language, Translations> = {
     },
     workoutPlansPage: {
         title: "Planes de Entrenamiento",
-        description: "Crea, gestiona y comparte tus programas de entrenamiento.",
         createNewPlanButton: "Crear Nuevo Plan",
         involvedMusclesLabel: "Músculos Involucrados:",
-        estDurationLabel: "Duración Est.:",
-        exercisesLabel: "Ejercicios:",
         startButton: "Empezar",
         dialogEditTitle: "Editar Plan de Entrenamiento",
         dialogCreateTitle: "Crear Nuevo Plan de Entrenamiento",
@@ -1106,7 +1072,6 @@ const translations: Record<Language, Translations> = {
         addThisExerciseButton: "Añadir este Ejercicio",
         addedExercisesLabel: "Ejercicios Añadidos:",
         noExercisesAddedYet: "Aún no se han añadido ejercicios a este plan.",
-        addExerciseButton: "Añadir Ejercicio al Plan",
         cancelButton: "Cancelar",
         savePlanButton: "Guardar Plan",
         toastPlanUpdatedTitle: "Plan Actualizado",
@@ -1221,7 +1186,6 @@ const translations: Record<Language, Translations> = {
       calendar: 'Calendrier',
       progress: 'Progrès',
       diet: 'Diète',
-      home: 'Accueil',
     },
     userDropdown: {
         myAccount: 'Mon Compte',
@@ -1231,7 +1195,7 @@ const translations: Record<Language, Translations> = {
     header: {
         toggleTheme: 'Changer de thème',
         openMenu: 'Ouvrir le menu',
-        mobileNavTitle: 'Menu de Navigation', // Added
+        mobileNavTitle: 'Menu de Navigation',
     },
      dashboard: {
       welcomeTitle: 'Bienvenue sur SickFit Pro !',
@@ -1241,8 +1205,6 @@ const translations: Record<Language, Translations> = {
       currentWeight: 'Poids Actuel',
       logNewWorkout: 'Commencer l\'Entraînement',
       todaysFocus: "Focus d'Aujourd'hui",
-      todaysFocusDescription: "Qu'y a-t-il au programme aujourd'hui ?",
-      checkCalendarForWorkout: "Consultez votre calendrier pour l'entraînement d'aujourd'hui !",
       viewCalendarToSeeWorkout: "Votre entraînement programmé apparaîtra ici.",
       viewFullSchedule: 'Voir le Programme Complet',
       activityAndHistoryTitle: "Activité et Historique",
@@ -1339,7 +1301,7 @@ const translations: Record<Language, Translations> = {
      aiHealthAdvisor: {
         cardTitle: "Conseiller Santé IA",
         dataUsageInfo: "Vos objectifs macro, votre objectif d'apport en eau, vos mesures corporelles et votre résumé d'entraînement stockés seront automatiquement utilisés par l'IA pour fournir des conseils plus personnalisés. Vous pouvez également poser une question spécifique ci-dessous.",
-        userQueryPlaceholder: "Ex: Comment puis-je améliorer mon sommeil ? ou Quels sont les bons exercices pour le mal de dos ?",
+        userQueryPlaceholder: "Demandez conseil sur les suppléments (ex: ongles/mémoire) ou comment reprogrammer les macros mensuelles (même en tableau)...",
         userQueryMinError: "Si vous posez une question, veuillez fournir au moins 10 caractères.",
         getAdviceButton: "Obtenir Conseil Santé IA",
         adviceReadyTitle: "Conseil Santé Prêt !",
@@ -1349,6 +1311,7 @@ const translations: Record<Language, Translations> = {
         resultsTitle: "Résultats Conseiller Santé IA",
         overallAssessment: "Évaluation Globale",
         specificAdvice: "Conseils Spécifiques",
+        generatingAdviceDescription: "L'IA traite vos conseils...",
     },
     dietPage: {
         title: "Suivi de l'Alimentation",
@@ -1373,7 +1336,6 @@ const translations: Record<Language, Translations> = {
     },
     calendarPage: {
         title: "Calendrier d'Entraînement",
-        description: "Planifiez et suivez votre programme d'entraînement hebdomadaire.",
         weeklyScheduleTitle: "Programme d'Entraînement Hebdomadaire",
         weeklyScheduleDescription: "Configurez votre semaine d'entraînement type. Ce programme se répétera automatiquement.",
         days: {
@@ -1483,11 +1445,8 @@ const translations: Record<Language, Translations> = {
     },
     workoutPlansPage: {
         title: "Programmes d'Entraînement",
-        description: "Créez, gérez et partagez vos programmes d'entraînement.",
         createNewPlanButton: "Créer un Nouveau Programme",
         involvedMusclesLabel: "Muscles Impliqués :",
-        estDurationLabel: "Durée Est.:",
-        exercisesLabel: "Exercices:",
         startButton: "Commencer",
         dialogEditTitle: "Modifier le Programme d'Entraînement",
         dialogCreateTitle: "Créer un Nouveau Programme d'Entraînement",
@@ -1502,7 +1461,6 @@ const translations: Record<Language, Translations> = {
         addThisExerciseButton: "Ajouter cet Exercice",
         addedExercisesLabel: "Exercices Ajoutés :",
         noExercisesAddedYet: "Aucun exercice ajouté à ce programme pour l'instant.",
-        addExerciseButton: "Ajouter un Exercice au Programme",
         cancelButton: "Annuler",
         savePlanButton: "Enregistrer le Programme",
         toastPlanUpdatedTitle: "Programme Mis à Jour",
@@ -1717,4 +1675,3 @@ export function useLanguage() {
   }
   return context;
 }
-
