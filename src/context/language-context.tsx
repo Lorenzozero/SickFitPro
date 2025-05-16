@@ -46,6 +46,7 @@ const translations: Record<Language, Translations> = {
       viewAllHistoryButton: "View All History",
       todayIsRestDay: "Today is a rest day! Enjoy it! 😊",
       noWorkoutScheduledForToday: "No workout scheduled for today.",
+      upcomingWorkoutsTitle: "Upcoming Workouts",
     },
     waterIntakeCard: {
       title: "Water Intake",
@@ -59,8 +60,8 @@ const translations: Record<Language, Translations> = {
       waterResetTitle: "Water Reset",
       waterResetDescription: "Your water intake for the day has been reset.",
       goalSettingsButtonLabel: "Goal Settings", 
-      goalSettingsAriaLabel: "Water Goal Settings",
-      goalSettingsTooltip: "Set your daily water goal",
+      goalSettingsAriaLabel: "Water Goal Settings", 
+      goalSettingsTooltip: "Set your daily water goal", 
       ariaAddGlass: "Add glass ({amount}ml)",
       ariaAddBottle: "Add bottle ({amount}ml)",
       tooltipAddAmount: "+{amount}ml",
@@ -194,7 +195,7 @@ const translations: Record<Language, Translations> = {
         samplePlan4: "Cardio Session",
         loadingCalendar: "Loading calendar...",
     },
-    exercisesPage: { 
+     exercisesPage: { 
       muscleGroupChest: "Chest",
       muscleGroupBack: "Back",
       muscleGroupLegs: "Legs",
@@ -435,6 +436,7 @@ const translations: Record<Language, Translations> = {
       viewAllHistoryButton: "Visualizza Tutto lo Storico",
       todayIsRestDay: "Oggi è giorno di riposo! Goditelo! 😊",
       noWorkoutScheduledForToday: "Nessun allenamento programmato per oggi.",
+      upcomingWorkoutsTitle: "Prossimi Allenamenti",
     },
     waterIntakeCard: {
       title: "Apporto Idrico",
@@ -824,6 +826,7 @@ const translations: Record<Language, Translations> = {
       viewAllHistoryButton: "Ver Todo el Historial",
       todayIsRestDay: "¡Hoy es día de descanso! ¡Disfrútalo! 😊",
       noWorkoutScheduledForToday: "Ningún entrenamiento programado para hoy.",
+      upcomingWorkoutsTitle: "Próximos Entrenamientos",
     },
     settingsPage: {
       title: 'Configuración',
@@ -1214,6 +1217,7 @@ const translations: Record<Language, Translations> = {
       viewAllHistoryButton: "Voir Tout l'Historique",
       todayIsRestDay: "Aujourd'hui, c'est jour de repos ! Profitez-en ! 😊",
       noWorkoutScheduledForToday: "Aucun entraînement programmé pour aujourd'hui.",
+      upcomingWorkoutsTitle: "Prochains Entraînements",
     },
     settingsPage: {
       title: 'Paramètres',

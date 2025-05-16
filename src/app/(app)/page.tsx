@@ -11,6 +11,8 @@ import { useEffect, useState, useMemo } from 'react';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Separator } from '@/components/ui/separator';
 import { useWeeklySchedule, dayKeys, type WorkoutPlanOption } from '@/context/weekly-schedule-context';
+import { addDays, format as formatDateFn } from 'date-fns';
+import { it as dateFnsIt, es as dateFnsEs, fr as dateFnsFr, enUS as dateFnsEnUs } from 'date-fns/locale';
 
 interface WorkoutHistoryItem {
   id: string;
@@ -27,12 +29,30 @@ const mockWorkoutHistory: WorkoutHistoryItem[] = [
   { id: 'h4', date: '2024-07-08', planNameKey: 'calendarPage.samplePlan1', defaultPlanName: 'Full Body Blast', duration: '50 min' },
 ];
 
+interface UpcomingWorkoutDisplayItem {
+  id: string;
+  date: Date;
+  dayOfWeek: string;
+  dayOfMonth: string;
+  month: string;
+  planName: string;
+}
+
+const getDateFnsLocale = (lang: string) => {
+  switch (lang) {
+    case 'it': return dateFnsIt;
+    case 'es': return dateFnsEs;
+    case 'fr': return dateFnsFr;
+    default: return dateFnsEnUs;
+  }
+};
 
 export default function DashboardPage() {
   const { t, language, isClient: languageContextIsClient } = useLanguage();
   const { weeklySchedule, isClient: scheduleIsClient, availableWorkoutPlans } = useWeeklySchedule();
   const [isMounted, setIsMounted] = useState(false);
   const [currentWeight, setCurrentWeight] = useState<string>('N/A');
+  const [upcomingWorkouts, setUpcomingWorkouts] = useState<UpcomingWorkoutDisplayItem[]>([]);
 
   useEffect(() => {
     setIsMounted(true);
@@ -68,12 +88,56 @@ export default function DashboardPage() {
     });
   }, [isMounted, today, scheduleIsClient, weeklySchedule, availableWorkoutPlans, t]);
 
+  useEffect(() => {
+    if (!isMounted || !scheduleIsClient || !languageContextIsClient) {
+      setUpcomingWorkouts([]);
+      return;
+    }
+
+    const calculateUpcomingWorkouts = () => {
+      const locale = getDateFnsLocale(language);
+      const todayDate = new Date();
+      const nextDaysLimit = 7; // Show workouts for the next 7 days
+      const workouts: UpcomingWorkoutDisplayItem[] = [];
+
+      for (let i = 0; i < nextDaysLimit; i++) {
+        const currentDate = addDays(todayDate, i);
+        // date-fns getDay: 0 for Sunday, 1 for Monday, ..., 6 for Saturday
+        // My dayKeys: 0 for Monday, ..., 6 for Sunday
+        const dateFnsDayIndex = currentDate.getDay();
+        const appDayKey = dayKeys[dateFnsDayIndex === 0 ? 6 : dateFnsDayIndex - 1];
+        
+        const scheduledForDay = weeklySchedule[appDayKey];
+
+        if (scheduledForDay && scheduledForDay.length > 0) {
+          scheduledForDay.forEach(scheduledWorkout => {
+            const planDetails = availableWorkoutPlans.find(p => p.id === scheduledWorkout.planId);
+            if (planDetails) {
+              workouts.push({
+                id: `${formatDateFn(currentDate, 'yyyy-MM-dd')}-${scheduledWorkout.id}`,
+                date: currentDate,
+                dayOfWeek: formatDateFn(currentDate, 'EEEE', { locale }),
+                dayOfMonth: formatDateFn(currentDate, 'd', { locale }),   
+                month: formatDateFn(currentDate, 'MMM', { locale }),      
+                planName: t(planDetails.nameKey, { default: planDetails.defaultName }),
+              });
+            }
+          });
+        }
+      }
+      setUpcomingWorkouts(workouts.slice(0, 5)); // Limit to show, e.g., next 5 scheduled instances found within 7 days
+    };
+
+    calculateUpcomingWorkouts();
+  }, [isMounted, scheduleIsClient, languageContextIsClient, weeklySchedule, availableWorkoutPlans, language, t]);
+
+
   const totalScheduledWorkoutsThisWeek = useMemo(() => {
     if (!scheduleIsClient) return 0;
     return dayKeys.reduce((sum, dayKey) => sum + (weeklySchedule[dayKey]?.length || 0), 0);
   }, [scheduleIsClient, weeklySchedule]);
 
-  const completedWorkoutsThisWeek = 0; // Placeholder - implement actual tracking later
+  const completedWorkoutsThisWeek = 0; 
 
 
   const stats = [
@@ -82,7 +146,7 @@ export default function DashboardPage() {
     { titleKey: 'dashboard.currentWeight', value: currentWeight, icon: Weight, color: 'text-orange-500' },
   ];
 
-  const formatDate = (dateString: string) => {
+  const formatDateHistory = (dateString: string) => {
     if (!isMounted) return dateString;
     return new Date(dateString + 'T00:00:00').toLocaleDateString(language, {
       year: 'numeric',
@@ -174,7 +238,7 @@ export default function DashboardPage() {
                           <p className="font-semibold text-secondary-foreground">
                             {isMounted ? t(item.planNameKey, { default: item.defaultPlanName }) : item.defaultPlanName}
                           </p>
-                          <p className="text-xs text-muted-foreground">{formatDate(item.date)}</p>
+                          <p className="text-xs text-muted-foreground">{formatDateHistory(item.date)}</p>
                         </div>
                         <div className="flex items-center text-sm text-muted-foreground shrink-0">
                           <Clock className="w-3.5 h-3.5 mr-1.5" />
@@ -199,7 +263,30 @@ export default function DashboardPage() {
           )}
         </Card>
       </div>
+
+      {/* Upcoming Workouts Section */}
+      {isMounted && languageContextIsClient && upcomingWorkouts.length > 0 && (
+        <Card className="mt-6 shadow-lg">
+          <CardHeader>
+            <CardTitle>{t('dashboard.upcomingWorkoutsTitle', { default: 'Upcoming Workouts' })}</CardTitle>
+          </CardHeader>
+          <CardContent className="grid gap-3 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
+            {upcomingWorkouts.map(workout => (
+              <Card key={workout.id} className="p-3 bg-secondary/50 hover:shadow-md transition-shadow">
+                <div className="text-center">
+                  <p className="text-xs font-semibold text-primary uppercase tracking-wider">{workout.dayOfWeek}</p>
+                  <p className="text-2xl font-bold text-foreground">{workout.dayOfMonth}</p>
+                  <p className="text-xs text-muted-foreground uppercase">{workout.month}</p>
+                </div>
+                <Separator className="my-2" />
+                <p className="mt-1 text-sm font-medium text-center truncate" title={workout.planName}>
+                  {workout.planName}
+                </p>
+              </Card>
+            ))}
+          </CardContent>
+        </Card>
+      )}
     </>
   );
 }
-
