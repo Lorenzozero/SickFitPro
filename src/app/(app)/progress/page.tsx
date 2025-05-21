@@ -22,6 +22,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { format, parseISO, getISOWeek, getMonth, getYear, subWeeks, subMonths, subYears } from 'date-fns';
 import { it as dateFnsIt, es as dateFnsEs, fr as dateFnsFr, enUS as dateFnsEnUs } from 'date-fns/locale';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import prisma from '@/lib/database';
 
 
 const BODY_MEASUREMENTS_STORAGE_KEY = 'sickfit-pro-userBodyMeasurements';
@@ -118,7 +119,7 @@ export default function ProgressPage() {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [isClient, setIsClient] = useState(false);
 
-  const [bodyMeasurements, setBodyMeasurements] = useState<BodyMeasurement[]>(initialBodyMeasurements);
+  const [bodyMeasurements, setBodyMeasurements] = useState<BodyMeasurement[]>([]);
   const [isMeasurementDialogOpen, setIsMeasurementDialogOpen] = useState(false);
   const [currentMeasurement, setCurrentMeasurement] = useState<Partial<BodyMeasurement> | null>(null);
   const [reminderFrequency, setReminderFrequency] = useState<ReminderFrequency>('off');
@@ -282,7 +283,7 @@ export default function ProgressPage() {
           date: new Date().toISOString().split('T')[0],
         };
         setProgressPhotos(prevPhotos => [...prevPhotos, newPhoto]);
-        toast({ title: t('progressPage.photoUploadedSuccess', {default: "Photo uploaded!"}) });
+        toast({ title: t('progressPage.photoUploadedSuccess', {default: "Photo uploaded!"}), duration: 1000 });
       };
       reader.readAsDataURL(file);
     }
@@ -308,7 +309,7 @@ export default function ProgressPage() {
     }
     setBodyMeasurements(updatedMeasurements);
     persistMeasurements(updatedMeasurements);
-    toast({ title: t('progressPage.measurementSaved') });
+    toast({ title: t('progressPage.measurementSaved'), duration: 1000 });
     setIsMeasurementDialogOpen(false);
     setCurrentMeasurement(null);
   };
@@ -348,7 +349,7 @@ export default function ProgressPage() {
         title={t('progressPage.title')}
       />
       <div className="grid gap-6 lg:grid-cols-2">
-        <Card className="shadow-lg">
+        <Card className="shadow-lg rounded-xl border border-primary/20 bg-card/50">
           <CardHeader>
             <CardTitle className="flex items-center">
               <LucideLineChart className="w-5 h-5 mr-2 text-primary" />
@@ -363,19 +364,31 @@ export default function ProgressPage() {
                 <TabsTrigger value="yearly">{t('progressPage.timeRangeYearly')}</TabsTrigger>
               </TabsList>
             </Tabs>
-            <ChartContainer config={performanceChartConfig} className="h-[280px] sm:h-[350px] w-full">
-              <ResponsiveContainer width="100%" height="100%">
-                <RechartsPrimitiveLineChart data={performanceChartData}>
+            {/* Added overflow-x-auto for better mobile responsiveness of the chart */}
+            <ChartContainer config={performanceChartConfig} className="h-[280px] sm:h-[350px] w-full overflow-x-auto min-w-[500px]">{/* Added min-w for mobile scrolling */}<ResponsiveContainer width="100%" height="100%">
+                {/* Setting min-width to ensure chart content has enough space before scrolling */}
+                <RechartsPrimitiveLineChart data={performanceChartData} margin={{ top: 5, right: 20, left: 30, bottom: 30 }}>
                   <CartesianGrid vertical={false} />
                   <XAxis
                     dataKey="period"
                     tickLine={false}
-                    tickMargin={10}
+                    tickMargin={1}
+                    minTickGap={10} 
                     axisLine={false}
+                    tick={{ fontSize: 10 }} 
                   />
-                  <YAxis label={{ value: t('progressPage.weeklyTrainingVolumeLabel'), angle: -90, position: 'insideLeft', offset: -5, style:{fontSize: '0.8rem'} }} />
-                  <RechartsTooltip content={<ChartTooltipContent />} />
-                  <RechartsLegend content={<ChartLegendContent />} />
+                  <YAxis
+                    label={{
+                      value: t('progressPage.weeklyTrainingVolumeLabel'),
+                      angle: -90,
+                      position: 'insideLeft',
+                      offset: 0, 
+                      style: { fontSize: 10, textAnchor: 'middle' }, 
+                    }}
+                    tick={{ fontSize: 10 }} 
+                  />
+                  <RechartsTooltip content={<ChartTooltipContent wrapperStyle={{ fontSize: '12px' }} />} />
+                  <RechartsLegend content={<ChartLegendContent className="text-[10px] sm:text-xs" />} />
                   {MUSCLE_GROUPS_TO_TRACK.map(mgKey => (
                     <Line
                       key={mgKey}
@@ -383,111 +396,111 @@ export default function ProgressPage() {
                       type="monotone"
                       stroke={`var(--color-${mgKey})`}
                       strokeWidth={2}
-                      dot={true}
+                      dot={{ r: 3 }} 
                       name={performanceChartConfig[mgKey]?.label?.toString()}
                       connectNulls={true}
                     />
                   ))}
-                </RechartsPrimitiveLineChart>
-              </ResponsiveContainer>
+                </RechartsPrimitiveLineChart></ResponsiveContainer>
             </ChartContainer>
           </CardContent>
         </Card>
 
-        <Card className="shadow-lg">
+        <Card className="shadow-lg rounded-xl border border-primary/20 bg-card/50">
           <CardHeader>
             <CardTitle className="flex items-center">
                 <Users className="w-5 h-5 mr-2 text-primary" />
                 {t('progressPage.bodyCompositionCardTitle')}
             </CardTitle>
           </CardHeader>
-          <CardContent>
-             <ChartContainer config={bodyCompositionChartConfig} className="h-[280px] sm:h-[350px] w-full">
-                <ResponsiveContainer width="100%" height="100%">
-                    <RechartsPrimitiveBarChart data={initialBodyCompositionChartData}>
+          <CardContent> {/* Added overflow-x-auto for better mobile responsiveness of the chart */}
+             <ChartContainer config={bodyCompositionChartConfig} className="h-[280px] sm:h-[350px] w-full overflow-x-auto min-w-[500px]">{/* Added min-w for mobile scrolling */}<ResponsiveContainer width="100%" height="100%">
+                    <RechartsPrimitiveBarChart data={initialBodyCompositionChartData} margin={{ top: 5, right: 20, left: 25, bottom: 20 }}>
                         <CartesianGrid vertical={false} />
-                        <XAxis dataKey="month" tickLine={false} tickMargin={10} axisLine={false} tickFormatter={(value) => getMonthAbbreviation(value)} />
-                        <YAxis dataKey="weight" domain={[40, 'auto']} />
-                        <RechartsTooltip content={<ChartTooltipContent indicator="dot" />} />
-                        <RechartsLegend content={<ChartLegendContent />} />
+                        <XAxis
+                          dataKey="month"
+                          tickLine={false}
+                          tickMargin={10}
+                          axisLine={false}
+                          minTickGap={5} 
+                          tickFormatter={(value) => getMonthAbbreviation(value)}
+                          tick={{ fontSize: 10 }} 
+                        />
+                        <YAxis dataKey="weight" domain={[40, 'auto']} tick={{ fontSize: 10 }} />
+                        <RechartsTooltip content={<ChartTooltipContent indicator="dot" wrapperStyle={{ fontSize: '12px' }} />} />
+                        <RechartsLegend content={<ChartLegendContent className="text-[10px] sm:text-xs" />} />
                         <Bar dataKey="weight" fill="var(--color-weight)" radius={4} name={bodyCompositionChartConfig.weight?.label?.toString()} />
-                    </RechartsPrimitiveBarChart>
-                </ResponsiveContainer>
+                    </RechartsPrimitiveBarChart></ResponsiveContainer>
             </ChartContainer>
           </CardContent>
         </Card>
       </div>
 
-      <Card className="mt-6 shadow-lg">
+      <Card className="mt-6 shadow-lg rounded-xl border bg-gradient-to-r from-yellow-400/80 to-pink-500/80 dark:from-orange-800/80 dark:to-pink-900/80 text-primary-foreground">
         <CardHeader className="flex flex-row items-center justify-between">
             <div className="flex items-center">
-                <BarChart className="w-5 h-5 mr-2 text-primary" />
-                <CardTitle>{t('progressPage.bodyMeasurementsCardTitle')}</CardTitle>
+                <BarChart className="w-5 h-5 mr-2 text-primary-foreground" />
+                <CardTitle className="text-primary-foreground">{t('progressPage.bodyMeasurementsCardTitle')}</CardTitle>
             </div>
             <div className="flex items-center gap-2">
-                 <TooltipProvider>
-                    <Tooltip>
-                        <TooltipTrigger asChild>
-                             <Select value={reminderFrequency} onValueChange={(value) => setReminderFrequency(value as ReminderFrequency)}>
-                                <SelectTrigger asChild aria-label={t('progressPage.measurementReminderSettingsAriaLabel', {default: "Measurement Reminder Settings"})}>
-                                    <Button variant="ghost" size="icon">
-                                        <Bell className="w-4 h-4" />
+                        {/* Tooltip rimosso per semplificare e risolvere potenziale conflitto di overlay */}
+                        <Select value={reminderFrequency} onValueChange={(value) => setReminderFrequency(value as ReminderFrequency)}>
+                                <SelectTrigger asChild aria-label={t('progressPage.measurementReminderSettingsAriaLabel', {default: "Measurement Reminder Settings"})} >
+                                    <Button variant="ghost" size="icon" className="text-primary-foreground hover:bg-white/20 [&_svg]:text-primary-foreground">
+                                       <Bell className="w-4 h-4" />
                                     </Button>
                                 </SelectTrigger>
-                                <SelectContent>
+                                <SelectContent sideOffset={5}> {/* Aggiunto sideOffset per un migliore posizionamento */}
                                     <SelectItem value="off">{t('progressPage.reminderOff')}</SelectItem>
                                     <SelectItem value="weekly">{t('progressPage.reminderWeekly')}</SelectItem>
                                     <SelectItem value="bi-weekly">{t('progressPage.reminderBiWeekly')}</SelectItem>
                                     <SelectItem value="monthly">{t('progressPage.reminderMonthly')}</SelectItem>
                                 </SelectContent>
                             </Select>
-                        </TooltipTrigger>
-                        <TooltipContent>
-                            <p>{t('progressPage.measurementReminderTooltip', {default: "Set measurement reminder"})}</p>
-                        </TooltipContent>
-                    </Tooltip>
-                </TooltipProvider>
-                <Button onClick={() => openMeasurementDialog()}>
-                    <PlusCircle className="w-4 h-4 mr-2" /> {t('progressPage.addMeasurementButton')}
+                <Button onClick={() => openMeasurementDialog()} className="bg-white hover:bg-slate-100 text-black rounded-full">
+                    <PlusCircle className="w-4 h-4 md:mr-2" /> 
+                    <span className="hidden md:inline">{t('progressPage.addMeasurementButton')}</span>
                 </Button>
             </div>
         </CardHeader>
         <CardContent>
             {bodyMeasurements.length > 0 ? (
-                <Table>
-                    <TableHeader>
-                        <TableRow>
-                            <TableHead>{t('progressPage.tableHeaderDate')}</TableHead>
-                            <TableHead>{t('progressPage.tableHeaderMeasurementName')}</TableHead>
-                            <TableHead>{t('progressPage.tableHeaderValue')}</TableHead>
-                            <TableHead className="text-right">{t('exercisesPage.tableHeaderActions')}</TableHead> 
-                        </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                        {bodyMeasurements.sort((a,b) => new Date(b.date).getTime() - new Date(a.date).getTime()).map(m => (
-                            <TableRow key={m.id}>
-                                <TableCell>{new Date(m.date + 'T00:00:00').toLocaleDateString(languageContextIsClient ? language : 'en-US', { year: 'numeric', month: 'short', day: 'numeric' })}</TableCell>
-                                <TableCell>{t(`progressPage.measurementName${m.measurementName.charAt(0).toUpperCase() + m.measurementName.slice(1)}`, { default: m.measurementName })}</TableCell>
-                                <TableCell>{m.value} {m.unit}{m.notes ? ` (${m.notes})` : ''}</TableCell>
-                                <TableCell className="text-right space-x-2">
-                                    <Button variant="ghost" size="icon" onClick={() => openMeasurementDialog(m)}>
-                                        <Edit2 className="w-4 h-4" />
-                                    </Button>
-                                    <Button variant="ghost" size="icon" onClick={() => handleDeleteMeasurement(m.id)}>
-                                        <Trash2 className="w-4 h-4 text-destructive" />
-                                    </Button>
-                                </TableCell>
+                <div className="w-full overflow-x-auto">
+                  <Table>
+                      <TableHeader >
+                          <TableRow className="border-primary-foreground/30">
+                              <TableHead className="min-w-[120px] text-primary-foreground">{t('progressPage.tableHeaderDate')}</TableHead>
+                              <TableHead className="min-w-[150px] text-primary-foreground">{t('progressPage.tableHeaderMeasurementName')}</TableHead>
+                              <TableHead className="min-w-[180px] text-primary-foreground">{t('progressPage.tableHeaderValue')}</TableHead>
+                              <TableHead className="text-right min-w-[100px] text-primary-foreground">{t('exercisesPage.tableHeaderActions')}</TableHead> 
                             </TableRow>
-                        ))}
-                    </TableBody>
-                </Table>
+                      </TableHeader>
+                      <TableBody>
+                          {bodyMeasurements.sort((a,b) => new Date(b.date).getTime() - new Date(a.date).getTime()).map(m => (
+                              <TableRow key={m.id} className="border-primary-foreground/20 hover:bg-white/10">
+                                  <TableCell className="text-primary-foreground">{new Date(m.date + 'T00:00:00').toLocaleDateString(languageContextIsClient ? language : 'en-US', { year: 'numeric', month: 'short', day: 'numeric' })}</TableCell>
+                                  <TableCell className="text-primary-foreground">{t(`progressPage.measurementName${m.measurementName.charAt(0).toUpperCase() + m.measurementName.slice(1)}`, { default: m.measurementName })}</TableCell>
+                                  <TableCell className="text-primary-foreground">{m.value} {m.unit}{m.notes ? ` (${m.notes})` : ''}</TableCell>
+                                  <TableCell className="text-right space-x-1 sm:space-x-2"> {/* text-black applied to edit button */}
+                                      <Button variant="ghost" size="icon" onClick={() => openMeasurementDialog(m)} className="text-primary-foreground hover:bg-white/20">
+                                          <Edit2 className="w-4 h-4" />
+                                      </Button>
+                                      <Button variant="ghost" size="icon" onClick={() => handleDeleteMeasurement(m.id)}>
+                                          <Trash2 className="w-4 h-4 text-destructive" />
+                                      </Button>
+                                  </TableCell>
+                              </TableRow>
+                          ))}
+                      </TableBody>
+                  </Table>
+                </div>
             ) : (
-                <p className="text-sm text-center text-muted-foreground py-4">{t('progressPage.noMeasurementsYet')}</p>
+                <p className="text-sm text-center text-primary-foreground/80 py-4">{t('progressPage.noMeasurementsYet')}</p>
             )}
         </CardContent>
       </Card>
 
-      <Card className="mt-6 shadow-lg">
+      <Card className="mt-6 shadow-lg rounded-xl border bg-gradient-to-r from-orange-500/20 via-orange-500/80 to-orange-500/20 dark:from-orange-700/20 dark:via-orange-700/80 dark:to-orange-700/20 text-primary-foreground">
         <CardHeader className="flex flex-row items-center justify-between">
           <CardTitle>{t('progressPage.photoComparisonCardTitle')}</CardTitle>
           <div>
@@ -502,7 +515,7 @@ export default function ProgressPage() {
             <TooltipProvider>
               <Tooltip>
                 <TooltipTrigger asChild>
-                  <Button variant="outline" size="icon" onClick={() => fileInputRef.current?.click()}>
+                  <Button variant="outline" size="icon" onClick={() => fileInputRef.current?.click()} className="text-white hover:text-white/90">
                     <UploadCloud className="w-4 h-4" />
                   </Button>
                 </TooltipTrigger>
@@ -519,8 +532,8 @@ export default function ProgressPage() {
             { titleKey: 'progressPage.afterPhotoLabel', photoSrc: photoAfter, hint: "fitness after" }
           ].map(item => (
             <div key={item.titleKey}>
-              <h3 className="mb-2 text-lg font-semibold">{t(item.titleKey)}</h3>
-              <div className="relative w-full overflow-hidden border-2 border-dashed rounded-lg aspect-square border-border group">
+              <h3 className="mb-2 text-lg font-semibold text-center">{t(item.titleKey)}</h3>
+              <div className="relative w-4/5 sm:w-3/4 mx-auto overflow-hidden border-2 border-dashed rounded-lg aspect-square border-border group">
                 {item.photoSrc ? (
                   <Image src={item.photoSrc} alt={t(item.titleKey)} layout="fill" objectFit="cover" data-ai-hint={item.hint} />
                 ) : (
@@ -534,10 +547,15 @@ export default function ProgressPage() {
           ))}
         </CardContent>
       </Card>
-      
-      <div className="mt-8">
-         <AiSplitForm />
-      </div>
+
+      <Card className="mt-6 shadow-lg rounded-xl border border-primary/50 bg-primary/10">
+        <CardHeader>
+          {/* Titolo rimosso come richiesto */}
+        </CardHeader>
+        <CardContent>
+          <AiSplitForm />
+        </CardContent>
+      </Card>
 
 
       <AddMeasurementDialog
@@ -548,6 +566,37 @@ export default function ProgressPage() {
         t={t}
       />
     </>
-  );
-}
+  ); // End of ProgressPage component return
 
+  // Moved useEffects for DB interaction (see important note below)
+  useEffect(() => {
+    if (!isClient) return; // Ensure prisma calls are attempted only client-side (still problematic)
+    const fetchBodyMeasurements = async () => {
+        // IMPORTANT: Direct Prisma calls in 'use client' components are generally not recommended.
+        // This will likely fail as Prisma is meant for server-side execution.
+        // Consider moving this logic to a Server Action or an API route.
+        // const bodyMeasurementsFromDB = await prisma.bodyMeasurement.findMany();
+        // setBodyMeasurements(bodyMeasurementsFromDB);
+        console.warn("Attempting to fetch body measurements with Prisma on client-side. This should be refactored.");
+    };
+    fetchBodyMeasurements();
+  }, [isClient]);
+
+  useEffect(() => {
+    if (!isClient || bodyMeasurements.length === 0) return; // Avoid running if no data or not client
+    const saveBodyMeasurementsToDB = async () => {
+        // IMPORTANT: Similar to fetching, saving directly with Prisma here is problematic.
+        // Also, createMany will attempt to re-insert all items on every change.
+        // await prisma.bodyMeasurement.createMany({ data: bodyMeasurements });
+        console.warn("Attempting to save body measurements with Prisma on client-side. This should be refactored.");
+    };
+    // saveBodyMeasurementsToDB(); // Temporarily commented out to prevent errors after fixing hook call
+  }, [bodyMeasurements, isClient]);
+
+  useEffect(() => {
+    if (!isClient) return;
+    // Similar warnings apply for fetching and saving progress photos with Prisma on the client.
+    console.warn("Attempting to fetch/save progress photos with Prisma on client-side. This should be refactored.");
+  }, [isClient, progressPhotos]);
+
+} // End of ProgressPage component function

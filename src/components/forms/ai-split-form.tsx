@@ -106,8 +106,28 @@ const formatAiResponse = (text: string): React.ReactNode[] => {
         flushList();
         if (trimmedLine) {
           elements.push(<p key={`p-${lineIndex}`} className="my-2 text-sm">{processInlineFormatting(trimmedLine)}</p>);
-        } else if (elements.length > 0 && !(elements[elements.length -1].type === 'ul' || elements[elements.length-1].key?.toString().startsWith('table-wrapper'))) {
+        } else if (elements.length > 0) {
+            const lastElement = elements[elements.length - 1];
+            let isLastElementUl = false;
+            let isLastElementTableWrapper = false;
+
+            if (React.isValidElement(lastElement)) {
+                if (typeof lastElement.type === 'string' && lastElement.type === 'ul') {
+                    isLastElementUl = true;
+                }
+                // Ensure key is not null and is a string before calling startsWith
+                if (lastElement.key !== null && typeof lastElement.key === 'string' && lastElement.key.startsWith('table-wrapper')) {
+                    isLastElementTableWrapper = true;
+                }
+            }
+            
+            if (!(isLastElementUl || isLastElementTableWrapper)) {
             // Aggiunge spazio solo se la riga precedente non era una lista o una tabella
+            // This block was originally empty. If the intent is to add a space for empty lines
+            // not following a list or table, it would be done here.
+            // e.g., elements.push(<br key={`br-${lineIndex}-${elementKeyCounter++}`} />);
+            // For now, keeping it empty as per original logic, but with safe access.
+            }
         }
       }
     }
@@ -197,13 +217,21 @@ export function AiSplitForm() {
             <Wand2 className="w-6 h-6 mr-2 text-primary" />
             {t('aiSplitForm.cardTitle')}
           </CardTitle>
-          <Button onClick={handleGenerateAdvice} disabled={isLoading}>
+          {/* Pulsante responsivo per Ottieni/Rigenera Consulenza */}
+          <Button 
+            onClick={handleGenerateAdvice} 
+            disabled={isLoading}
+            variant="outline" // Usiamo outline per un bordo leggero, e poi sovrascriviamo bg/text
+            className="bg-white hover:bg-gray-100 text-black dark:bg-slate-100 dark:hover:bg-slate-200 dark:text-black
+                       h-10 w-10 p-0 md:h-9 md:w-auto md:px-3 md:py-2 flex items-center justify-center rounded-md"
+            aria-label={t('aiSplitForm.generateAdviceButton')}
+          >
             {isLoading ? (
-              <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+              <Loader2 className="h-5 w-5 animate-spin md:h-4 md:w-4" />
             ) : (
-              <Wand2 className="w-4 h-4 mr-2" />
+              <Wand2 className="h-5 w-5 md:h-4 md:w-4" />
             )}
-            {t('aiSplitForm.generateAdviceButton')}
+            <span className="hidden md:ml-2 md:inline-block">{t('aiSplitForm.generateAdviceButton')}</span>
           </Button>
         </CardHeader>
         <CardContent>

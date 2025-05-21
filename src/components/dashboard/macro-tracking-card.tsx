@@ -18,6 +18,7 @@ import { ChartContainer, ChartTooltip, ChartTooltipContent, ChartLegend, ChartLe
 import { Line, CartesianGrid, XAxis, YAxis, Tooltip as RechartsTooltip, ResponsiveContainer, LineChart as RechartsPrimitiveLineChart } from "recharts";
 import { format, subDays, subWeeks, subMonths, startOfWeek, startOfMonth, eachDayOfInterval, getDay, getISOWeek, getMonth } from 'date-fns';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import prisma from '@/lib/database';
 
 
 interface DailyMacroGoals {

@@ -104,6 +104,17 @@ const initialWorkoutPlans: WorkoutPlan[] = [
   },
 ];
 
+// Helper function to get image URL and AI hint based on plan ID
+const getPlanVisuals = (planId: string) => {
+  switch (planId) {
+    case '1':
+      return { imageUrl: "https://placehold.co/144x192.png", aiHint: "energetic fitness" };
+    case '2':
+      return { imageUrl: "https://placehold.co/144x192.png", aiHint: "strength arms" };
+    default:
+      return { imageUrl: "https://placehold.co/144x192.png", aiHint: "powerful legs" };
+  }
+};
 
 export default function WorkoutPlansPage() {
   const { t, isClient: languageContextIsClient } = useLanguage();
@@ -131,10 +142,22 @@ export default function WorkoutPlansPage() {
     }
   }, [selectedExerciseIdOrAction]);
 
+  const resetDialogFormFields = () => {
+    setSelectedExerciseIdOrAction(initialExercisesMockForSelect[0]?.id || '');
+    setNewExerciseManualName('');
+    setNewExerciseSets('');
+    setNewExerciseReps('');
+    setDialogSelectedMuscleGroups([]);
+  };
+
   const handleMuscleGroupChangeInDialog = (muscleGroup: MuscleGroup, checked: boolean) => {
     setDialogSelectedMuscleGroups(prev => 
       checked ? [...prev, muscleGroup] : prev.filter(mg => mg !== muscleGroup)
     );
+  };
+
+  const deriveOverallPlanMuscleGroups = (exerciseDetails: ExerciseDetail[]): MuscleGroup[] => {
+    return Array.from(new Set((exerciseDetails || []).flatMap(ex => ex.muscleGroups)));
   };
 
   const openDialog = (plan?: WorkoutPlan) => {
@@ -143,11 +166,7 @@ export default function WorkoutPlansPage() {
     } else {
       setCurrentPlan({ name: '', exerciseDetails: [], duration: '', muscleGroups: [] });
     }
-    setSelectedExerciseIdOrAction(initialExercisesMockForSelect[0]?.id || '');
-    setNewExerciseManualName('');
-    setNewExerciseSets('');
-    setNewExerciseReps('');
-    setDialogSelectedMuscleGroups([]); // Resetta i gruppi muscolari del dialogo all'apertura
+    resetDialogFormFields();
     setIsDialogOpen(true);
   };
 
@@ -195,25 +214,20 @@ export default function WorkoutPlansPage() {
       ...prev,
       exerciseDetails: [...(prev.exerciseDetails || []), newExerciseDetail],
       // Aggiorna i gruppi muscolari della scheda in base agli esercizi aggiunti
-      muscleGroups: Array.from(new Set([...(prev.muscleGroups || []), ...newExerciseDetail.muscleGroups]))
+      muscleGroups: deriveOverallPlanMuscleGroups([...(prev.exerciseDetails || []), newExerciseDetail])
     }));
 
     // Reset fields for adding next exercise
-    setSelectedExerciseIdOrAction(initialExercisesMockForSelect[0]?.id || '');
-    setNewExerciseManualName('');
-    setNewExerciseSets('');
-    setNewExerciseReps('');
-    setDialogSelectedMuscleGroups([]); // Resetta i gruppi muscolari del dialogo
+    resetDialogFormFields();
   };
 
   const handleRemoveExerciseFromCurrentPlan = (exerciseId: string) => {
     setCurrentPlan(prev => {
         const updatedExerciseDetails = (prev.exerciseDetails || []).filter(ex => ex.id !== exerciseId);
-        const updatedMuscleGroups = Array.from(new Set(updatedExerciseDetails.flatMap(ex => ex.muscleGroups)));
         return {
             ...prev,
             exerciseDetails: updatedExerciseDetails,
-            muscleGroups: updatedMuscleGroups
+            muscleGroups: deriveOverallPlanMuscleGroups(updatedExerciseDetails)
         }
     });
   };
@@ -230,7 +244,7 @@ export default function WorkoutPlansPage() {
       name: currentPlan.name,
       exerciseDetails: currentPlan.exerciseDetails || [],
       duration: currentPlan.duration || '',
-      muscleGroups: Array.from(new Set((currentPlan.exerciseDetails || []).flatMap(ex => ex.muscleGroups))), // Ricalcola i gruppi della scheda
+      muscleGroups: deriveOverallPlanMuscleGroups(currentPlan.exerciseDetails || []),
     };
 
     if (currentPlan.id) {
@@ -280,8 +294,17 @@ export default function WorkoutPlansPage() {
       <PageHeader
         title={languageContextIsClient ? t('nav.workoutPlans') : "Workout Plans"}
         actions={
-          <Button onClick={() => openDialog()} disabled={!!(activeWorkoutIsClient && activePlanId)}>
-            <PlusCircle className="w-4 h-4 mr-2" /> {t('workoutPlansPage.createNewPlanButton')}
+          <Button 
+            onClick={() => openDialog()} 
+            disabled={!!(activeWorkoutIsClient && activePlanId)} 
+            className="text-black dark:text-black" 
+            // Rimuovi size="icon" per permettere al pulsante di adattarsi al contenuto (icona + testo)
+            aria-label={languageContextIsClient ? t('workoutPlansPage.createNewPlanButton') : "Create New Plan"} // Mantieni un'etichetta per l'accessibilità
+          >
+            <PlusCircle className="w-5 h-5 sm:mr-2" /> {/* Icona sempre visibile, margine destro su schermi sm e più grandi */}
+            <span className="hidden sm:inline"> {/* Testo nascosto di default, visibile (inline) su schermi sm e più grandi */}
+              {languageContextIsClient ? t('workoutPlansPage.createNewPlanButton') : "Create New Plan"}
+            </span>
           </Button>
         }
       />
@@ -297,7 +320,7 @@ export default function WorkoutPlansPage() {
               <p className="text-sm text-destructive-foreground mt-2">
                  {t('activeWorkoutPage.finishCurrentWorkoutPrompt', { default: 'You have an active workout. Please finish or abandon it before starting a new one or creating/editing plans.' })}
               </p>
-               <Button asChild variant="outline" className="mt-3">
+               <Button asChild variant="outline" className="mt-3 text-white dark:text-white">
                 <Link href={`/workouts/${activePlanId}/active`}>{t('resumeWorkoutButton.resumeTitle')}</Link>
               </Button>
             </CardContent>
@@ -306,26 +329,23 @@ export default function WorkoutPlansPage() {
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
         {plans.map((plan) => (
-          <Card key={plan.id} className="flex flex-col shadow-lg hover:shadow-xl transition-shadow duration-300">
+          <Card key={plan.id} className="flex flex-col shadow-lg hover:shadow-xl transition-shadow duration-300 bg-white dark:bg-slate-800">
             <CardContent className="flex-grow p-4 relative">
               <div className="flex items-start gap-4">
                 <div className="relative w-24 sm:w-32 h-36 sm:h-44 flex-shrink-0">
+                  {(() => { // IIFE per usare la logica della funzione helper
+                    const visuals = getPlanVisuals(plan.id);
+                    return (
                   <Image
-                      src={
-                        plan.id === '1' ? "https://placehold.co/144x192.png" :
-                        plan.id === '2' ? "https://placehold.co/144x192.png" :
-                        "https://placehold.co/144x192.png"
-                      }
+                      src={visuals.imageUrl}
                       alt={t('workoutPlansPage.muscleSilhouetteAlt', {default: 'Muscle groups involved'})}
                       layout="fill"
                       objectFit="cover"
                       className="rounded-sm"
-                      data-ai-hint={
-                        plan.id === '1' ? "energetic fitness" :
-                        plan.id === '2' ? "strength arms" :
-                        "powerful legs"
-                      }
+                      data-ai-hint={visuals.aiHint}
                   />
+                    );
+                  })()}
                 </div>
 
                 <div className="flex-grow flex flex-col min-w-0">
@@ -351,25 +371,27 @@ export default function WorkoutPlansPage() {
                 <span>{plan.duration}</span>
               </div>
             </CardContent>
-            <CardFooter className="flex flex-col sm:flex-row justify-between items-center gap-2 pt-3 border-t p-3">
+            {/* Modificato per rendere il footer sempre una riga e allineare gli elementi */}
+            <CardFooter className="flex flex-row justify-between items-center gap-2 pt-3 border-t p-3">
               <Button
                 variant="default"
                 size="sm"
                 disabled={!!(activeWorkoutIsClient && activePlanId)}
                 onClick={() => handleStartPlanClick(plan.id, plan.name)}
-                className="w-full sm:w-auto"
+                className="text-black dark:text-black" 
               >
-                <PlayCircle className="w-4 h-4 mr-2" /> {t('workoutPlansPage.startButton')}
+                <PlayCircle className="w-4 h-4 sm:mr-2" /> {/* Margine destro solo su schermi sm+ quando il testo è visibile */}
+                <span className="hidden sm:inline">{t('workoutPlansPage.startButton')}</span> {/* Testo nascosto su mobile, visibile su sm+ */}
               </Button>
               <div className="flex gap-1">
-                <Button variant="ghost" size="icon" onClick={() => openDialog(plan)} disabled={!!(activeWorkoutIsClient && activePlanId)}>
+                <Button variant="ghost" size="icon" onClick={() => openDialog(plan)} disabled={!!(activeWorkoutIsClient && activePlanId)} className="text-white dark:text-white">
                   <Edit2 className="w-4 h-4" />
                 </Button>
-                <Button variant="ghost" size="icon" onClick={() => handleSharePlan(plan.name)}>
+                <Button variant="ghost" size="icon" onClick={() => handleSharePlan(plan.name)} className="text-white dark:text-white">
                   <Share2 className="w-4 h-4" />
                 </Button>
-                <Button variant="ghost" size="icon" onClick={() => handleDeletePlan(plan.id, plan.name)} disabled={!!(activeWorkoutIsClient && activePlanId)}>
-                  <Trash2 className="w-4 h-4 text-destructive" />
+                <Button variant="ghost" size="icon" onClick={() => handleDeletePlan(plan.id, plan.name)} disabled={!!(activeWorkoutIsClient && activePlanId)} className="text-white dark:text-white">
+                  <Trash2 className="w-4 h-4" />
                 </Button>
               </div>
             </CardFooter>
@@ -384,7 +406,7 @@ export default function WorkoutPlansPage() {
           </UIDialogHeader>
           <form onSubmit={handleSavePlan} className="flex flex-col flex-grow min-h-0">
             <div className="flex-grow overflow-y-auto p-6 space-y-4">
-                <div>
+                <div className="flex flex-col items-center text-center">
                   <Label htmlFor="planName">{t('workoutPlansPage.planNameLabel')}</Label>
                   <Input
                     id="planName"
@@ -394,7 +416,7 @@ export default function WorkoutPlansPage() {
                     required
                   />
                 </div>
-                <div>
+                <div className="flex flex-col items-center text-center">
                   <Label htmlFor="planDuration">{t('workoutPlansPage.planDurationLabel')}</Label>
                   <Input
                     id="planDuration"
@@ -405,13 +427,13 @@ export default function WorkoutPlansPage() {
                   />
                 </div>
 
-                <div className="mt-4 border rounded-md p-4">
-                  <h4 className="text-base flex items-center font-semibold mb-3">
-                      <ListChecks className="w-4 h-4 mr-2" />
-                      {t('workoutPlansPage.addExerciseButton')}
+                <div className="mt-4 border rounded-md p-4 bg-slate-100 dark:bg-slate-800">
+                  <h4 className="text-base flex items-center justify-center font-semibold mb-3">
+                      <ListChecks className="w-4 h-4 mr-2" /> {/* Icon remains */}
+                      Nuovo Esercizio
                   </h4>
                   <div className="space-y-3">
-                    <div>
+                    <div className="flex flex-col items-center text-center">
                       <Label htmlFor="selectExercise">{t('workoutPlansPage.exerciseNameLabel')}</Label>
                       <Select
                         value={selectedExerciseIdOrAction}
@@ -423,9 +445,7 @@ export default function WorkoutPlansPage() {
                         <SelectContent>
                           {initialExercisesMockForSelect.map(ex => (
                             <SelectItem key={ex.id} value={ex.id}>
-                                {ex.name} 
-                                {ex.muscleGroups && ex.muscleGroups.length > 0 && 
-                                 ` (${ex.muscleGroups.map(mg => t(`exercisesPage.muscleGroup${mg.replace(/\s+/g, '')}`, {default: mg})).join(', ')})`}
+                                {ex.name}
                             </SelectItem>
                           ))}
                           <SelectItem value={CREATE_NEW_EXERCISE_VALUE}>
@@ -436,7 +456,7 @@ export default function WorkoutPlansPage() {
                     </div>
 
                     {selectedExerciseIdOrAction === CREATE_NEW_EXERCISE_VALUE && (
-                      <div>
+                      <div className="w-full flex flex-col items-center text-center"> {/* Added w-full for consistency if input inside is not w-full */}
                         <Label htmlFor="newExerciseManualName">{t('workoutPlansPage.newExerciseNameLabel', { default: 'New Exercise Name' })}</Label>
                         <Input
                           id="newExerciseManualName"
@@ -448,19 +468,19 @@ export default function WorkoutPlansPage() {
                     )}
 
                     <div className="grid grid-cols-2 gap-3">
-                      <div>
-                        <Label htmlFor="newExerciseSets">{t('workoutPlansPage.setsLabel')}</Label>
+                      <div className="flex flex-col items-center">
+                        <Label htmlFor="newExerciseSets" className="block text-center">{t('workoutPlansPage.setsLabel')}</Label>
                         <Input id="newExerciseSets" value={newExerciseSets} onChange={(e) => setNewExerciseSets(e.target.value)} placeholder={t('workoutPlansPage.setsPlaceholder', {default: "e.g., 3"})} />
                       </div>
-                      <div>
-                        <Label htmlFor="newExerciseReps">{t('workoutPlansPage.repsLabel')}</Label>
+                      <div className="flex flex-col items-center">
+                        <Label htmlFor="newExerciseReps" className="block text-center">{t('workoutPlansPage.repsLabel')}</Label>
                         <Input id="newExerciseReps" value={newExerciseReps} onChange={(e) => setNewExerciseReps(e.target.value)} placeholder={t('workoutPlansPage.repsPlaceholder', {default: "e.g., 8-12"})} />
                       </div>
                     </div>
                     
-                    <div>
+                    <div className="flex flex-col items-center text-center">
                         <Label>{t('workoutPlansPage.muscleGroupsLabel', { default: 'Muscle Groups' })}</Label>
-                        <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 mt-1 p-2 border rounded-md max-h-32 overflow-y-auto">
+                        <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 mt-1 p-2 border rounded-md max-h-32 overflow-y-auto w-full max-w-md"> {/* Added w-full max-w-md for better centering of the grid itself */}
                             {allMuscleGroups.map(mg => (
                             <div key={mg} className="flex items-center space-x-2">
                                 <Checkbox
@@ -477,7 +497,7 @@ export default function WorkoutPlansPage() {
                     </div>
 
                     <div className="flex justify-center">
-                        <Button type="button" variant="outline" size="sm" onClick={handleAddExerciseToCurrentPlan} className="w-full">
+                        <Button type="button" variant="outline" size="sm" onClick={handleAddExerciseToCurrentPlan} className="w-full text-white dark:text-white">
                         <PlusCircle className="w-4 h-4 mr-2" /> {t('workoutPlansPage.addThisExerciseButton')}
                         </Button>
                     </div>
@@ -499,8 +519,8 @@ export default function WorkoutPlansPage() {
                                 </span>
                                 )}
                             </span>
-                            <Button type="button" variant="ghost" size="icon" className="h-6 w-6 text-destructive" onClick={() => handleRemoveExerciseFromCurrentPlan(ex.id)}>
-                              <Trash2 className="h-3.5 w-3.5" />
+                            <Button type="button" variant="ghost" size="icon" className="h-6 w-6" onClick={() => handleRemoveExerciseFromCurrentPlan(ex.id)}>
+                              <Trash2 className="h-3.5 w-3.5 text-destructive filter drop-shadow-[0_1px_0px_rgb(255,255,255)] drop-shadow-[0_-1px_0px_rgb(255,255,255)] drop-shadow-[1px_0_0px_rgb(255,255,255)] drop-shadow-[-1px_0_0px_rgb(255,255,255)]" />
                             </Button>
                           </li>
                         ))}
@@ -514,9 +534,9 @@ export default function WorkoutPlansPage() {
             </div>
             <UIDialogFooter className="p-6 border-t shrink-0 sm:justify-center">
               <DialogClose asChild>
-                <Button type="button" variant="outline">{t('workoutPlansPage.cancelButton')}</Button>
+                <Button type="button" variant="outline" className="text-white dark:text-white">{t('workoutPlansPage.cancelButton')}</Button>
               </DialogClose>
-              <Button type="submit">{t('workoutPlansPage.savePlanButton')}</Button>
+              <Button type="submit" className="bg-green-600 hover:bg-green-700 text-black dark:text-black">{t('workoutPlansPage.savePlanButton')}</Button>
             </UIDialogFooter>
           </form>
         </DialogContent>
@@ -524,4 +544,3 @@ export default function WorkoutPlansPage() {
     </>
   );
 }
-

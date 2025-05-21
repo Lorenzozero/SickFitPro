@@ -7,31 +7,28 @@ interface PageHeaderProps {
   description?: string;
   actions?: ReactNode;
 }
-
 export function PageHeader({ title, description, actions }: PageHeaderProps) {
   return (
-    <div className={cn("mb-6")}> {/* Retained mb-6 for now, can be adjusted if too much */}
-      <div className={cn(actions ? "md:flex md:items-start md:justify-between" : "text-center")}>
+    <div className={cn("mb-6")}>
+      <div className={cn(
+        "flex flex-row items-center justify-between gap-4" // Always allow space for actions, title will adjust
+      )}>
         {/* Text content container */}
-        <div className={actions ? "flex-1 min-w-0 text-center md:text-left" : "text-center"}> {/* Ensure centering if no actions */}
+        <div className={cn(
+          "flex-1 min-w-0", // Allows text to truncate, takes available space
+          !actions ? "text-center" : "text-left" // Center text if no actions, otherwise align left
+        )}>
           <h1 className={cn(
-            "text-2xl font-bold leading-tight tracking-tight text-foreground sm:text-3xl",
-            "text-center" // Title is always centered
+            "text-2xl font-bold leading-tight tracking-tight text-foreground sm:text-3xl"
           )}>
             {title}
           </h1>
           {description && (
-            // Description follows container alignment: centered if no actions, natural (left for LTR) if actions.
-            <p className={cn(
-              "mt-1 text-sm text-muted-foreground",
-              actions ? "md:text-left" : "text-center" // Description also centered if no actions
-            )}>{description}</p>
+            <p className="mt-1 text-sm text-muted-foreground">{description}</p>
           )}
         </div>
         {/* Actions container */}
-        {actions && (
-          <div className="mt-4 flex justify-center md:justify-end md:ml-4 md:mt-0">{actions}</div>
-        )}
+        {actions && <div className="flex-shrink-0 flex items-center gap-2">{actions}</div>}
       </div>
     </div>
   );

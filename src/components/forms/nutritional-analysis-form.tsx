@@ -8,7 +8,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Form, FormControl, FormField, FormItem, FormMessage } from '@/components/ui/form';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
-import { Loader2, Wand2, Info } from 'lucide-react';
+import { Loader2, Wand2, Info, RefreshCw } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { useLanguage } from '@/context/language-context';
 import { getHealthAdvice, type HealthContextInput, type HealthAdviceOutput } from '@/ai/flows/analyze-meal-flow';
@@ -28,6 +28,7 @@ interface UserEditableFormValues {
 // Funzione per formattare la risposta AI (simile a quella in AiSplitForm)
 const formatHealthAdviceResponse = (text: string): React.ReactNode[] => {
   if (!text) return [];
+  let keyCounter = 0; // Counter for stable keys
 
   const elements: React.ReactNode[] = [];
   const lines = text.split('\n');
@@ -39,7 +40,7 @@ const formatHealthAdviceResponse = (text: string): React.ReactNode[] => {
 
   function flushList() {
     if (currentListItems.length > 0) {
-      elements.push(<ul key={`ul-${elements.length}-${Math.random()}`} className="my-2 ml-6 list-disc space-y-1">{currentListItems}</ul>);
+      elements.push(<ul key={`ul-${keyCounter++}`} className="my-2 ml-6 list-disc space-y-1">{currentListItems}</ul>);
       currentListItems = [];
     }
   }
@@ -47,17 +48,17 @@ const formatHealthAdviceResponse = (text: string): React.ReactNode[] => {
   function flushTable() {
     if (tableHeaders.length > 0 || tableRows.length > 0) {
       elements.push(
-        <div key={`table-wrapper-${elements.length}-${Math.random()}`} className="my-4 overflow-x-auto rounded-md border border-border">
+        <div key={`table-wrapper-${keyCounter++}`} className="my-4 overflow-x-auto rounded-md border border-border">
           <table className="min-w-full w-full border-collapse text-sm">
             {tableHeaders.length > 0 && (
               <thead className="bg-muted/50">
-                <tr>{tableHeaders}</tr>
+                <tr key={`thr-${keyCounter++}`}>{tableHeaders}</tr>
               </thead>
             )}
             {tableRows.length > 0 && (
               <tbody>
                 {tableRows.map((row, i) => (
-                  <tr key={`tr-${i}-${Math.random()}`} className="border-b border-border last:border-b-0 hover:bg-muted/20">
+                  <tr key={`tr-${i}-${keyCounter++}`} className="border-b border-border last:border-b-0 hover:bg-muted/20">
                     {row}
                   </tr>
                 ))}
@@ -75,8 +76,8 @@ const formatHealthAdviceResponse = (text: string): React.ReactNode[] => {
   function processInlineFormatting(lineContent: string): React.ReactNode {
     const parts = lineContent.split(/(\*\*.*?\*\*)/g); 
     return parts.filter(Boolean).map((part, index) => {
-      if (part.startsWith('**') && part.endsWith('**')) {
-        return <strong key={`strong-part-${index}-${Math.random()}`}>{part.substring(2, part.length - 2)}</strong>;
+      if (part.startsWith('**') && part.endsWith('**') && part.length > 4) { // Ensure it's not just "**"
+        return <strong key={`strong-part-${index}-${keyCounter++}`}>{part.substring(2, part.length - 2)}</strong>;
       }
       return part; 
     });
@@ -94,19 +95,19 @@ const formatHealthAdviceResponse = (text: string): React.ReactNode[] => {
       
       if (cells.every(cell => cell.match(/^--+$/))) {
         // Markdown table separator line, only used if headers are not yet set from first data row
-         if (tableHeaders.length === 0 && tableRows.length > 0 && tableRows[0].length === cells.length) {
+         if (tableHeaders.length === 0 && tableRows.length > 0 && tableRows[0]?.length === cells.length) {
             tableHeaders = tableRows[0].map((cellContent, i) => 
-                <th key={`th-implicit-${lineIndex}-${i}-${Math.random()}`} className="p-2 border-b border-r border-border text-left font-semibold last:border-r-0">{cellContent}</th>
+                <th key={`th-implicit-${lineIndex}-${i}-${keyCounter++}`} className="p-2 border-b border-r border-border text-left font-semibold last:border-r-0">{cellContent}</th>
             );
             tableRows.shift(); 
         }
       } else if (tableHeaders.length === 0 && tableRows.length === 0) { 
         tableHeaders = cells.map((cell, i) => 
-            <th key={`th-${lineIndex}-${i}-${Math.random()}`} className="p-2 border-b border-r border-border text-left font-semibold last:border-r-0">{processInlineFormatting(cell)}</th>
+            <th key={`th-${lineIndex}-${i}-${keyCounter++}`} className="p-2 border-b border-r border-border text-left font-semibold last:border-r-0">{processInlineFormatting(cell)}</th>
         );
       } else { 
         tableRows.push(cells.map((cell, i) => 
-            <td key={`td-${lineIndex}-${i}-${Math.random()}`} className="p-2 border-r border-border last:border-r-0">{processInlineFormatting(cell)}</td>
+            <td key={`td-${lineIndex}-${i}-${keyCounter++}`} className="p-2 border-r border-border last:border-r-0">{processInlineFormatting(cell)}</td>
         ));
       }
     } else { 
@@ -115,11 +116,11 @@ const formatHealthAdviceResponse = (text: string): React.ReactNode[] => {
       }
       if (trimmedLine.startsWith('* ') || trimmedLine.startsWith('- ')) {
         const listItemText = trimmedLine.substring(trimmedLine.startsWith('* ') ? 2 : 1).trimStart();
-        currentListItems.push(<li key={`li-${lineIndex}-${Math.random()}`}>{processInlineFormatting(listItemText)}</li>);
+        currentListItems.push(<li key={`li-${lineIndex}-${keyCounter++}`}>{processInlineFormatting(listItemText)}</li>);
       } else {
         flushList();
         if (trimmedLine) {
-          elements.push(<p key={`p-${lineIndex}-${Math.random()}`} className="my-2">{processInlineFormatting(trimmedLine)}</p>);
+          elements.push(<p key={`p-${lineIndex}-${keyCounter++}`} className="my-2">{processInlineFormatting(trimmedLine)}</p>);
         }
       }
     }
@@ -222,6 +223,7 @@ export default function AiHealthAdvisorForm() {
         toast({
             title: t('aiHealthAdvisor.adviceReadyTitle'),
             description: t('aiHealthAdvisor.adviceReadyDescription'),
+            duration: 1000, // Aggiungi questa riga per 1 secondo di durata
         });
       }
     } catch (error) {
@@ -262,15 +264,32 @@ export default function AiHealthAdvisorForm() {
 
   return (
     <Card className="shadow-lg">
-      <CardHeader>
+      <CardHeader className="flex flex-row items-center justify-between">
         <CardTitle className="flex items-center">
           <Wand2 className="w-6 h-6 mr-2 text-primary" />
           {t('aiHealthAdvisor.cardTitle')}
         </CardTitle>
+        <div>
+          {/* Pulsante responsivo per Ottieni/Rigenera Consulenza */}
+          <Button
+            type="submit"
+            form="ai-health-advisor-form"
+            disabled={isLoading}
+            variant="outline" // Usiamo outline per un bordo leggero, e poi sovrascriviamo bg/text
+            className="bg-white hover:bg-gray-100 text-black dark:bg-slate-100 dark:hover:bg-slate-200 dark:text-black
+                       h-10 w-10 p-0 md:h-9 md:w-auto md:px-3 md:py-2 flex items-center justify-center rounded-md"
+            aria-label={t('aiHealthAdvisor.getAdviceButton')}
+          >
+            {/* Icona si adatta alla dimensione e allo stato di caricamento */}
+            {isLoading ? <Loader2 className="h-5 w-5 animate-spin md:h-4 md:w-4" /> : <Wand2 className="h-5 w-5 md:h-4 md:w-4" />}
+            {/* Testo visibile solo su schermi md e superiori */}
+            <span className="hidden md:ml-2 md:inline-block">{t('aiHealthAdvisor.getAdviceButton')}</span>
+          </Button>
+        </div>
       </CardHeader>
       <CardContent>
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+          <form id="ai-health-advisor-form" onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
             <FormField
               control={form.control}
               name="userQuery"
@@ -287,17 +306,6 @@ export default function AiHealthAdvisorForm() {
                 </FormItem>
               )}
             />
-            
-            <div className="flex justify-center">
-                <Button type="submit" disabled={isLoading} className="w-full md:w-auto">
-                {isLoading && !adviceResult ? ( // Show loader only if initial advice is loading
-                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                ) : (
-                    <Wand2 className="w-4 h-4 mr-2" />
-                )}
-                {t('aiHealthAdvisor.getAdviceButton')}
-                </Button>
-            </div>
           </form>
         </Form>
 
@@ -340,4 +348,3 @@ export default function AiHealthAdvisorForm() {
     </Card>
   );
 }
-

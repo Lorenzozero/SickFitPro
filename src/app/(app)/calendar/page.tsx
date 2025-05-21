@@ -50,15 +50,15 @@ const DayScheduleContent: React.FC<DayScheduleContentProps> = ({
 }) => {
   return (
     <div className="flex flex-col h-full">
-      <ul className={`space-y-0.5 flex-grow overflow-y-auto mb-1.5 ${isMobile ? 'max-h-[100px]' : ''}`}>
+      <ul className={`space-y-0.5 flex-grow overflow-y-auto mb-8 ${isMobile ? 'max-h-[100px]' : ''}`}>
         {workouts && workouts.length > 0 ? (
           workouts.map(workout => {
             const planDetails = availableWorkoutPlans.find(p => p.id === workout.planId);
             return (
-              <li key={workout.id} className="p-1 rounded-md bg-secondary text-xs">
+              <li key={workout.id} className="p-1 rounded-md bg-black/10 dark:bg-white/10 text-xs">
                 <div className="flex justify-between items-center gap-1">
-                  <span className="font-semibold text-secondary-foreground truncate flex-grow min-w-0">{workout.planName}</span>
-                  <Button variant="ghost" size="icon" className="h-5 w-5 text-destructive shrink-0" onClick={() => onDeleteWorkout(dayKey, workout.id)}>
+                  <span className="font-semibold text-primary-foreground truncate flex-grow min-w-0">{workout.planName}</span>
+                  <Button variant="ghost" size="icon" className="h-5 w-5 text-destructive-foreground hover:bg-destructive/80 hover:text-destructive-foreground shrink-0" onClick={() => onDeleteWorkout(dayKey, workout.id)}>
                     <Trash2 className="h-3 w-3" />
                   </Button>
                 </div>
@@ -66,18 +66,19 @@ const DayScheduleContent: React.FC<DayScheduleContentProps> = ({
             );
           })
         ) : (
-          <p className="text-xs text-center text-muted-foreground pt-1">
+          <p className="text-xs text-center text-primary-foreground/80 pt-1">
             {t('calendarPage.noWorkoutsForDayOfWeek', { dayOfWeek: t(`calendarPage.days.${dayKey}`)})}
           </p>
         )}
       </ul>
       <Button 
         onClick={() => onOpenDialog(dayKey)} 
-        size="sm" 
-        variant={isMobile ? "default" : "outline"} 
-        className="w-full mt-auto text-xs px-2 py-1 h-auto"
+        size="icon" // Modificato per dimensione icona standard
+        variant={isMobile ? "secondary" : "outline"} 
+        className="rounded-full mt-auto mx-auto" // Reso rotondo e centrato orizzontalmente
+        aria-label={t('calendarPage.addWorkoutToDay')} // Aggiunta etichetta per accessibilità
       >
-        <PlusCircle className="w-3 h-3 mr-1 shrink-0" /> <span className="truncate">{t('calendarPage.addWorkoutToDay')}</span>
+        <PlusCircle className="h-5 w-5 shrink-0" /> {/* Icona senza margine e leggermente più grande */}
       </Button>
     </div>
   );
@@ -125,15 +126,22 @@ export default function CalendarPage() {
         description: t('calendarPage.toastWorkoutScheduledDescriptionNoTime', { 
             planName: t(plan.nameKey, { default: plan.defaultName}), 
             dayOfWeek: t(`calendarPage.days.${selectedDayForDialog}`),
-        })
+        }),
+        duration: 1000, // Aggiungi una durata per l'auto-chiusura (es. 3 secondi)
     });
-    setIsDialogOpen(false);
-    setSelectedDayForDialog(null);
+    setTimeout(() => {
+      setIsDialogOpen(false);
+      setSelectedDayForDialog(null);
+    }, 1000);
   };
 
   const handleDeleteWorkoutFromWeek = (dayKey: string, workoutId: string) => {
     deleteWorkoutFromDay(dayKey, workoutId);
-    toast({ title: t('calendarPage.toastWorkoutRemovedTitle', { default: "Workout Removed" }), variant: "destructive"});
+    toast({ 
+        title: t('calendarPage.toastWorkoutRemovedTitle', { default: "Workout Removed" }), 
+        variant: "destructive",
+        duration: 3000, // Aggiungi una durata anche qui per coerenza
+    });
   }
 
 
@@ -144,8 +152,8 @@ export default function CalendarPage() {
           title={languageContextIsClient ? t('calendarPage.weeklyScheduleTitle') : "Weekly Training Schedule"}
           description={languageContextIsClient ? t('calendarPage.weeklyScheduleDescription') : "Set up your typical training week. This schedule will repeat automatically."}
         />
-        <Card className="shadow-lg">
-          <CardContent className="p-4">
+        <Card className="shadow-xl bg-gradient-to-br from-blue-600/80 to-indigo-700/80 dark:from-blue-900/80 dark:to-indigo-950/80 text-primary-foreground">
+          <CardContent className="p-4 text-primary-foreground">
             <Skeleton className="h-8 w-3/4 mb-4" />
             <div className="hidden md:block">
               <Skeleton className="h-48 w-full" />
@@ -165,13 +173,13 @@ export default function CalendarPage() {
         title={t('calendarPage.weeklyScheduleTitle')}
         description={t('calendarPage.weeklyScheduleDescription')}
       />
-      <Card className="shadow-lg">
-        <CardContent className="p-0">
+      <Card className="shadow-xl bg-gradient-to-br from-blue-600/80 to-indigo-700/80 dark:from-blue-900/80 dark:to-indigo-950/80 text-primary-foreground">
+        <CardContent className="p-0 text-primary-foreground">
           {/* Mobile View */}
           <div className="md:hidden flex flex-col gap-2 p-2">
             {dayKeys.map(dayKey => (
-              <Card key={`mobile-${dayKey}`} className="shadow-sm border">
-                <CardHeader className="p-2"> 
+              <Card key={`mobile-${dayKey}`} className="shadow-md bg-black/10 dark:bg-white/10">
+                <CardHeader className="p-2 border-b border-primary-foreground/20"> 
                   <CardTitle className="text-base capitalize text-center font-semibold">{t(`calendarPage.days.${dayKey}`)}</CardTitle> 
                 </CardHeader>
                 <CardContent className="p-2 pt-0 min-h-[100px]"> 
@@ -196,7 +204,7 @@ export default function CalendarPage() {
               <TableHeader>
                 <TableRow>
                   {dayKeys.map(dayKey => (
-                    <TableHead key={`desktop-head-${dayKey}`} className="text-center capitalize p-1.5 md:p-2 w-[14.28%] min-w-[100px] md:min-w-[80px]"> 
+                    <TableHead key={`desktop-head-${dayKey}`} className="text-center capitalize p-1.5 md:p-2 w-[14.28%] min-w-[100px] md:min-w-[80px] border-x border-primary-foreground/20 first:border-l-0 last:border-r-0"> 
                       {t(`calendarPage.days.${dayKey}`)}
                     </TableHead>
                   ))}
@@ -205,7 +213,7 @@ export default function CalendarPage() {
               <TableBody>
                 <TableRow className="align-top">
                   {dayKeys.map(dayKey => (
-                    <TableCell key={`desktop-cell-${dayKey}`} className="p-1 md:p-1.5 h-36 md:h-40 border align-top">
+                    <TableCell key={`desktop-cell-${dayKey}`} className="p-1 md:p-1.5 h-36 md:h-40 border-x border-primary-foreground/20 first:border-l-0 last:border-r-0 align-top">
                       <DayScheduleContent
                         dayKey={dayKey}
                         workouts={weeklySchedule[dayKey] || []}
@@ -256,7 +264,7 @@ export default function CalendarPage() {
             </div>
             <DialogFooter className="sm:justify-center">
               <Button type="button" variant="outline" onClick={() => setIsDialogOpen(false)}>{t('calendarPage.cancelButton')}</Button>
-              <Button type="submit">{t('calendarPage.scheduleWorkoutButton')}</Button>
+              <Button type="submit" className="text-black">{t('calendarPage.scheduleWorkoutButton')}</Button>
             </DialogFooter>
           </form>
         </DialogContent>

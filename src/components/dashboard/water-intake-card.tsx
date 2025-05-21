@@ -119,18 +119,18 @@ export default function WaterIntakeCard() {
   }
 
   return (
-    <Card className="shadow-lg">
+    <Card className="shadow-lg rounded-xl border bg-gradient-to-br from-blue-500/90 to-sky-600/90 dark:from-blue-800/90 dark:to-sky-900/90 text-primary-foreground">
       <CardHeader>
         <div className="flex items-center justify-between">
           <CardTitle className="flex items-center">
-            <Droplet className="w-5 h-5 mr-2 text-blue-500" />
+            <Droplet className="w-5 h-5 mr-2 text-primary-foreground" />
             {t('waterIntakeCard.title')}
           </CardTitle>
           <div className="flex items-center gap-1">
             <TooltipProvider>
               <Tooltip>
                 <TooltipTrigger asChild>
-                  <Button variant="ghost" size="icon" onClick={resetWater} aria-label={t('waterIntakeCard.resetWaterButton')}>
+                  <Button variant="ghost" size="icon" onClick={resetWater} aria-label={t('waterIntakeCard.resetWaterButton')} className="text-primary-foreground hover:bg-white/20">
                     <RotateCcw className="w-4 h-4" />
                   </Button>
                 </TooltipTrigger>
@@ -143,8 +143,8 @@ export default function WaterIntakeCard() {
                 <Tooltip>
                     <TooltipTrigger asChild>
                          <Select value={reminderFrequency} onValueChange={(value) => setReminderFrequency(value as ReminderFrequency)}>
-                            <SelectTrigger asChild aria-label={t('waterIntakeCard.hydrationReminderSettingsAriaLabel', {default: "Hydration Reminder Settings"})}>
-                                <Button variant="ghost" size="icon">
+                            <SelectTrigger asChild aria-label={t('waterIntakeCard.hydrationReminderSettingsAriaLabel', {default: "Hydration Reminder Settings"})} >
+                                <Button variant="ghost" size="icon" className="text-primary-foreground hover:bg-white/20 [&_svg]:text-primary-foreground">
                                     <Bell className="w-4 h-4" />
                                 </Button>
                             </SelectTrigger>
@@ -167,7 +167,7 @@ export default function WaterIntakeCard() {
                     variant="ghost" 
                     size="icon" 
                     aria-label={t('waterIntakeCard.goalSettingsButtonLabel', { default: 'Goal Settings' })}
-                    onClick={() => setIsGoalSettingsOpen(!isGoalSettingsOpen)}
+                    onClick={() => setIsGoalSettingsOpen(!isGoalSettingsOpen)} className="text-primary-foreground hover:bg-white/20"
                   >
                     <Target className="w-4 h-4" />
                   </Button>
@@ -183,7 +183,7 @@ export default function WaterIntakeCard() {
       <CardContent className="space-y-4">
         {isGoalSettingsOpen && (
             <div>
-            <Label htmlFor="water-goal" className="text-md font-semibold">
+            <Label htmlFor="water-goal" className="text-md font-semibold text-primary-foreground">
                 {t('waterIntakeCard.setDailyGoalLabel', {default: 'Daily Goal (ml)'})}
             </Label>
             <div className="flex items-center gap-2 mt-1">
@@ -193,21 +193,21 @@ export default function WaterIntakeCard() {
                 value={inputGoal}
                 onChange={handleGoalInputChange}
                 min="1"
-                className="w-full"
+                className="w-full text-primary-foreground bg-background/50 border-primary-foreground/50 placeholder:text-primary-foreground/70"
                 />
-                <Button onClick={handleSaveGoal} size="sm">{t('waterIntakeCard.saveGoalButton')}</Button>
+                <Button onClick={handleSaveGoal} size="sm" variant="outline" className="bg-white/20 hover:bg-white/30 border-white/50 text-primary-foreground">{t('waterIntakeCard.saveGoalButton')}</Button>
             </div>
             </div>
         )}
         
         <div>
           <div className="flex justify-between items-center mb-1">
-            <span className="text-sm text-muted-foreground">
+            <span className="text-sm text-primary-foreground/90">
               {t('waterIntakeCard.currentIntakeLabel', { current: currentWaterIntake, dailyGoal: dailyWaterGoal })}
             </span>
-            <span className="text-sm font-medium">{Math.round(progressPercentage)}%</span>
+            <span className="text-sm font-medium text-primary-foreground">{Math.round(progressPercentage)}%</span>
           </div>
-          <Progress value={progressPercentage} className="w-full h-2" />
+          <Progress value={progressPercentage} className="w-full h-2 bg-white/30 [&>div]:bg-white" />
         </div>
         <TooltipProvider>
           <div className="grid grid-cols-2 gap-2">
@@ -217,7 +217,7 @@ export default function WaterIntakeCard() {
                   onClick={() => addWater(WATER_INCREMENT_ML)} 
                   variant="outline" 
                   aria-label={t('waterIntakeCard.ariaAddGlass', { amount: WATER_INCREMENT_ML })}
-                  className="w-28 h-16 flex flex-col items-center justify-center mx-auto"
+                  className="w-full h-auto py-3 flex flex-col items-center justify-center bg-white/10 hover:bg-white/20 border-white/40 text-primary-foreground"
                 >
                   <GlassWater className="w-6 h-6 mb-0.5" />
                   <span className="text-xs">+{WATER_INCREMENT_ML}ml</span>
@@ -234,7 +234,7 @@ export default function WaterIntakeCard() {
                   onClick={() => addWater(WATER_INCREMENT_ML * 2)} 
                   variant="outline" 
                   aria-label={t('waterIntakeCard.ariaAddBottle', { amount: WATER_INCREMENT_ML * 2 })}
-                  className="w-28 h-16 flex flex-col items-center justify-center mx-auto"
+                  className="w-full h-auto py-3 flex flex-col items-center justify-center bg-white/10 hover:bg-white/20 border-white/40 text-primary-foreground"
                 >
                   <Milk className="w-6 h-6 mb-0.5" />
                    <span className="text-xs">+{WATER_INCREMENT_ML * 2}ml</span>

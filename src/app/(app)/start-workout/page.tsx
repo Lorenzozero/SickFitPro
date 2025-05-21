@@ -4,12 +4,13 @@
 import Link from 'next/link';
 import { PageHeader } from '@/components/shared/page-header';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { PlayCircle, Ban } from 'lucide-react';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'; // PlayCircle removed from imports
+import { Ban } from 'lucide-react'; // PlayCircle icon is no longer used here
 import { useLanguage } from '@/context/language-context';
 import { useActiveWorkout } from '@/context/active-workout-context';
 import { useRouter } from 'next/navigation';
 import { Skeleton } from '@/components/ui/skeleton';
+import { cn } from '@/lib/utils';
 
 // Mock data - similar to initialWorkoutPlans in workouts/page.tsx for consistency
 const availablePlans = [
@@ -37,7 +38,6 @@ export default function StartWorkoutPage() {
       <>
         <PageHeader
           title={languageContextIsClient ? t('startWorkoutPage.title') : "Start New Workout"}
-          description={languageContextIsClient ? t('startWorkoutPage.description') : "Choose a plan to start or begin an ad-hoc session."}
         />
         <div className="space-y-6">
           <Card className="shadow-lg">
@@ -61,7 +61,6 @@ export default function StartWorkoutPage() {
     <>
       <PageHeader
         title={t('startWorkoutPage.title')}
-        description={t('startWorkoutPage.description')}
       />
 
       <div className="space-y-6">
@@ -84,27 +83,35 @@ export default function StartWorkoutPage() {
           </Card>
         )}
         <Card className="shadow-lg">
-          <CardHeader>
+          <CardHeader className="text-center">
             <CardTitle>{t('startWorkoutPage.selectPlanTitle')}</CardTitle>
           </CardHeader>
           <CardContent>
             {availablePlans.length > 0 ? (
               <div className="space-y-4">
                 {availablePlans.map((plan) => (
-                  <Card key={plan.id} className="flex flex-col sm:flex-row items-start sm:items-center justify-between p-4 gap-3">
-                    <div className="flex-grow">
-                      <h3 className="font-semibold">{plan.name}</h3>
-                      <p className="text-sm text-muted-foreground">{plan.description}</p>
+                  <Card
+                    key={plan.id}
+                    className={cn(
+                      "p-4 rounded-lg shadow-md transition-all duration-300 ease-in-out bg-gradient-to-tr from-sky-50 to-blue-50 dark:from-sky-700 dark:to-blue-700", // Sfondo più luminoso
+                      !!activePlanId
+                        ? "opacity-60 cursor-not-allowed" // Stile per quando un allenamento è attivo
+                        : "cursor-pointer hover:shadow-xl hover:scale-[1.02] active:scale-[0.98]" // Stile per quando è cliccabile
+                    )}
+                    onClick={() => {
+                      if (!activePlanId) { // Esegui solo se nessun allenamento è attivo
+                        handleStartPlan(plan.id, plan.name);
+                      }
+                    }}
+                    role="button"
+                    tabIndex={!!activePlanId ? -1 : 0}
+                    aria-disabled={!!activePlanId}
+                    aria-label={languageContextIsClient ? t('startWorkoutPage.startPlanButtonAlt', { planName: plan.name }) : `Start plan ${plan.name}`}
+                  >
+                    <div className="flex-grow text-center"> {/* Testo centrato */}
+                      <h3 className="font-semibold text-lg text-slate-800 dark:text-slate-100">{plan.name}</h3>
+                      <p className="text-sm text-slate-600 dark:text-slate-400 mt-1">{plan.description}</p>
                     </div>
-                    <Button 
-                      size="sm" 
-                      disabled={!!activePlanId}
-                      className="w-full sm:w-auto"
-                      onClick={() => handleStartPlan(plan.id, plan.name)}
-                    >
-                      <PlayCircle className="w-4 h-4 mr-2" />
-                      {t('startWorkoutPage.startPlanButton')}
-                    </Button>
                   </Card>
                 ))}
               </div>

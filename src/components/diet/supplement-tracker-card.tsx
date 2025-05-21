@@ -28,6 +28,7 @@ import { PlusCircle, Edit2, Trash2, Bell, BellOff, PackagePlus } from 'lucide-re
 import { useLanguage } from '@/context/language-context';
 import { useToast } from '@/hooks/use-toast';
 import { ScrollArea } from '../ui/scroll-area';
+import prisma from '@/lib/database';
 
 export interface Supplement {
   id: string;
@@ -86,6 +87,28 @@ export default function SupplementTrackerCard() {
       localStorage.setItem(SUPPLEMENT_NOTIFICATIONS_GLOBAL_KEY, JSON.stringify(globalNotificationsEnabled));
     }
   }, [globalNotificationsEnabled]);
+
+  // Moved useEffects for DB interaction (see important note below)
+  useEffect(() => {
+    // IMPORTANT: Direct Prisma calls in 'use client' components are generally not recommended.
+    // This will likely fail as Prisma is meant for server-side execution.
+    // Consider moving this logic to a Server Action or an API route.
+    const fetchSupplements = async () => {
+        // const supplementsFromDB = await prisma.supplement.findMany();
+        // setSupplements(supplementsFromDB);
+        console.warn("Attempting to fetch supplements with Prisma on client-side. This should be refactored.");
+    };
+    // fetchSupplements(); // Temporarily commented out to prevent errors
+  }, []);
+
+  useEffect(() => {
+    // IMPORTANT: Similar to fetching, saving directly with Prisma here is problematic.
+    const saveSupplementsToDB = async () => {
+        // await prisma.supplement.createMany({ data: supplements });
+        console.warn("Attempting to save supplements with Prisma on client-side. This should be refactored.");
+    };
+    // if (supplements.length > 0) saveSupplementsToDB(); // Temporarily commented out
+  }, [supplements]);
 
   const resetDialogFields = () => {
     setDialogName('');
@@ -159,64 +182,69 @@ export default function SupplementTrackerCard() {
 
   return (
     <>
-      <Card className="shadow-lg">
+      <Card className="shadow-lg rounded-xl border bg-gradient-to-br from-green-500/90 to-emerald-600/90 dark:from-green-700/90 dark:to-emerald-900/90 text-primary-foreground">
         <CardHeader className="flex flex-row items-center justify-between">
           <div className="flex items-center">
-            <PackagePlus className="w-5 h-5 mr-2 text-primary" />
-            <CardTitle>{t('supplements.cardTitle', { default: 'Supplement Tracker' })}</CardTitle>
+            <PackagePlus className="w-5 h-5 mr-2 text-primary-foreground" />
+            <CardTitle className="text-primary-foreground">{t('supplements.cardTitle', { default: 'Supplement Tracker' })}</CardTitle>
           </div>
+          {/* Actions in Header: Add Supplement and Global Notifications Toggle */}
           <div className="flex items-center space-x-2">
-            <Label htmlFor="global-supplement-notifications" className="text-sm text-muted-foreground">
-              {t('supplements.enableAllNotificationsLabel', { default: 'All Notifications' })}
-            </Label>
-            <Switch
-              id="global-supplement-notifications"
-              checked={globalNotificationsEnabled}
-              onCheckedChange={setGlobalNotificationsEnabled}
-              aria-label={t('supplements.enableAllNotificationsAria', { default: 'Toggle all supplement notifications' })}
-            />
+            <Button onClick={() => openDialog()} className="bg-white hover:bg-slate-100 text-black rounded-full" size="icon">
+              {/* Icona sempre visibile, testo visibile da md in su - rimosso testo per coerenza con bottone notifiche */}
+              <PlusCircle className="w-5 h-5" />
+              <span className="sr-only">{t('supplements.addSupplementButton', { default: 'Add Supplement' })}</span>
+            </Button>
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => setGlobalNotificationsEnabled(!globalNotificationsEnabled)}
+              aria-label={globalNotificationsEnabled
+                ? t('supplements.disableAllNotificationsAria', { default: 'Disable all supplement notifications' })
+                : t('supplements.enableAllNotificationsAria', { default: 'Enable all supplement notifications' })}
+              className={`rounded-full
+                ${globalNotificationsEnabled // Active state with bright green
+                  ? 'bg-lime-400 hover:bg-lime-500 text-lime-900'
+                  : 'bg-red-500 hover:bg-red-600 text-white dark:bg-red-600 dark:hover:bg-red-700 dark:text-red-100'}`}
+            >
+              {globalNotificationsEnabled ? <Bell className="w-5 h-5" /> : <BellOff className="w-5 h-5" />}
+            </Button>
           </div>
         </CardHeader>
         <CardContent>
-          <div className="mb-4 flex justify-center sm:justify-start">
-            <Button onClick={() => openDialog()}>
-              <PlusCircle className="w-4 h-4 mr-2" />
-              {t('supplements.addSupplementButton', { default: 'Add Supplement' })}
-            </Button>
-          </div>
           {supplements.length > 0 ? (
             <ScrollArea className="max-h-[400px]">
               <Table>
                 <TableHeader>
-                  <TableRow>
-                    <TableHead>{t('supplements.tableHeaderName', { default: 'Name' })}</TableHead>
-                    <TableHead>{t('supplements.tableHeaderTiming', { default: 'When' })}</TableHead>
-                    <TableHead>{t('supplements.tableHeaderQuantity', { default: 'Quantity' })}</TableHead>
-                    <TableHead>{t('supplements.tableHeaderFrequency', { default: 'Frequency' })}</TableHead>
-                    <TableHead>{t('supplements.tableHeaderTime', { default: 'Time' })}</TableHead>
-                    <TableHead className="text-center">{t('supplements.tableHeaderNotifications', { default: 'Notify' })}</TableHead>
-                    <TableHead className="text-right">{t('exercisesPage.tableHeaderActions')}</TableHead>
+                  <TableRow className="border-primary-foreground/30">
+                    <TableHead className="text-primary-foreground">{t('supplements.tableHeaderName', { default: 'Name' })}</TableHead>
+                    <TableHead className="text-primary-foreground">{t('supplements.tableHeaderTiming', { default: 'When' })}</TableHead>
+                    <TableHead className="text-primary-foreground">{t('supplements.tableHeaderQuantity', { default: 'Quantity' })}</TableHead>
+                    <TableHead className="hidden sm:table-cell text-primary-foreground">{t('supplements.tableHeaderFrequency', { default: 'Frequency' })}</TableHead>
+                    <TableHead className="hidden sm:table-cell text-primary-foreground">{t('supplements.tableHeaderTime', { default: 'Time' })}</TableHead>
+                    <TableHead className="text-center hidden sm:table-cell text-primary-foreground">{t('supplements.tableHeaderNotifications', { default: 'Notify' })}</TableHead>
+                    <TableHead className="text-right w-[100px] text-primary-foreground">{t('exercisesPage.tableHeaderActions')}</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
                   {supplements.map(sup => (
-                    <TableRow key={sup.id}>
-                      <TableCell className="font-medium">{sup.name}</TableCell>
-                      <TableCell>{sup.timing}</TableCell>
-                      <TableCell>{sup.quantity}</TableCell>
-                      <TableCell>{t(`supplements.frequency${sup.frequency.charAt(0).toUpperCase() + sup.frequency.slice(1)}`, { default: sup.frequency })}</TableCell>
-                      <TableCell>{sup.specificTime || 'N/A'}</TableCell>
-                      <TableCell className="text-center">
-                        <Button variant="ghost" size="icon" onClick={() => toggleSupplementNotification(sup.id)} 
+                    <TableRow key={sup.id} className="border-primary-foreground/20 hover:bg-white/10">
+                      <TableCell className="font-medium text-primary-foreground">{sup.name}</TableCell>
+                      <TableCell className="text-primary-foreground">{sup.timing}</TableCell>
+                      <TableCell className="text-primary-foreground">{sup.quantity}</TableCell>
+                      <TableCell className="hidden sm:table-cell text-primary-foreground">{t(`supplements.frequency${sup.frequency.charAt(0).toUpperCase() + sup.frequency.slice(1)}`, { default: sup.frequency })}</TableCell>
+                      <TableCell className="hidden sm:table-cell text-primary-foreground">{sup.specificTime || 'N/A'}</TableCell>
+                      <TableCell className="text-center hidden sm:table-cell">
+                        <Button variant="ghost" size="icon" onClick={() => toggleSupplementNotification(sup.id)} className="hover:bg-white/20"
                                 aria-label={sup.notificationsEnabled ? t('supplements.disableNotificationAria', {name: sup.name}) : t('supplements.enableNotificationAria', {name: sup.name})}>
-                          {globalNotificationsEnabled && sup.notificationsEnabled ? <Bell className="w-4 h-4 text-green-500" /> : <BellOff className="w-4 h-4 text-muted-foreground" />}
+                          {globalNotificationsEnabled && sup.notificationsEnabled ? <Bell className="w-4 h-4 text-lime-400" /> : <BellOff className="w-4 h-4 text-primary-foreground/70" />}
                         </Button>
                       </TableCell>
-                      <TableCell className="text-right space-x-1">
-                        <Button variant="ghost" size="icon" onClick={() => openDialog(sup)}>
-                          <Edit2 className="w-4 h-4" />
+                      <TableCell className="text-right space-x-0 sm:space-x-1 ">
+                        <Button variant="ghost" size="icon" onClick={() => openDialog(sup)} className="text-primary-foreground hover:bg-white/20">
+                          <Edit2 className="w-4 h-4 " />
                         </Button>
-                        <Button variant="ghost" size="icon" onClick={() => handleDeleteSupplement(sup.id)}>
+                        <Button variant="ghost" size="icon" onClick={() => handleDeleteSupplement(sup.id)} className="text-red-400 hover:text-red-300 hover:bg-white/20">
                           <Trash2 className="w-4 h-4 text-destructive" />
                         </Button>
                       </TableCell>
@@ -226,7 +254,7 @@ export default function SupplementTrackerCard() {
               </Table>
             </ScrollArea>
           ) : (
-            <p className="text-sm text-center text-muted-foreground py-4">
+            <p className="text-sm text-center text-primary-foreground/80 py-4">
               {t('supplements.noSupplementsAdded', { default: 'No supplements added yet. Click "Add Supplement" to start tracking.' })}
             </p>
           )}
@@ -298,7 +326,7 @@ export default function SupplementTrackerCard() {
                   {t('calendarPage.cancelButton')}
                 </Button>
               </DialogClose>
-              <Button type="submit">{t('progressPage.saveMeasurementButton')}</Button> 
+              <Button type="submit" className="text-black hover:text-black/90">{t('supplements.saveButton', { default: 'Save Supplement' })}</Button> 
             </DialogFooter>
           </form>
         </DialogContent>

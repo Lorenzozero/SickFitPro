@@ -4,7 +4,7 @@
 import { PageHeader } from '@/components/shared/page-header';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { TrendingUp, Weight, PlayCircle, Users, Activity, Clock, CalendarDays } from 'lucide-react';
+import { TrendingUp, Weight, PlayCircle, Users, Activity, Clock, type LucideIcon, ChevronDown, ChevronUp } from 'lucide-react';
 import Link from 'next/link';
 import { useLanguage } from '@/context/language-context';
 import { useEffect, useState, useMemo } from 'react';
@@ -27,6 +27,14 @@ interface UpcomingWorkoutDisplayItem {
   planName: string;
 }
 
+interface StatItem {
+  titleKey: string;
+  value: string;
+  icon: LucideIcon; // Specific type for Lucide icons
+  color: string;
+  href?: string; // Optional link for the card
+}
+
 const getDateFnsLocale = (lang: string) => {
   switch (lang) {
     case 'it': return dateFnsIt;
@@ -42,6 +50,7 @@ export default function DashboardPage() {
   const [isMounted, setIsMounted] = useState(false);
   const [currentWeight, setCurrentWeight] = useState<string>('N/A');
   const [upcomingWorkouts, setUpcomingWorkouts] = useState<UpcomingWorkoutDisplayItem[]>([]);
+  const [showAllUpcoming, setShowAllUpcoming] = useState(false);
   const [actualWorkoutHistory, setActualWorkoutHistory] = useState<CompletedWorkout[]>([]);
 
   useEffect(() => {
@@ -130,7 +139,7 @@ export default function DashboardPage() {
           const todaySimple = new Date(todayDate.getFullYear(), todayDate.getMonth(), todayDate.getDate());
           const workoutDateSimple = new Date(workoutDate.getFullYear(), workoutDate.getMonth(), workoutDate.getDate());
           return workoutDateSimple > todaySimple;
-      }).slice(0, 5));
+      })); // Rimosso .slice(0, 5) per caricare tutti gli allenamenti futuri
     };
 
     calculateUpcomingWorkouts();
@@ -152,62 +161,87 @@ export default function DashboardPage() {
   }).length;
 
 
-  const stats = [
-    { titleKey: 'dashboard.workoutsThisWeek', value: `${completedWorkoutsThisWeek}/${totalScheduledWorkoutsThisWeek}`, icon: Users, color: 'text-accent' },
-    { titleKey: 'dashboard.weightLifted', value: '0 kg', icon: TrendingUp, color: 'text-green-500' }, // Placeholder
-    { titleKey: 'dashboard.currentWeight', value: currentWeight, icon: Weight, color: 'text-orange-500' },
-  ];
+  const stats: StatItem[] = useMemo(() => [
+    { titleKey: 'dashboard.workoutsThisWeek', value: `${completedWorkoutsThisWeek}/${totalScheduledWorkoutsThisWeek}`, icon: Users, color: 'text-accent', href: '/calendar' },
+    { titleKey: 'dashboard.weightLifted', value: '0 kg', icon: TrendingUp, color: 'text-green-500', href: '/progress' }, // Placeholder, added href
+    { titleKey: 'dashboard.currentWeight', value: currentWeight, icon: Weight, color: 'text-orange-500', href: '/diet' },
+  ], [completedWorkoutsThisWeek, totalScheduledWorkoutsThisWeek, currentWeight]);
 
   const formatDateHistory = (dateString: string) => {
     if (!isMounted || !languageContextIsClient) return dateString;
-    return new Date(dateString + 'T00:00:00').toLocaleDateString(language, {
+    // Ensure the date string is treated as local time, not UTC, if it's just a date
+    const date = new Date(dateString.includes('T') ? dateString : dateString + 'T00:00:00');
+    return date.toLocaleDateString(language, {
       year: 'numeric',
       month: 'short',
       day: 'numeric',
     });
   };
 
+  const renderStatCardContent = (stat: StatItem) => (
+    <>
+      <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
+        <CardTitle className="flex-grow text-center text-sm font-medium text-muted-foreground">
+          {isMounted && languageContextIsClient ? t(stat.titleKey) : stat.titleKey.split('.').pop()}
+        </CardTitle>
+        <stat.icon className={`w-5 h-5 ${stat.color}`} />
+      </CardHeader>
+      <CardContent>
+        <div className="text-center text-3xl font-bold text-foreground">{stat.value}</div>
+      </CardContent>
+    </>
+  );
+
+  const displayedUpcomingWorkouts = showAllUpcoming ? upcomingWorkouts : upcomingWorkouts.slice(0, 2);
+
   return (
     <>
       <PageHeader
         title={languageContextIsClient ? t('dashboard.welcomeTitle') : "Welcome to SickFit Pro!"}
-        description={languageContextIsClient ? t('dashboard.welcomeDescription') : "Your journey to peak fitness starts here. Let's get to work."}
+        description=""
       />
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-        {stats.map((stat) => (
-          <Card key={stat.titleKey} className="shadow-lg hover:shadow-xl transition-shadow duration-300">
-            <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
-              <CardTitle className="text-sm font-medium text-muted-foreground">
-                {isMounted && languageContextIsClient ? t(stat.titleKey) : stat.titleKey.split('.').pop()}
-              </CardTitle>
-              <stat.icon className={`w-5 h-5 ${stat.color}`} />
-            </CardHeader>
-            <CardContent>
-              <div className="text-3xl font-bold text-foreground">{stat.value}</div>
-            </CardContent>
-          </Card>
-        ))}
+      <div className={"grid grid-cols-3 gap-4 md:gap-6 lg:gap-8 mt-4 mb-8"}>
+        {stats.map((stat, idx) => {
+          // Definisci tre colori di sfondo diversi, ben contrastati per light/dark
+          const cardBgVariants = [
+            "bg-gradient-to-br from-blue-600/80 to-indigo-700/80 dark:from-blue-900/80 dark:to-indigo-950/80",
+            "bg-gradient-to-br from-green-500/80 to-emerald-700/80 dark:from-green-900/80 dark:to-emerald-950/80",
+            "bg-gradient-to-br from-orange-400/80 to-pink-500/80 dark:from-orange-900/80 dark:to-pink-950/80"
+          ];
+          const cardBg = cardBgVariants[idx % 3];
+          const cardClass = `min-h-[160px] h-[160px] max-h-[160px] w-full rounded-xl shadow-xl border-none flex flex-col justify-between hover:scale-[1.03] transition-transform ${cardBg}`;
+          return stat.href ? (
+            <Link href={stat.href} key={stat.titleKey} className="block hover:no-underline">
+              <Card className={cardClass}>
+                {renderStatCardContent(stat)}
+              </Card>
+            </Link>
+          ) : (
+            <Card key={stat.titleKey} className={cardClass}>
+              {renderStatCardContent(stat)}
+            </Card>
+          );
+        })}
       </div>
 
       <div className="mt-6 grid gap-4 md:grid-cols-1 lg:grid-cols-2">
-        <Card className="shadow-lg">
-          <CardHeader className="flex flex-row items-center justify-between">
-            <CardTitle>{isMounted && languageContextIsClient ? t('dashboard.todaysFocus') : "Today's Focus"}</CardTitle>
-            <Button asChild className="md:w-auto" size="sm">
-              <Link href="/start-workout">
-                <PlayCircle className="w-4 h-4 mr-2"/> {isMounted && languageContextIsClient ? t('dashboard.logNewWorkout') : 'Start Workout'}
-              </Link>
-            </Button>
+        {/* Card "Today's Focus" - resa relativa per posizionare il pulsante mobile */}
+        <Card className="shadow-xl relative bg-gradient-to-br from-blue-600/80 to-indigo-700/80 dark:from-blue-900/80 dark:to-indigo-950/80 text-primary-foreground">
+          <CardHeader className="relative text-center"> {/* Rimosso flex, aggiunto text-center e relative */}
+            <CardTitle> {/* Il testo qui sarà centrato grazie a text-center sul genitore */}
+              {isMounted && languageContextIsClient ? t('dashboard.todaysFocus') : "Today's Focus"}
+            </CardTitle>
           </CardHeader>
+
           <CardContent className="relative">
-            <div className="text-center border-2 border-dashed rounded-lg border-border min-h-[120px] flex flex-col justify-center p-4" data-ai-hint="workout routine">
+            <div className="text-center border-2 border-dashed rounded-lg border-primary-foreground/50 min-h-[120px] flex flex-col justify-center p-4" data-ai-hint="workout routine">
               {isMounted && scheduleIsClient && languageContextIsClient ? (
                 todaysWorkoutsDetails.length > 0 ? (
                   <>
                     {todaysWorkoutsDetails.map(workout => (
                       <div key={workout.id} className="mb-2">
-                        <p className="text-xl font-semibold text-primary">{workout.planName}</p>
-                        {workout.duration && (
+                        <p className="text-xl font-semibold text-white">{workout.planName}</p>
+                        {workout.duration && ( // text-muted-foreground è già bianco globalmente, erediterà da text-primary-foreground
                           <div className="flex items-center justify-center text-sm text-muted-foreground mt-1">
                             <Clock className="w-3.5 h-3.5 mr-1.5" />
                             <span>{workout.duration}</span>
@@ -218,13 +252,13 @@ export default function DashboardPage() {
                   </>
                 ) : (
                   <>
-                    <Activity className="w-12 h-12 mx-auto mb-2 text-muted-foreground" />
+                    <Activity className="w-12 h-12 mx-auto mb-2 text-muted-foreground" /> {/* text-muted-foreground è già bianco */}
                     <p className="font-semibold">{t('dashboard.todayIsRestDay')}</p>
                   </>
                 )
               ) : (
                  <>
-                  <Activity className="w-12 h-12 mx-auto mb-2 text-muted-foreground" />
+                  <Activity className="w-12 h-12 mx-auto mb-2 text-muted-foreground" /> {/* text-muted-foreground è già bianco */}
                   <p className="font-semibold">{t('dashboard.viewCalendarToSeeWorkout')}</p>
                  </>
               )}
@@ -232,19 +266,31 @@ export default function DashboardPage() {
             
             {isMounted && languageContextIsClient && upcomingWorkouts.length > 0 && (
               <>
-                <Separator className="my-4" />
-                <h4 className="text-md font-semibold text-center mb-3">
-                  {t('dashboard.upcomingWorkoutsTitle', { default: 'Upcoming Workouts' })}
-                </h4>
+                <Separator className="my-4 bg-primary-foreground/30" />
+                <div className="flex justify-between items-center mb-3">
+                  <h4 className="text-md font-semibold text-center flex-grow">
+                    {t('dashboard.upcomingWorkoutsTitle', { default: 'Upcoming Workouts' })}
+                  </h4>
+                  {upcomingWorkouts.length > 2 && (
+                    <Button 
+                      variant="ghost" 
+                      size="icon" 
+                      onClick={() => setShowAllUpcoming(!showAllUpcoming)}
+                      className="text-primary-foreground hover:bg-white/20 hover:text-primary-foreground"
+                    >
+                      {showAllUpcoming ? <ChevronUp className="w-5 h-5" /> : <ChevronDown className="w-5 h-5" />}
+                    </Button>
+                  )}
+                </div>
                 <div className="grid gap-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-2 xl:grid-cols-3">
-                  {upcomingWorkouts.map(workout => (
-                    <Card key={workout.id} className="p-2.5 bg-secondary/50 hover:shadow-md transition-shadow text-xs">
+                  {displayedUpcomingWorkouts.map(workout => (
+                    <Card key={workout.id} className="p-2.5 bg-black/10 dark:bg-white/10 hover:shadow-md transition-shadow text-xs text-primary-foreground">
                       <div className="text-center">
-                        <p className="font-semibold text-primary uppercase tracking-wider">{workout.dayOfWeek}</p>
-                        <p className="text-lg font-bold text-foreground">{workout.dayOfMonth}</p>
-                        <p className="text-muted-foreground uppercase">{workout.month}</p>
+                        <p className="font-semibold text-white uppercase tracking-wider">{workout.dayOfWeek}</p>
+                        <p className="text-lg font-bold text-primary-foreground">{workout.dayOfMonth}</p>
+                        <p className="text-muted-foreground uppercase">{workout.month}</p> {/* text-muted-foreground è già bianco */}
                       </div>
-                      <Separator className="my-1.5" />
+                      <Separator className="my-1.5 bg-primary-foreground/30" />
                       <p className="mt-1 font-medium text-center truncate" title={workout.planName}>
                         {workout.planName}
                       </p>
@@ -254,52 +300,52 @@ export default function DashboardPage() {
               </>
             )}
 
-            <Link href="/calendar" className="absolute bottom-3 right-3 text-primary hover:text-accent transition-colors" aria-label={t('dashboard.viewFullSchedule', { default: "View Full Schedule"})}>
-              <CalendarDays className="w-6 h-6" />
+            <Link href="/calendar" className="absolute bottom-3 right-3 text-white hover:text-accent transition-colors" aria-label={t('dashboard.viewFullSchedule', { default: "View Full Schedule"})}>
+              
             </Link>
           </CardContent>
+          {/* Pulsante Mobile Flottante: visibile solo sotto md */}
+          <Link
+            href="/start-workout"
+            className="md:hidden absolute z-10 bottom-0 left-1/2 -translate-x-1/2 translate-y-1/2
+                       bg-primary text-primary-foreground hover:bg-primary/90
+                       rounded-full w-14 h-14 flex items-center justify-center shadow-xl focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+            aria-label={isMounted && languageContextIsClient ? t('dashboard.logNewWorkout', { default: 'Start Workout' }) : 'Start Workout'}
+            data-ai-hint="start-workout-fab"
+          >
+            <PlayCircle className="w-7 h-7 text-black" />
+          </Link>
         </Card>
 
-        <Card className="shadow-lg">
+        <Card className="shadow-xl mt-6 lg:mt-0 bg-gradient-to-br from-teal-500/80 to-cyan-600/80 dark:from-teal-900/80 dark:to-cyan-950/80 text-primary-foreground">
           <CardHeader>
             <CardTitle>{isMounted && languageContextIsClient ? t('dashboard.activityAndHistoryTitle') : "Activity & History"}</CardTitle>
           </CardHeader>
-          <CardContent>
+          <CardContent className="text-primary-foreground">
             {actualWorkoutHistory.length > 0 ? (
               <ScrollArea className="h-64">
                 <ul className="space-y-2 pr-3">
                   {actualWorkoutHistory.map((item, index) => (
                     <li key={item.id}>
-                      <div className="flex items-center justify-between p-2 rounded-md bg-secondary/50 hover:bg-secondary transition-colors">
+                      <div className="flex items-center justify-between p-2 rounded-md bg-black/10 dark:bg-white/10 hover:bg-black/20 dark:hover:bg-white/20 transition-colors">
                         <div className="flex-grow">
-                          <p className="font-semibold text-secondary-foreground">
+                          <p className="font-semibold text-primary-foreground">
                             {item.planName}
                           </p>
-                          <p className="text-xs text-muted-foreground">{formatDateHistory(item.completionDate)}</p>
+                          <p className="text-xs text-muted-foreground">{formatDateHistory(item.completionDate)}</p> {/* text-muted-foreground è già bianco */}
                         </div>
-                        <div className="flex items-center text-sm text-muted-foreground shrink-0">
+                        <div className="flex items-center text-sm text-muted-foreground shrink-0"> {/* text-muted-foreground è già bianco */}
                           <Clock className="w-3.5 h-3.5 mr-1.5" />
                           <span>{item.duration}</span>
                         </div>
                       </div>
-                      {index < actualWorkoutHistory.length - 1 && <Separator className="my-2" />}
+                      {index < actualWorkoutHistory.length - 1 && <Separator className="my-2 bg-primary-foreground/30" />}
                     </li>
                   ))}
                 </ul>
               </ScrollArea>
-            ) : (
-              <p className="text-center text-muted-foreground py-4">
-                {isMounted && languageContextIsClient ? t('dashboard.noWorkoutHistory') : "No workout history yet."}
-              </p>
-            )}
+            ) : null}
           </CardContent>
-          {actualWorkoutHistory.length > 0 && (
-              <CardFooter className="justify-center pt-3 border-t">
-                   <Button asChild variant="outline" size="sm">
-                      <Link href="/progress">{isMounted && languageContextIsClient ? t('dashboard.viewAllHistoryButton') : "View All History"}</Link>
-                  </Button>
-              </CardFooter>
-          )}
         </Card>
       </div>
     </>

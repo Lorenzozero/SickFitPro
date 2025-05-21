@@ -7,7 +7,7 @@ import { Logo } from '@/components/icons/logo';
 import { navItems } from '@/config/nav';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Settings, LogOut, Moon, Sun, Menu as MenuIcon } from 'lucide-react';
+import { Settings, LogOut, Moon, Sun, Menu as MenuIcon, UserCircle } from 'lucide-react';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -17,6 +17,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { useTheme } from '@/components/theme-provider';
+import { useRouter } from 'next/navigation'; // Make sure useRouter is imported
 import { useLanguage } from '@/context/language-context';
 import ResumeWorkoutButton from '@/components/shared/resume-workout-button';
 import { Sheet, SheetContent, SheetTrigger, SheetTitle } from '@/components/ui/sheet'; // Added SheetTitle
@@ -24,6 +25,7 @@ import { Sheet, SheetContent, SheetTrigger, SheetTitle } from '@/components/ui/s
 export default function AppLayout({ children }: { children: ReactNode }) {
   const { setTheme, resolvedTheme } = useTheme();
   const { t, isClient } = useLanguage();
+  const router = useRouter(); // Initialize router here
 
   const UserProfileDropdown = () => (
     <DropdownMenu>
@@ -124,6 +126,9 @@ export default function AppLayout({ children }: { children: ReactNode }) {
           {/* Right side actions (Theme toggle, User Profile) */}
           <div className="flex items-center gap-1 sm:gap-2">
             <ThemeToggleButton />
+            <Button variant="ghost" size="icon" onClick={() => router.push('/settings')}>
+              <UserCircle className="w-5 h-5" />
+            </Button>
             <div className="hidden md:block">
               <UserProfileDropdown />
             </div>
@@ -131,7 +136,7 @@ export default function AppLayout({ children }: { children: ReactNode }) {
         </div>
       </header>
 
-      <main className="flex-1 p-4 md:p-6 text-center">
+      <main className="flex-1 p-4 md:p-6">
         {children}
       </main>
       <ResumeWorkoutButton />

@@ -15,19 +15,19 @@
     --popover-foreground: 0 0% 3.9%;
 
     --primary: 180 100% 25.1%; /* #008080 Dark Teal */
-    --primary-foreground: 0 0% 98%;
+    --primary-foreground: 0 0% 3.9%; /* Testo nero su primario */
 
     --secondary: 210 40% 96.1%; /* Default Shadcn light gray */
-    --secondary-foreground: 0 0% 9%;
+    --secondary-foreground: 0 0% 3.9%; /* Testo nero su secondario */
 
     --muted: 210 40% 96.1%;
-    --muted-foreground: 0 0% 45.1%;
+    --muted-foreground: 0 0% 3.9%; /* Testo nero per muted-foreground in light mode */
 
     --accent: 182 100% 74.3%; /* #7DF9FF Electric Blue */
-    --accent-foreground: 180 100% 15%; /* Dark Teal for text on accent */
+    --accent-foreground: 0 0% 3.9%; /* Testo nero su accent */
 
     --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 0 0% 98%;
+    --destructive-foreground: 0 0% 3.9%; /* Testo nero su destructive */
 
     --border: 0 0% 89.8%;
     --input: 0 0% 89.8%;
@@ -41,12 +41,12 @@
     --radius: 0.5rem;
 
     /* Sidebar specific theme */
-    --sidebar-background: 180 30% 97%; /* Very light teal */
-    --sidebar-foreground: 180 80% 20%; /* Darker teal text */
+    --sidebar-background: 180 30% 97%; 
+    --sidebar-foreground: 0 0% 3.9%; /* Testo nero */
     --sidebar-primary: 180 100% 25.1%; /* Dark Teal for active/selected items */
-    --sidebar-primary-foreground: 0 0% 98%; /* White text on active items */
-    --sidebar-accent: 180 50% 90%; /* Lighter teal for hover */
-    --sidebar-accent-foreground: 180 80% 20%; /* Darker teal text on hover */
+    --sidebar-primary-foreground: 0 0% 3.9%; /* Testo nero su primario sidebar */
+    --sidebar-accent: 180 50% 90%; 
+    --sidebar-accent-foreground: 0 0% 3.9%; /* Testo nero su accent sidebar */
     --sidebar-border: 180 30% 88%; /* Subtle teal border */
     --sidebar-ring: 182 100% 74.3%; /* Electric blue for focus rings */
   }
@@ -61,14 +61,14 @@
     --popover: 240 10% 3.9%;
     --popover-foreground: 0 0% 98%;
 
-    --primary: 180 100% 35%; /* Dark Teal, slightly lighter for dark mode */
-    --primary-foreground: 0 0% 98%;
+    --primary: 0 0% 100%; /* Bianco */
+    --primary-foreground: 0 0% 98%; /* Testo bianco */
 
     --secondary: 240 3.7% 15.9%;
     --secondary-foreground: 0 0% 98%;
 
     --muted: 240 3.7% 15.9%;
-    --muted-foreground: 0 0% 63.9%;
+    --muted-foreground: 0 0% 98%; /* Bianco per muted-foreground in dark mode */
 
     --accent: 182 100% 64.3%; /* Electric Blue, slightly darker for dark mode */
     --accent-foreground: 0 0% 98%; /* Light text for accent in dark mode */
@@ -78,7 +78,7 @@
 
     --border: 240 3.7% 15.9%;
     --input: 240 3.7% 15.9%;
-    --ring: 180 100% 35%;
+    --ring: 0 0% 100%; /* Bianco per gli anelli di focus in dark mode */
 
     --chart-1: 220 70% 50%;
     --chart-2: 160 60% 45%;
@@ -87,12 +87,12 @@
     --chart-5: 340 75% 55%;
 
     /* Sidebar specific theme for dark mode */
-    --sidebar-background: 180 80% 10%; /* Dark teal background */
-    --sidebar-foreground: 180 20% 85%; /* Light teal text */
+    --sidebar-background: 180 80% 10%; 
+    --sidebar-foreground: 0 0% 98%; /* Testo bianco */
     --sidebar-primary: 182 100% 74.3%; /* Electric blue for active/selected items */
-    --sidebar-primary-foreground: 180 100% 10%; /* Dark text on active items */
-    --sidebar-accent: 180 70% 15%; /* Slightly lighter dark teal for hover */
-    --sidebar-accent-foreground: 180 20% 90%; /* Light teal text on hover */
+    --sidebar-primary-foreground: 0 0% 98%; /* Testo bianco */
+    --sidebar-accent: 180 70% 15%; 
+    --sidebar-accent-foreground: 0 0% 98%; /* Testo bianco */
     --sidebar-border: 180 60% 20%; /* Dark teal border */
     --sidebar-ring: 182 100% 74.3%; /* Electric blue for focus rings */
   }
@@ -104,5 +104,6 @@
   }
   body {
     @apply bg-background text-foreground;
+    font-family: 'Exo', sans-serif;
   }
 }

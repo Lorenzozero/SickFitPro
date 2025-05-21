@@ -9,8 +9,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Progress } from '@/components/ui/progress';
-import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
-import { CheckCircle, XCircle, Timer, Play, Pause, PlusCircle, Trash2, Award } from 'lucide-react';
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';import { CheckCircle, XCircle, Timer, Play, Pause, PlusCircle, Trash2, Award, Home } from 'lucide-react';
 import { useLanguage } from '@/context/language-context';
 import { useEffect, useState, useMemo } from 'react';
 import Image from 'next/image';
@@ -88,12 +87,26 @@ interface SessionPBs {
   maxReps: number;
 }
 
+interface CompletedSetDetail {
+  reps: string;
+  weight: string;
+}
+
+interface CompletedExerciseDetail {
+  id: string; // exercise ID
+  name: string;
+  loggedSets: CompletedSetDetail[];
+  targetSets: number;
+  targetReps: string;
+}
+
 export interface CompletedWorkout {
-  id: string;
+  id: string; // Unique ID for this completion instance
   planId: string;
   planName: string;
   completionDate: string; // YYYY-MM-DD
   duration: string;
+  exercises: CompletedExerciseDetail[]; // Detailed exercise data
 }
 
 
@@ -106,6 +119,22 @@ interface ExerciseCardProps {
   totalExercises: number;
   t: (key: string, replacements?: Record<string, string | number | undefined>) => string;
 }
+
+interface ExerciseComparison {
+  exerciseName: string;
+  currentMaxWeight: number | null;
+  previousMaxWeight: number | null;
+  weightImprovement?: number;
+  currentMaxReps: number | null;
+  previousMaxReps: number | null;
+  repsImprovement?: number;
+  currentSetsCompleted: number;
+  previousSetsCompleted: number | null;
+  setsImprovement?: number;
+}
+
+type ComparisonSummary = ExerciseComparison[];
+
 
 function ExerciseCard({ exercise, onLogSet, onDeleteSet, isCurrentlyVisible, exerciseIndex, totalExercises, t }: ExerciseCardProps) {
   const [repsInput, setRepsInput] = useState('');
@@ -133,7 +162,7 @@ function ExerciseCard({ exercise, onLogSet, onDeleteSet, isCurrentlyVisible, exe
   return (
     <Card
         className={cn(
-            "shadow-xl overflow-hidden bg-card/80 backdrop-blur-sm transition-opacity duration-500 ease-in-out mb-8",
+            "shadow-xl overflow-hidden bg-card transition-opacity duration-500 ease-in-out mb-8",
             isCurrentlyVisible ? 'opacity-100' : 'opacity-60'
         )}
         id={`exercise-${exercise.id}`}
@@ -162,33 +191,37 @@ function ExerciseCard({ exercise, onLogSet, onDeleteSet, isCurrentlyVisible, exe
                 <CardTitle className="text-2xl font-bold text-primary">
                   {exerciseIndex + 1}. {exercise.name}
                 </CardTitle>
-                <CardDescription className="text-base">
-                  {t('activeWorkoutPage.targetSetsLabel')}: {exercise.targetSets} | {t('activeWorkoutPage.targetRepsLabel')}: {exercise.targetReps}
+                <CardDescription className="text-base text-gray-700 dark:text-gray-300">
+                  {t('activeWorkoutPage.targetRepsLabel')}: {exercise.targetReps}
                 </CardDescription>
               </div>
-              <span className="text-sm text-muted-foreground">{exerciseIndex + 1} / {totalExercises}</span>
+              <span className="text-sm text-gray-600 dark:text-gray-400">{exerciseIndex + 1} / {totalExercises}</span>
             </div>
             <div className="mt-2">
               <div className="flex items-center justify-between mb-1">
-                <span className="text-xs text-muted-foreground">{t('activeWorkoutPage.setCompletionLabel', { completed: completedSets, total: exercise.targetSets })}</span>
-                <span className="text-xs font-medium">{Math.round(progress)}%</span>
+                <span className="text-xs text-gray-700 dark:text-muted-foreground">{t('activeWorkoutPage.setCompletionLabel', { completed: completedSets, total: exercise.targetSets })}</span>
+                <span className="text-xs font-medium text-gray-700 dark:text-foreground">{Math.round(progress)}%</span>
               </div>
-              <Progress value={progress} className="h-1.5" />
+              <Progress value={progress} className="h-1.5 bg-green-200 dark:bg-green-800 [&>div]:bg-green-600 dark:[&>div]:bg-green-400" />
             </div>
           </CardHeader>
           <CardContent className="pt-0">
             <form onSubmit={handleLogSetSubmit} className="grid grid-cols-6 gap-3 items-end mb-4">
               <div className="col-span-2">
-                <Label htmlFor={`reps-${exercise.id}`} className="text-xs">{t('activeWorkoutPage.repsInputLabel')}</Label>
-                <Input id={`reps-${exercise.id}`} type="number" placeholder="8" value={repsInput} onChange={(e) => setRepsInput(e.target.value)} required className="h-9"/>
+                <Label htmlFor={`reps-${exercise.id}`} className="text-xs text-gray-700 dark:text-gray-300 text-center block w-full">{t('activeWorkoutPage.repsInputLabel')}</Label>
+                <Input id={`reps-${exercise.id}`} type="number" placeholder="8" value={repsInput} onChange={(e) => setRepsInput(e.target.value)} required className="h-9 text-center text-gray-900 dark:text-gray-100"/>
               </div>
               <div className="col-span-2">
-                <Label htmlFor={`weight-${exercise.id}`} className="text-xs">{t('activeWorkoutPage.weightInputLabel')}</Label>
-                <Input id={`weight-${exercise.id}`} type="number" placeholder="60" value={weightInput} onChange={(e) => setWeightInput(e.target.value)} required className="h-9" />
+                <Label htmlFor={`weight-${exercise.id}`} className="text-xs text-gray-700 dark:text-gray-300 text-center block w-full">{t('activeWorkoutPage.weightInputLabel')}</Label>
+                <Input id={`weight-${exercise.id}`} type="number" placeholder="60" value={weightInput} onChange={(e) => setWeightInput(e.target.value)} required className="h-9 text-center text-gray-900 dark:text-gray-100" />
               </div>
               <div className="col-span-2">
-                <Button type="submit" className="w-full h-9">
-                  <PlusCircle className="w-4 h-4 mr-1.5" /> {t('activeWorkoutPage.logSetButton')}
+                <Button
+                  type="submit"
+                  className="w-full h-9 bg-green-600 hover:bg-green-700 text-black dark:text-black flex items-center justify-center sm:justify-start sm:gap-1.5"
+                >
+                  <PlusCircle className="w-4 h-4" />
+                  <span className="hidden sm:inline">{t('activeWorkoutPage.logSetButton')}</span>
                 </Button>
               </div>
             </form>
@@ -198,22 +231,22 @@ function ExerciseCard({ exercise, onLogSet, onDeleteSet, isCurrentlyVisible, exe
                 <Table>
                   <TableHeader>
                     <TableRow>
-                      <TableHead className="w-1/5 h-8 text-xs">{t('activeWorkoutPage.setColumnLabel')}</TableHead>
-                      <TableHead className="w-1/4 h-8 text-xs">{t('activeWorkoutPage.dateColumnLabel')}</TableHead>
-                      <TableHead className="w-1/4 h-8 text-xs">{t('activeWorkoutPage.repsColumnLabel')}</TableHead>
-                      <TableHead className="w-1/4 h-8 text-xs">{t('activeWorkoutPage.weightColumnLabel')}</TableHead>
-                      <TableHead className="w-auto h-8 text-xs text-right"></TableHead>
+                      <TableHead className="w-1/5 h-8 text-xs text-gray-700 dark:text-gray-400">{t('activeWorkoutPage.setColumnLabel')}</TableHead>
+                      <TableHead className="w-1/4 h-8 text-xs text-gray-700 dark:text-gray-400">{t('activeWorkoutPage.dateColumnLabel')}</TableHead>
+                      <TableHead className="w-1/4 h-8 text-xs text-gray-700 dark:text-gray-400">{t('activeWorkoutPage.repsColumnLabel')}</TableHead>
+                      <TableHead className="w-1/4 h-8 text-xs text-gray-700 dark:text-gray-400">{t('activeWorkoutPage.weightColumnLabel')}</TableHead>
+                      <TableHead className="w-auto h-8 text-xs text-right text-gray-700 dark:text-gray-400"></TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {exercise.loggedSets.map((set, index) => (
+                    {[...exercise.loggedSets].reverse().map((set, index) => (
                       <TableRow key={set.id}>
-                        <TableCell className="py-1.5 text-sm font-medium">{index + 1}</TableCell>
-                        <TableCell className="py-1.5 text-sm">{set.date}</TableCell>
-                        <TableCell className="py-1.5 text-sm">{set.reps}</TableCell>
-                        <TableCell className="py-1.5 text-sm">{set.weight} kg</TableCell>
-                        <TableCell className="py-1.5 text-right">
-                          <Button variant="ghost" size="icon" className="h-6 w-6 text-destructive" onClick={() => onDeleteSet(exercise.id, set.id)}>
+                        <TableCell className="py-1.5 text-sm font-medium text-gray-800 dark:text-gray-100">{index + 1}</TableCell>
+                        <TableCell className="py-1.5 text-sm text-gray-800 dark:text-gray-200">{set.date}</TableCell>
+                        <TableCell className="py-1.5 text-sm text-gray-800 dark:text-gray-200">{set.reps}</TableCell>
+                        <TableCell className="py-1.5 text-sm text-gray-800 dark:text-gray-200">{set.weight} kg</TableCell>
+                        <TableCell className="py-1.5 text-right text-gray-800 dark:text-gray-200">
+                          <Button variant="ghost" size="icon" className="h-6 w-6 text-black dark:text-black" onClick={() => onDeleteSet(exercise.id, set.id)}>
                             <Trash2 className="h-3.5 w-3.5"/>
                           </Button>
                         </TableCell>
@@ -224,16 +257,16 @@ function ExerciseCard({ exercise, onLogSet, onDeleteSet, isCurrentlyVisible, exe
               </div>
             )}
             {exercise.loggedSets.length === 0 && (
-                <p className="text-sm text-center text-muted-foreground py-4">{t('activeWorkoutPage.noSetsLoggedYet')}</p>
+                <p className="text-sm text-center text-gray-700 dark:text-muted-foreground py-4">{t('activeWorkoutPage.noSetsLoggedYet')}</p>
             )}
 
             {sessionPBs.maxWeight > 0 || sessionPBs.maxReps > 0 ? (
-                <div className="p-3 mt-2 border rounded-md bg-accent/10">
-                    <h4 className="mb-2 text-sm font-semibold text-accent-foreground flex items-center">
-                        <Award className="w-4 h-4 mr-2 text-accent" />
+                <div className="p-3 mt-2 border rounded-md bg-yellow-50 dark:bg-yellow-900/30 border-yellow-200 dark:border-yellow-700/40">
+                    <h4 className="mb-2 text-sm font-semibold text-yellow-700 dark:text-yellow-300 flex items-center">
+                        <Award className="w-4 h-4 mr-2 text-yellow-600 dark:text-yellow-400" />
                         {t('activeWorkoutPage.sessionPBsLabel')}
                     </h4>
-                    <div className="grid grid-cols-2 gap-2 text-xs text-accent-foreground/80">
+                    <div className="grid grid-cols-2 gap-2 text-xs text-yellow-600 dark:text-yellow-400">
                         <p>{t('activeWorkoutPage.maxWeightLabel')}: {sessionPBs.maxWeight} kg</p>
                         <p>{t('activeWorkoutPage.maxRepsLabel')}: {sessionPBs.maxReps} {t('activeWorkoutPage.repsUnitLabel')}</p>
                     </div>
@@ -268,10 +301,17 @@ export default function ActiveWorkoutPage() {
   const [elapsedTime, setElapsedTime] = useState('00:00');
   const [isTimerRunning, setIsTimerRunning] = useState(false);
   const [isFinished, setIsFinished] = useState(false);
+  const [comparisonSummary, setComparisonSummary] = useState<ComparisonSummary | null>(null);
 
   const planIdFromRoute = typeof paramsProp.planId === 'string' ? paramsProp.planId : undefined;
 
   useEffect(() => {
+    // Se l'allenamento è già marcato come finito, non procedere con i controlli
+    // relativi al piano attivo, poiché la pagina mostrerà la schermata di completamento.
+    if (isFinished) {
+      return;
+    }
+
     if (!activeWorkoutContextIsClient || !planIdFromRoute) {
       setPlan(null);
       setActiveWorkout(null);
@@ -283,7 +323,8 @@ export default function ActiveWorkoutPage() {
         toast({
           title: t('activeWorkoutPage.planNotFound', { default: "Workout Mismatch"}),
           description: t('activeWorkoutPage.planNotFoundDescription', { default: "No active workout for this plan or mismatch. Redirecting..."}),
-          variant: "destructive"
+          variant: "destructive",
+          duration: 1000
         });
       }
       router.push('/start-workout');
@@ -304,13 +345,13 @@ export default function ActiveWorkoutPage() {
         toast({
           title: t('activeWorkoutPage.planNotFound', { default: "Plan Not Found"}),
           description: t('activeWorkoutPage.planNotFoundDescription', { default: "The workout plan could not be loaded."}),
-          variant: "destructive"
+          variant: "destructive",
+          duration: 1000
         });
       }
       router.push('/workouts');
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [planIdFromRoute, activeWorkoutContextIsClient, contextActivePlanId, router, toast]); // languageContextIsClient removed as it was causing re-runs
+  }, [planIdFromRoute, activeWorkoutContextIsClient, contextActivePlanId, router, toast, isFinished, languageContextIsClient, t]);
 
   useEffect(() => {
     if (plan && activeWorkoutContextIsClient && contextStartTimeFromProvider) {
@@ -374,7 +415,8 @@ export default function ActiveWorkoutPage() {
 
     toast({
         title: t('activeWorkoutPage.toastSetLoggedTitle'),
-        description: t('activeWorkoutPage.toastSetLoggedDescription', { exerciseName: targetExercise.name })
+        description: t('activeWorkoutPage.toastSetLoggedDescription', { exerciseName: targetExercise.name }),
+        duration: 1000
     });
   };
 
@@ -386,11 +428,21 @@ export default function ActiveWorkoutPage() {
     const updatedLoggedSets = targetExercise.loggedSets.filter(s => s.id !== setId);
     updateExerciseData(exerciseId, updatedLoggedSets);
 
-    toast({ title: t('activeWorkoutPage.toastSetDeletedTitle'), variant: 'destructive' });
+    toast({ title: t('activeWorkoutPage.toastSetDeletedTitle'), variant: 'destructive', duration: 1000 });
   };
 
   const handleFinishWorkout = () => {
     if (!languageContextIsClient || !plan) return;
+
+    const completedExercisesData: CompletedExerciseDetail[] = activeWorkout
+      ? activeWorkout.map(ex => ({
+          id: ex.id,
+          name: ex.name,
+          loggedSets: ex.loggedSets.map(set => ({ reps: set.reps, weight: set.weight })),
+          targetSets: ex.targetSets,
+          targetReps: ex.targetReps,
+        }))
+      : [];
 
     const completedWorkoutData: CompletedWorkout = {
       id: String(Date.now()),
@@ -398,7 +450,7 @@ export default function ActiveWorkoutPage() {
       planName: contextActivePlanName || plan.name, // Use contextActivePlanName if available
       completionDate: new Date().toISOString().split('T')[0],
       duration: elapsedTime,
-      // Potentially add loggedSets data here if needed for detailed history
+      exercises: completedExercisesData,
     };
 
     if (typeof window !== 'undefined') {
@@ -415,13 +467,75 @@ export default function ActiveWorkoutPage() {
       history.unshift(completedWorkoutData); // Add to the beginning
       localStorage.setItem(WORKOUT_HISTORY_STORAGE_KEY, JSON.stringify(history.slice(0, 20))); // Keep last 20
     }
+
+    // Perform comparison for summary
+    let summaryForDisplay: ComparisonSummary | null = null;
+    if (typeof window !== 'undefined') {
+      const historyString = localStorage.getItem(WORKOUT_HISTORY_STORAGE_KEY);
+      if (historyString) {
+        try {
+          const history: CompletedWorkout[] = JSON.parse(historyString);
+          const currentPlanHistory = history.filter(h => h.planId === plan.id);
+          let previousWorkout: CompletedWorkout | undefined = undefined;
+
+          // The workout just completed is currentPlanHistory[0].
+          // The one before that (if it exists for the same plan) is currentPlanHistory[1].
+          if (currentPlanHistory.length > 1) {
+            previousWorkout = currentPlanHistory[1];
+          }
+
+          if (previousWorkout) {
+            summaryForDisplay = completedExercisesData.map(currentEx => {
+              const prevEx = Array.isArray(previousWorkout.exercises) ? previousWorkout.exercises.find(pEx => pEx.id === currentEx.id) : undefined; // More robust check
+
+              const getCurrentMax = (sets: CompletedSetDetail[], type: 'weight' | 'reps') => {
+                if (!sets || sets.length === 0) return null;
+                const values = sets.map(s => type === 'weight' ? parseFloat(s.weight) : parseInt(s.reps, 10));
+                const validValues = values.filter(v => !isNaN(v) && v > 0); // Ensure positive values
+                return validValues.length > 0 ? Math.max(...validValues) : null;
+              };
+
+              const currentMaxWeight = getCurrentMax(currentEx.loggedSets, 'weight');
+              const currentMaxReps = getCurrentMax(currentEx.loggedSets, 'reps');
+
+              const currentSetsCompleted = currentEx.loggedSets.length;
+              let previousSetsCompleted: number | null = null;
+
+              let previousMaxWeight: number | null = null;
+              let previousMaxReps: number | null = null;
+
+              if (prevEx) {
+                previousMaxWeight = getCurrentMax(prevEx.loggedSets, 'weight');
+                previousMaxReps = getCurrentMax(prevEx.loggedSets, 'reps');
+                previousSetsCompleted = prevEx.loggedSets.length;
+              }
+
+              return {
+                exerciseName: currentEx.name,
+                currentMaxWeight,
+                previousMaxWeight,
+                weightImprovement: (currentMaxWeight !== null && previousMaxWeight !== null) ? currentMaxWeight - previousMaxWeight : undefined,
+                currentMaxReps,
+                previousMaxReps,
+                repsImprovement: (currentMaxReps !== null && previousMaxReps !== null) ? currentMaxReps - previousMaxReps : undefined,
+                currentSetsCompleted,
+                previousSetsCompleted,
+                setsImprovement: (previousSetsCompleted !== null) ? currentSetsCompleted - previousSetsCompleted : undefined,
+              };
+            });
+          }
+        } catch (e) { console.error("Error processing workout history for comparison summary", e); }
+      }
+    }
+    setComparisonSummary(summaryForDisplay);
     
     setIsTimerRunning(false);
     setIsFinished(true);
     clearActiveWorkout();
     toast({
         title: t('activeWorkoutPage.toastWorkoutFinishedTitle'),
-        description: t('activeWorkoutPage.toastWorkoutFinishedDescription', { duration: elapsedTime })
+        description: t('activeWorkoutPage.toastWorkoutFinishedDescription', { duration: elapsedTime }),
+        duration: 1000
     });
   };
 
@@ -466,12 +580,109 @@ export default function ActiveWorkoutPage() {
     return (
       <div className="flex flex-col items-center justify-center min-h-[calc(100vh-200px)] text-center p-4">
         <CheckCircle className="w-24 h-24 text-green-500 mb-6" />
-        <h1 className="text-4xl font-bold mb-2">{t('activeWorkoutPage.workoutCompleteTitle')}</h1>
-        <p className="text-xl text-muted-foreground mb-4">{t('activeWorkoutPage.workoutCompleteDescription', { planName: plan.name })}</p>
-        <p className="text-lg mb-6">{t('activeWorkoutPage.totalTimeLabel')}: {elapsedTime}</p>
-        <Button onClick={() => router.push('/')} size="lg">
-          {t('activeWorkoutPage.backToDashboardButton')}
-        </Button>
+        <p className="text-xl text-gray-600 dark:text-gray-400 mb-6">{t('activeWorkoutPage.workoutCompleteDescription', { planName: plan.name })}</p><div className="flex items-center justify-center gap-4 mb-8">
+          <p className="text-lg text-foreground dark:text-foreground">{t('activeWorkoutPage.totalTimeLabel')}: {elapsedTime}</p>
+          <Button 
+            onClick={() => router.push('/')} 
+            size="default" 
+            variant="outline" 
+            className="text-black dark:text-black hover:bg-gray-100 dark:hover:bg-gray-800 flex items-center"
+          >
+            <Home className="w-5 h-5 sm:mr-2 text-white" /> {/* Icona resa bianca */}
+            <span className="hidden sm:inline">{t('activeWorkoutPage.backToDashboardButton')}</span>
+          </Button>
+        </div>
+
+        {comparisonSummary && comparisonSummary.length > 0 && (
+          <div className="mt-8 w-full max-w-2xl text-left">
+            <div className="space-y-4">
+              {comparisonSummary.map((comp, index) => (
+                <Card key={index} className="p-4 bg-card shadow-md">
+                  <CardTitle className="text-lg mb-2 text-primary">{comp.exerciseName}</CardTitle>
+                  <div className="grid grid-cols-3 gap-x-4 gap-y-2 text-sm">
+                    {/* Colonna Set Completati */}
+                    <div>
+                      <p className="font-medium text-muted-foreground">{t('activeWorkoutPage.setsCompletedLabel', {defaultValue: "Sets"})}:</p>
+                      <p className="font-semibold">
+                        {comp.currentSetsCompleted}
+                        {comp.previousSetsCompleted !== null && (
+                          <span className="text-xs text-muted-foreground/80 ml-1 font-normal">
+                            ({t('activeWorkoutPage.previousLabel', {defaultValue: "Prev:"})} {comp.previousSetsCompleted})
+                          </span>
+                        )}
+                      </p>
+                      {comp.setsImprovement !== undefined && (
+                        <p className={`text-xs font-medium ${
+                          comp.setsImprovement > 0
+                            ? "text-green-600 dark:text-green-400" 
+                            : comp.setsImprovement < 0
+                              ? "text-red-600 dark:text-red-400" 
+                              : "text-gray-700 dark:text-gray-300" // Invariato
+                          }`}>
+                          {comp.setsImprovement > 0 ? `+${comp.setsImprovement}` : comp.setsImprovement}
+                        </p>
+                      )}
+                    </div>
+
+                    {/* Colonna Ripetizioni Massime */}
+                    <div>
+                      <p className="font-medium text-muted-foreground">{t('activeWorkoutPage.maxRepsLabel', {defaultValue: "Max Reps"})}:</p>
+                      <p className="font-semibold">
+                        {comp.currentMaxReps !== null ? `${comp.currentMaxReps} ${t('activeWorkoutPage.repsUnitLabel', {defaultValue: "reps"})}` : t('activeWorkoutPage.notApplicable', {defaultValue: "N/A"})}
+                        {comp.previousMaxReps !== null && (
+                          <span className="text-xs text-muted-foreground/80 ml-1 font-normal">
+                            ({t('activeWorkoutPage.previousLabel', {defaultValue: "Prev:"})} {comp.previousMaxReps} {t('activeWorkoutPage.repsUnitLabel', {defaultValue: "reps"})})
+                          </span>
+                        )}
+                      </p>
+                      {comp.repsImprovement !== undefined && (
+                        <p className={`text-xs font-medium ${
+                          comp.repsImprovement > 0
+                            ? "text-green-600 dark:text-green-400" 
+                            : comp.repsImprovement < 0
+                              ? "text-red-600 dark:text-red-400" 
+                              : "text-gray-700 dark:text-gray-300" // Invariato
+                          }`}>
+                          {comp.repsImprovement > 0 ? `+${comp.repsImprovement}` : comp.repsImprovement} {t('activeWorkoutPage.repsUnitLabel', {defaultValue: "reps"})}
+                        </p>
+                      )}
+                    </div>
+
+                    {/* Colonna Peso Massimo */}
+                    <div>
+                      <p className="font-medium text-muted-foreground">{t('activeWorkoutPage.maxWeightLabel', {defaultValue: "Max Weight"})}:</p>
+                      <p className="font-semibold">
+                        {comp.currentMaxWeight !== null ? `${comp.currentMaxWeight} kg` : t('activeWorkoutPage.notApplicable', {defaultValue: "N/A"})}
+                        {comp.previousMaxWeight !== null && (
+                          <span className="text-xs text-muted-foreground/80 ml-1 font-normal">
+                            ({t('activeWorkoutPage.previousLabel', {defaultValue: "Prev:"})} {comp.previousMaxWeight} kg)
+                          </span>
+                        )}
+                      </p>
+                      {comp.weightImprovement !== undefined && (
+                        <p className={`text-xs font-medium ${
+                          comp.weightImprovement > 0
+                            ? "text-green-600 dark:text-green-400"
+                            : comp.weightImprovement < 0
+                              ? "text-red-600 dark:text-red-400"
+                              : "text-gray-700 dark:text-gray-300" // Invariato
+                          }`}>
+                          {comp.weightImprovement > 0 ? `+${comp.weightImprovement}` : comp.weightImprovement} kg
+                        </p>
+                      )}
+                    </div>
+
+                  </div>
+                </Card>
+              ))}
+            </div>
+          </div>
+        )}
+        {comparisonSummary === null && !isFinished && (<p className="mt-6 text-muted-foreground">{t('activeWorkoutPage.calculatingSummary', {defaultValue: "Calculating summary..."})}</p>)}
+        {isFinished && comparisonSummary && comparisonSummary.length === 0 && (
+          <p className="mt-6 text-muted-foreground">{t('activeWorkoutPage.noPreviousDataForComparison', {defaultValue: "No previous data for this plan to compare."})}</p>
+        )}
+
       </div>
     );
   }
@@ -482,46 +693,23 @@ export default function ActiveWorkoutPage() {
         title={languageContextIsClient ? t('activeWorkoutPage.title', { planName: plan.name }) : plan.name}
         description={languageContextIsClient ? plan.description : ''}
         actions={
-          <div className="flex items-center gap-2">
+          // Only the timer and its controls will be rendered in the PageHeader actions
             <div className="flex items-center gap-1 p-2 border rounded-md bg-background shadow-sm">
               <Timer className="w-5 h-5 text-primary" />
               <span className="text-lg font-semibold font-mono">{elapsedTime}</span>
-              <Button variant="ghost" size="icon" onClick={() => setIsTimerRunning(!isTimerRunning)} className="w-7 h-7">
+              <Button variant="ghost" size="icon" onClick={() => setIsTimerRunning(!isTimerRunning)} className="w-7 h-7 text-black dark:text-black">
                 {isTimerRunning ? <Pause className="w-4 h-4" /> : <Play className="w-4 h-4" />}
               </Button>
             </div>
-             <AlertDialog>
-                <AlertDialogTrigger asChild>
-                    <Button variant="destructive">
-                        <XCircle className="w-4 h-4 mr-2" />
-                        {t('activeWorkoutPage.finishWorkoutButton')}
-                    </Button>
-                </AlertDialogTrigger>
-                <AlertDialogContent>
-                    <AlertDialogHeader>
-                    <AlertDialogTitle>{t('activeWorkoutPage.confirmFinishTitle')}</AlertDialogTitle>
-                    <AlertDialogDescription>
-                        {t('activeWorkoutPage.confirmFinishDescription')}
-                    </AlertDialogDescription>
-                    </AlertDialogHeader>
-                    <AlertDialogFooter className="sm:justify-center">
-                    <AlertDialogCancel>{t('calendarPage.cancelButton')}</AlertDialogCancel>
-                    <AlertDialogAction onClick={handleFinishWorkout}>
-                        {t('activeWorkoutPage.confirmFinishButton')}
-                    </AlertDialogAction>
-                    </AlertDialogFooter>
-                </AlertDialogContent>
-            </AlertDialog>
-          </div>
         }
       />
 
       <div className="mb-6">
         <div className="flex items-center justify-between mb-1">
-            <span className="text-sm text-muted-foreground">{t('activeWorkoutPage.overallProgressLabel')}</span>
-            <span className="text-sm font-semibold">{Math.round(overallProgress)}%</span>
+            <span className="text-sm text-gray-700 dark:text-muted-foreground">{t('activeWorkoutPage.overallProgressLabel')}</span>
+            <span className="text-sm font-semibold text-gray-800 dark:text-gray-100">{Math.round(overallProgress)}%</span>
         </div>
-        <Progress value={overallProgress} className="w-full h-2" />
+        <Progress value={overallProgress} className="w-full h-2 bg-green-200 dark:bg-green-800 [&>div]:bg-green-600 dark:[&>div]:bg-green-400" />
       </div>
 
       <div className="space-y-8">
@@ -540,12 +728,36 @@ export default function ActiveWorkoutPage() {
         ))}
       </div>
 
-      {activeWorkout.length > 0 && !isFinished && (
-        <CardFooter className="p-4 mt-8 border-t flex justify-center">
-            <Button onClick={handleFinishWorkout} variant="default" size="lg" className="w-full md:w-auto bg-gradient-to-r from-green-500 to-emerald-600 text-white shadow-lg hover:shadow-xl transition-shadow">
-                <CheckCircle className="w-5 h-5 mr-2" /> {t('activeWorkoutPage.completeWorkoutButton')}
-            </Button>
-        </CardFooter>
+      {/* Pulsante Termina Allenamento Fisso */}
+      {!isFinished && (
+        <div className="fixed bottom-6 right-6 z-50">
+          <AlertDialog>
+            <AlertDialogTrigger asChild>
+              <Button
+                variant="destructive" // Usa il variant destructive per lo stile base
+                size="lg" // Stessa dimensione del ResumeWorkoutButton
+                className="shadow-xl bg-red-600 hover:bg-red-700 text-black dark:text-black rounded-full px-6 py-6 h-auto" // Stile specifico rosso
+              >
+                <XCircle className="w-6 h-6 mr-2 shrink-0" />
+                {t('activeWorkoutPage.finishWorkoutButton')}
+              </Button>
+            </AlertDialogTrigger>
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle>{t('activeWorkoutPage.confirmFinishTitle')}</AlertDialogTitle>
+                <AlertDialogDescription>{t('activeWorkoutPage.confirmFinishDescription')}</AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter className="sm:justify-center">
+                <AlertDialogCancel 
+                  className="bg-red-600 hover:bg-red-700 text-white border-red-600 hover:border-red-700"
+                >
+                  {t('calendarPage.cancelButton')}
+                </AlertDialogCancel>
+                <AlertDialogAction onClick={handleFinishWorkout} className="text-black dark:text-black">{t('activeWorkoutPage.confirmFinishButton')}</AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
+        </div>
       )}
     </>
   );

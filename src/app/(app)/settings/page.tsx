@@ -1,7 +1,7 @@
 
 'use client';
 
-import { useState, useEffect, type ChangeEvent, useRef } from 'react'; // Added useRef
+import { useState, useEffect, type ChangeEvent, useRef } from 'react';
 import Image from 'next/image';
 import { PageHeader } from '@/components/shared/page-header';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -15,13 +15,13 @@ import {
 } from '@/components/ui/select';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Switch } from '@/components/ui/switch';
-import { Languages, Bell, Save, UserCircle, Shield, Eye, EyeOff, Weight, Camera } from 'lucide-react'; // Added Camera
+import { Switch } from '@/components/ui/switch'; // UserCircle è già importato qui
+import { Languages, Bell, Save, UserCircle, Shield, Eye, EyeOff, Weight, Camera } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { useLanguage, type Language } from '@/context/language-context';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Skeleton } from '@/components/ui/skeleton';
-
+import { updateUserProfile, updateUserPreferences } from '@/lib/api';
 
 export default function SettingsPage() {
   const { language, setLanguage, t, isClient: languageContextIsClient } = useLanguage();
@@ -45,19 +45,42 @@ export default function SettingsPage() {
 
   const fileInputRef = useRef<HTMLInputElement>(null); // Ref for the hidden file input
 
+  // Placeholder for actual API functions to fetch initial data
+  // In a real application, these would make network requests.
+  const fetchInitialSettings = async () => {
+    // Mock implementation - replace with your actual API call
+    console.log('Fetching initial user settings...');
+    // Example: const response = await fetch('/api/user/settings');
+    // if (!response.ok) throw new Error('Failed to fetch settings');
+    // return await response.json();
+    return Promise.resolve({
+      name: 'Jane Doe', // Sample data
+      email: 'jane.doe@example.com', // Sample data
+      currentWeight: '65.5', // Sample data
+      profilePicture: null, // or a URL string 'https://example.com/avatar.jpg'
+      enableNotifications: false, // Sample data
+      language: 'en', // Sample data
+    });
+  };
+
   useEffect(() => {
     setIsClient(true);
-    if (typeof window !== 'undefined') {
-        const storedNotificationPref = localStorage.getItem('app-notifications-enabled');
-        if (storedNotificationPref !== null) {
-          setEnableNotifications(JSON.parse(storedNotificationPref));
-        }
-        setName(localStorage.getItem('app-user-name') || 'User Name');
-        setEmail(localStorage.getItem('app-user-email') || 'user@example.com');
-        setProfilePicture(localStorage.getItem('app-user-profile-picture') || null);
-        setCurrentWeight(localStorage.getItem('app-user-current-weight') || '');
-    }
-  }, []);
+    const loadInitialData = async () => {
+      try {
+        const userData = await fetchInitialSettings();
+        setName(userData.name || '');
+        setEmail(userData.email || ''); // Email might come from session/auth provider
+        setCurrentWeight(userData.currentWeight || '');
+        setProfilePicture(userData.profilePicture || null);
+        setEnableNotifications(userData.enableNotifications !== undefined ? userData.enableNotifications : true);
+        if (userData.language) setLanguage(userData.language as Language);
+      } catch (error) {
+        console.error("Failed to load user settings:", error);
+        toast({ title: t('settingsPage.toastErrorTitle'), description: t('settingsPage.loadSettingsError'), variant: "destructive" });
+      }
+    };
+    loadInitialData();
+  }, [languageContextIsClient]); // Rerun if language context client status changes, or on initial mount
 
   const handleProfilePictureChange = (event: ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -83,35 +106,52 @@ export default function SettingsPage() {
     fileInputRef.current?.click();
   };
 
-  const handleSaveChanges = () => {
+  // useEffect(() => { // This useEffect block was duplicated
+  //   setIsClient(true);
+  //   if (typeof window !== 'undefined') {
+  //       const fetchUserData = async () => {
+  //           // const userData = await getUserDataFromDB(); // Needs implementation
+  //           // setEnableNotifications(userData.notificationsEnabled);
+  //           // setName(userData.name);
+  //           // setEmail(userData.email);
+  //           // setProfilePicture(userData.profilePicture);
+  //           // setCurrentWeight(userData.currentWeight);
+  //       };
+  //       // fetchUserData();
+  //   }
+  // }, []);
+
+  const handleSaveChanges = async () => {
     if (!isClient) return;
     let changesMade = false;
     const updatedPreferences: string[] = [];
 
-    if (typeof window !== 'undefined') {
-        const currentNotificationPref = JSON.parse(localStorage.getItem('app-notifications-enabled') || 'true');
-        if (enableNotifications !== currentNotificationPref) {
-            localStorage.setItem('app-notifications-enabled', JSON.stringify(enableNotifications));
-            updatedPreferences.push(t('settingsPage.notifications'));
-            changesMade = true;
-        }
-    }
+    // if (typeof window !== 'undefined') {
+    //     // const currentNotificationPref = await getUserPreference('notificationsEnabled'); // Needs implementation
+    //     // if (enableNotifications !== currentNotificationPref) {
+    //         await updateUserPreferences('notificationsEnabled', enableNotifications); // This might still work if updateUserPreferences is a valid API call
+    //         updatedPreferences.push(t('settingsPage.notifications'));
+    //         changesMade = true;
+    //     // }
+    // }
 
-    if (name.trim() !== (localStorage.getItem('app-user-name') || 'User Name')) {
-        localStorage.setItem('app-user-name', name.trim());
+    // if (name.trim() !== (await getUserPreference('name'))) { // Needs implementation
+        await updateUserProfile('name', name.trim());
         updatedPreferences.push(t('settingsPage.nameLabel'));
         changesMade = true;
-    }
-    if (profilePicture && profilePicture !== (localStorage.getItem('app-user-profile-picture') || null)) {
-        localStorage.setItem('app-user-profile-picture', profilePicture);
+    // }
+    // The original condition also checked if it changed from a previous value, 
+    // but for now, we'll just ensure profilePicture is not null before sending.
+    if (profilePicture) { 
+        await updateUserProfile('profilePicture', profilePicture);
         updatedPreferences.push(t('settingsPage.uploadProfilePictureLabel'));
         changesMade = true;
     }
-    if (currentWeight.trim() !== (localStorage.getItem('app-user-current-weight') || '')) {
-        localStorage.setItem('app-user-current-weight', currentWeight.trim());
+    // if (currentWeight.trim() !== (await getUserPreference('currentWeight'))) { // Needs implementation
+        await updateUserProfile('currentWeight', currentWeight.trim());
         updatedPreferences.push(t('settingsPage.currentWeightLabel', {default: "Current Weight"}));
         changesMade = true;
-    }
+    // }
 
     if (newPassword && currentPassword) {
         if (newPassword !== confirmNewPassword) {
@@ -123,7 +163,7 @@ export default function SettingsPage() {
             return;
         }
         console.log('Attempting to change password...'); 
-        localStorage.setItem('app-user-password-placeholder', newPassword); 
+        await updateUserProfile('password', newPassword); 
         setCurrentPassword('');
         setNewPassword('');
         setConfirmNewPassword('');
@@ -175,10 +215,10 @@ export default function SettingsPage() {
     <>
       <PageHeader title={t('settingsPage.title')} />
       <div className="space-y-8">
-        <Card className="shadow-lg">
+        <Card className="shadow-xl bg-gradient-to-br from-blue-600/80 to-indigo-700/80 dark:from-blue-900/80 dark:to-indigo-950/80 text-primary-foreground">
           <CardHeader>
             <CardTitle className="flex items-center">
-              <UserCircle className="w-5 h-5 mr-2 text-primary" />
+              <UserCircle className="w-5 h-5 mr-2 text-primary-foreground" />
               {t('settingsPage.profileInformationTitle')}
             </CardTitle>
           </CardHeader>
@@ -192,7 +232,10 @@ export default function SettingsPage() {
               >
                 <Avatar className="w-24 h-24 text-lg">
                   <AvatarImage src={profilePicture || undefined} alt={t('settingsPage.profilePictureAlt')} data-ai-hint="profile avatar" />
-                  <AvatarFallback>{name ? name.charAt(0).toUpperCase() : 'U'}</AvatarFallback>
+                  <AvatarFallback>
+                    {/* Visualizza un'icona utente generica invece delle iniziali se non è disponibile alcuna immagine */}
+                    <UserCircle className="w-16 h-16 text-muted-foreground" /> {/* Dimensione adattata per un avatar da 96px */}
+                  </AvatarFallback>
                 </Avatar>
                 <div className="absolute inset-0 flex items-center justify-center bg-black/40 rounded-full opacity-0 group-hover:opacity-100 group-focus-within:opacity-100 transition-opacity duration-200">
                   <Camera className="w-8 h-8 text-white" />
@@ -207,7 +250,7 @@ export default function SettingsPage() {
                   ref={fileInputRef}
                   className="hidden" 
                 />
-                <p className="mt-1 text-sm text-muted-foreground">
+                <p className="mt-1 text-sm text-primary-foreground/80">
                   {t('settingsPage.clickAvatarToChangePhoto', {default: 'Click on the avatar to change your photo.'})}
                   <br />
                   {t('settingsPage.photoSizeLimit')}
@@ -251,10 +294,10 @@ export default function SettingsPage() {
           </CardContent>
         </Card>
 
-        <Card className="shadow-lg">
+        <Card className="shadow-xl bg-gradient-to-br from-blue-600/80 to-indigo-700/80 dark:from-blue-900/80 dark:to-indigo-950/80 text-primary-foreground">
           <CardHeader>
             <CardTitle className="flex items-center">
-              <Shield className="w-5 h-5 mr-2 text-primary" />
+              <Shield className="w-5 h-5 mr-2 text-primary-foreground" />
               {t('settingsPage.accountSecurityTitle')}
             </CardTitle>
           </CardHeader>
@@ -307,10 +350,10 @@ export default function SettingsPage() {
           </CardContent>
         </Card>
 
-        <Card className="shadow-lg">
+        <Card className="shadow-xl bg-gradient-to-br from-blue-600/80 to-indigo-700/80 dark:from-blue-900/80 dark:to-indigo-950/80 text-primary-foreground">
           <CardHeader>
             <CardTitle className="flex items-center">
-              <Languages className="w-5 h-5 mr-2 text-primary" />
+              <Languages className="w-5 h-5 mr-2 text-primary-foreground" />
               {t('settingsPage.language')}
             </CardTitle>
           </CardHeader>
@@ -338,10 +381,10 @@ export default function SettingsPage() {
           </CardContent>
         </Card>
 
-        <Card className="shadow-lg">
+        <Card className="shadow-xl bg-gradient-to-br from-blue-600/80 to-indigo-700/80 dark:from-blue-900/80 dark:to-indigo-950/80 text-primary-foreground">
           <CardHeader className="flex flex-row items-center justify-between">
             <CardTitle className="flex items-center">
-              <Bell className="w-5 h-5 mr-2 text-primary" />
+              <Bell className="w-5 h-5 mr-2 text-primary-foreground" />
               {t('settingsPage.notifications')}
             </CardTitle>
             <Switch
@@ -355,14 +398,18 @@ export default function SettingsPage() {
           </CardContent>
         </Card>
 
-        <div className="flex justify-center">
-          <Button onClick={handleSaveChanges} size="lg">
-            <Save className="w-4 h-4 mr-2" />
-            {t('settingsPage.saveChanges')}
-          </Button>
-        </div>
+        <div className="flex justify-center pt-4">
+          {/* <div className="flex justify-center"> Removed inner div, applied flex to parent */}
+            <Button
+              onClick={handleSaveChanges}
+              size="lg"
+              className="bg-green-600 hover:bg-green-700 text-white"
+            >
+              <Save className="w-4 h-4 mr-2" />
+              {t('settingsPage.saveChanges')}
+            </Button>
+          </div>
       </div>
-    </>
+    </> // This closing fragment tag was missing its opening pair, or the div above was an extra closing tag.
   );
 }
-

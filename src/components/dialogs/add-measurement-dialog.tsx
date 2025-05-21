@@ -106,7 +106,7 @@ export function AddMeasurementDialog({ isOpen, onOpenChange, onSave, measurement
 
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[480px]">
+      <DialogContent className="w-full max-w-sm sm:max-w-[480px]"> {/* Adjusted max-width for better mobile fit */}
         <DialogHeader>
           <DialogTitle>
             {measurement?.id ? t('progressPage.measurementDialogEditTitle') : t('progressPage.measurementDialogAddTitle')}
@@ -115,8 +115,9 @@ export function AddMeasurementDialog({ isOpen, onOpenChange, onSave, measurement
         </DialogHeader>
         <form onSubmit={handleSubmit}>
           <div className="grid gap-4 py-4">
-            <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="date" className="text-right">
+            {/* Responsive: Stacks on mobile, grid on md+ */}
+            <div className="grid grid-cols-1 gap-y-1.5 md:grid-cols-4 md:items-center md:gap-x-4">
+              <Label htmlFor="date" className="text-left md:text-right">
                 {t('progressPage.formDateLabel')}
               </Label>
               <Input
@@ -124,71 +125,79 @@ export function AddMeasurementDialog({ isOpen, onOpenChange, onSave, measurement
                 type="date"
                 value={date}
                 onChange={(e) => setDate(e.target.value)}
-                className="col-span-3"
+                className="w-full md:col-span-3 min-w-0" // Added min-w-0 for better shrinking on small screens
                 required
               />
             </div>
-            <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="measurementName" className="text-right">
+            <div className="grid grid-cols-1 gap-y-1.5 md:grid-cols-4 md:items-center md:gap-x-4">
+              <Label htmlFor="measurementName" className="text-left md:text-right">
                 {t('progressPage.formMeasurementNameLabel')}
               </Label>
               <Select value={measurementName} onValueChange={setMeasurementName} required>
-                <SelectTrigger className="col-span-3">
+                <SelectTrigger className="w-full md:col-span-3 min-w-0"> {/* Added min-w-0 */}
                   <SelectValue placeholder={t('progressPage.selectMeasurementNamePlaceholder')} />
                 </SelectTrigger>
                 <SelectContent>
                   {measurementNameOptions.map(opt => (
                     <SelectItem key={opt.value} value={opt.value}>
-                      {t(opt.labelKey)}
+                      {t(opt.labelKey, { default: opt.value })}
                     </SelectItem>
                   ))}
                 </SelectContent>
               </Select>
             </div>
-            <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="value" className="text-right">
+            <div className="grid grid-cols-1 gap-y-1.5 md:grid-cols-4 md:items-center md:gap-x-4">
+              <Label htmlFor="value" className="text-left md:text-right">
                 {t('progressPage.formValueLabel')}
               </Label>
-              <Input
-                id="value"
-                type="number"
-                step="0.1"
-                value={value}
-                onChange={(e) => setValue(e.target.value)}
-                className="col-span-2"
-                required
-              />
-              <Select value={unit} onValueChange={(val) => setUnit(val as Unit)}>
-                <SelectTrigger className="col-span-1">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  {availableUnits.map(u => (
-                    <SelectItem key={u} value={u}>{t(`progressPage.unit${u.toUpperCase()}`)}</SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              {/* Inner grid for value and unit to stack on mobile and be side-by-side on desktop */}
+              <div className="grid grid-cols-1 gap-2 md:col-span-3 md:grid-cols-3 md:gap-x-2">
+                <Input
+                  id="value"
+                  type="number"
+                  step="0.1"
+                  value={value}
+                  onChange={(e) => setValue(e.target.value)}
+                  className="w-full md:col-span-2 min-w-0" // Added min-w-0
+                  required
+                />
+                <Select value={unit} onValueChange={(val) => setUnit(val as Unit)}>
+                  <SelectTrigger className="w-full md:col-span-1 min-w-0"> {/* Added min-w-0 */}
+                    <SelectValue placeholder={t('progressPage.selectUnitPlaceholder', { default: 'Unit' })} />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {availableUnits.map(u => (
+                      <SelectItem key={u} value={u}>{t(`progressPage.unit${u.toUpperCase()}`, { default: u })}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
             </div>
-            <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="notes" className="text-right">
+            <div className="grid grid-cols-1 gap-y-1.5 md:grid-cols-4 md:items-center md:gap-x-4">
+              <Label htmlFor="notes" className="text-left md:text-right">
                 {t('progressPage.formNotesLabel')}
               </Label>
               <Textarea
                 id="notes"
                 value={notes}
                 onChange={(e) => setNotes(e.target.value)}
-                className="col-span-3"
+                className="w-full md:col-span-3 min-w-0" // Added min-w-0
                 placeholder={t('progressPage.formNotesPlaceholder')}
               />
             </div>
           </div>
-          <DialogFooter className="sm:justify-center">
+          <DialogFooter className="flex flex-col-reverse gap-2 sm:flex-row sm:justify-center pt-4">
             <DialogClose asChild>
               <Button type="button" variant="outline">
                 {t('calendarPage.cancelButton')}
               </Button>
             </DialogClose>
-            <Button type="submit">{t('progressPage.saveMeasurementButton')}</Button>
+            <Button
+              type="submit"
+              className="bg-green-600 hover:bg-green-700 text-white" // Changed to green background
+            >
+              {t('progressPage.saveMeasurementButton')}
+            </Button>
           </DialogFooter>
         </form>
       </DialogContent>

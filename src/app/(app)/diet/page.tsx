@@ -15,7 +15,6 @@ export default function DietPage() {
     <>
       <PageHeader
         title={t('dietPage.title')}
-        description={t('dietPage.description')}
       />
       <div className="space-y-6">
         <WaterIntakeCard />
