@@ -3,8 +3,10 @@ import { useEffect, useState } from "react";
 import { collection, onSnapshot, orderBy, query, where } from "firebase/firestore";
 import { db } from "@/lib/firebase/config";
 import { GamificationService } from "@/lib/firebase/services";
+import { useAuthCtx } from "@/context/auth-context";
 
 export default function Page() {
+  const { user, loading, signIn } = useAuthCtx();
   const [items, setItems] = useState<any[]>([]);
 
   useEffect(() => {
@@ -14,10 +16,18 @@ export default function Page() {
   }, []);
 
   const vote = async (id: string, approve: boolean) => {
+    if (!user) return;
     const svc = new GamificationService();
-    // TODO: sostituire con userId reale da auth
-    await svc.validateWorkout(id, 'demo', approve);
+    await svc.validateWorkout(id, user.uid, approve);
   };
+
+  if (loading) return <p>Caricamento…</p>;
+  if (!user) return (
+    <div className="space-y-3">
+      <p className="text-muted-foreground">Accedi per validare i workout della community.</p>
+      <button onClick={signIn} className="rounded bg-primary text-primary-foreground px-4 py-2">Login con Google</button>
+    </div>
+  );
 
   return (
     <div className="space-y-4">

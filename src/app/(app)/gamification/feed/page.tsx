@@ -1,13 +1,26 @@
 "use client";
 import { useEffect, useState } from "react";
 import { subscribeFeed } from "@/lib/firebase/services";
+import { useAuthCtx } from "@/context/auth-context";
 
 export default function Page() {
+  const { user, loading, signIn } = useAuthCtx();
   const [items, setItems] = useState<any[]>([]);
+
   useEffect(() => {
+    if (!user) return; // opzionale: feed pubblico anche da ospiti
     const unsub = subscribeFeed(setItems, "all");
-    return () => unsub();
-  }, []);
+    return () => unsub && unsub();
+  }, [user]);
+
+  if (loading) return <p>Caricamento…</p>;
+  if (!user) return (
+    <div className="space-y-3">
+      <p className="text-muted-foreground">Accedi per vedere e votare i post della community.</p>
+      <button onClick={signIn} className="rounded bg-primary text-primary-foreground px-4 py-2">Login con Google</button>
+    </div>
+  );
+
   return (
     <div className="space-y-4">
       <h1 className="text-2xl font-semibold">Community Feed</h1>

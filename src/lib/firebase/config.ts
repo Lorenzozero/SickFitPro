@@ -1,6 +1,6 @@
 import { initializeApp } from 'firebase/app';
+import { getAuth, onAuthStateChanged, GoogleAuthProvider, signInWithPopup, signOut } from 'firebase/auth';
 import { getFirestore } from 'firebase/firestore';
-import { getAuth } from 'firebase/auth';
 import { getStorage } from 'firebase/storage';
 
 const firebaseConfig = {
@@ -13,6 +13,14 @@ const firebaseConfig = {
 };
 
 const app = initializeApp(firebaseConfig);
-export const db = getFirestore(app);
 export const auth = getAuth(app);
+export const db = getFirestore(app);
 export const storage = getStorage(app);
+export const googleProvider = new GoogleAuthProvider();
+
+export function watchAuth(cb: (user: import('firebase/auth').User|null)=>void) {
+  return onAuthStateChanged(auth, cb);
+}
+
+export async function signInWithGoogle() { return signInWithPopup(auth, googleProvider); }
+export async function signOutApp() { return signOut(auth); }

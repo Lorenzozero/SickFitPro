@@ -1,47 +1,46 @@
 "use client";
 import { useState } from "react";
 import { GamificationService } from "@/lib/firebase/services";
-import type { UserProfile, SharedWorkout } from "@/lib/firebase/schema";
+import type { SharedWorkout } from "@/lib/firebase/schema";
 import { MediaUploader } from "@/components/gamification/MediaUploader";
+import { useAuthCtx } from "@/context/auth-context";
 
 export default function Page() {
+  const { user, loading, signIn } = useAuthCtx();
   const [form, setForm] = useState({ exercise: "", weight: 0, reps: 0, sets: 1, country: "", notes: "" });
   const [mediaUrls, setMediaUrls] = useState<string[]>([]);
   const [busy, setBusy] = useState(false);
 
   const submit = async () => {
+    if (!user) return;
     setBusy(true);
     try {
-      // TODO: sostituire con utente reale da auth
-      const user: UserProfile = {
-        id: "demo",
-        email: "demo@example.com",
-        name: "Demo",
-        country: form.country || "IT",
-        createdAt: undefined as any,
-        updatedAt: undefined as any,
-        profileVisibility: "public",
-        shareWorkouts: true,
-        gamingProfile: { level: 1, xp: 0, badges: [], totalWorkoutsShared: 0, validationsGiven: 0, validationAccuracy: 0, currentRanks: {} }
-      };
       const svc = new GamificationService();
       const data: Omit<SharedWorkout, 'id'|'user'|'createdAt'|'oneRepMax'> = {
-        userId: user.id,
+        userId: user.uid,
         exercise: form.exercise,
         weight: Number(form.weight),
         reps: Number(form.reps),
         sets: Number(form.sets),
         media: mediaUrls.map(u=>({ url: u, type: u.includes('.mp4')? 'video':'image' })) as any,
         status: 'pending',
-        country: user.country,
+        country: form.country || 'IT',
         notes: form.notes
       } as any;
-      await svc.shareWorkout(user, data);
+      await svc.shareWorkout({ id: user.uid, email: user.email ?? '', name: user.displayName ?? user.email ?? 'User', country: data.country, createdAt: undefined as any, updatedAt: undefined as any, profileVisibility: 'public', shareWorkouts: true, gamingProfile: { level: 1, xp: 0, badges: [], totalWorkoutsShared: 0, validationsGiven: 0, validationAccuracy: 0, currentRanks: {} } }, data);
       alert("Condiviso per validazione");
       setForm({ exercise: "", weight: 0, reps: 0, sets: 1, country: "", notes: "" });
       setMediaUrls([]);
     } finally { setBusy(false); }
   };
+
+  if (loading) return <p>Caricamento…</p>;
+  if (!user) return (
+    <div className="space-y-3">
+      <p className="text-muted-foreground">Accedi per condividere i tuoi workout con la community.</p>
+      <button onClick={signIn} className="rounded bg-primary text-primary-foreground px-4 py-2">Login con Google</button>
+    </div>
+  );
 
   return (
     <div className="space-y-4">
