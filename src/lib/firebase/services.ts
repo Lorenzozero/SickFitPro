@@ -42,7 +42,7 @@ export class GamificationService {
   }
 
   private async updateRankings(sw: SharedWorkout) {
-    // Placeholder: implement ranking collections writes here
+    // TODO: implement ranking writes (global/country/gym)
     return;
   }
 }
