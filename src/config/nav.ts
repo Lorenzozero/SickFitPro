@@ -1,6 +1,5 @@
-
 import type { LucideIcon } from 'lucide-react';
-import { LayoutDashboard, Dumbbell, CalendarDays, BarChart3, Users, Utensils, Clock } from 'lucide-react';
+import { LayoutDashboard, Dumbbell, CalendarDays, BarChart3, Users, Utensils, Trophy } from 'lucide-react';
 
 export interface NavItem {
   titleKey: string;
@@ -12,11 +11,15 @@ export interface NavItem {
 }
 
 export const navItems: NavItem[] = [
-  // Voce Home rimossa
   {
-    titleKey: 'nav.workoutPlans', // "Schede"
+    titleKey: 'nav.workoutPlans',
     href: '/workouts',
     icon: Users,
+  },
+  {
+    titleKey: 'nav.community',
+    href: '/gamification',
+    icon: Trophy,
   },
   {
     titleKey: 'nav.calendar',
@@ -34,4 +37,3 @@ export const navItems: NavItem[] = [
     icon: Utensils,
   },
 ];
-

@@ -2,15 +2,17 @@
 import { useState } from "react";
 import { GamificationService } from "@/lib/firebase/services";
 import type { UserProfile, SharedWorkout } from "@/lib/firebase/schema";
+import { MediaUploader } from "@/components/gamification/MediaUploader";
 
 export default function Page() {
   const [form, setForm] = useState({ exercise: "", weight: 0, reps: 0, sets: 1, country: "", notes: "" });
+  const [mediaUrls, setMediaUrls] = useState<string[]>([]);
   const [busy, setBusy] = useState(false);
 
   const submit = async () => {
     setBusy(true);
     try {
-      // TODO: recuperare user da auth context
+      // TODO: sostituire con utente reale da auth
       const user: UserProfile = {
         id: "demo",
         email: "demo@example.com",
@@ -29,7 +31,7 @@ export default function Page() {
         weight: Number(form.weight),
         reps: Number(form.reps),
         sets: Number(form.sets),
-        media: [],
+        media: mediaUrls.map(u=>({ url: u, type: u.includes('.mp4')? 'video':'image' })) as any,
         status: 'pending',
         country: user.country,
         notes: form.notes
@@ -37,6 +39,7 @@ export default function Page() {
       await svc.shareWorkout(user, data);
       alert("Condiviso per validazione");
       setForm({ exercise: "", weight: 0, reps: 0, sets: 1, country: "", notes: "" });
+      setMediaUrls([]);
     } finally { setBusy(false); }
   };
 
@@ -52,9 +55,17 @@ export default function Page() {
         </div>
         <input className="border rounded p-2" placeholder="Nazione (es. IT)" value={form.country} onChange={e=>setForm({...form, country:e.target.value})} />
         <textarea className="border rounded p-2" placeholder="Note" value={form.notes} onChange={e=>setForm({...form, notes:e.target.value})} />
+        <div>
+          <label className="text-sm font-medium">Media (max 3 file, 20MB, immagini/video)</label>
+          <MediaUploader onUploaded={setMediaUrls} />
+          {mediaUrls.length > 0 && (
+            <ul className="text-sm text-muted-foreground mt-2 list-disc pl-4">
+              {mediaUrls.map((u)=> <li key={u}>{u}</li>)}
+            </ul>
+          )}
+        </div>
         <button disabled={busy} onClick={submit} className="rounded bg-primary text-primary-foreground px-4 py-2 disabled:opacity-50">{busy? 'Invio…':'Condividi'}</button>
       </div>
-      <p className="text-sm text-muted-foreground">Versione base: in produzione, integra upload su Firebase Storage con limiti (max 3 file, 20MB cad., img/video).</p>
     </div>
   );
 }
