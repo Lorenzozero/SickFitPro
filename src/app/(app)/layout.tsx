@@ -1,4 +1,3 @@
-
 'use client';
 
 import type { ReactNode } from 'react';
@@ -17,50 +16,50 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { useTheme } from '@/components/theme-provider';
-import { useRouter } from 'next/navigation'; // Make sure useRouter is imported
+import { useRouter } from 'next/navigation';
 import { useLanguage } from '@/context/language-context';
 import ResumeWorkoutButton from '@/components/shared/resume-workout-button';
-import { Sheet, SheetContent, SheetTrigger, SheetTitle } from '@/components/ui/sheet'; // Added SheetTitle
+import { Sheet, SheetContent, SheetTrigger, SheetTitle } from '@/components/ui/sheet';
 
 export default function AppLayout({ children }: { children: ReactNode }) {
   const { setTheme, resolvedTheme } = useTheme();
   const { t, isClient } = useLanguage();
-  const router = useRouter(); // Initialize router here
+  const router = useRouter();
 
   const UserProfileDropdown = () => (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Button variant="ghost" className="flex items-center justify-start gap-2 p-1 md:p-2 text-left h-auto">
           <Avatar className="w-8 h-8">
-            <AvatarImage src="https://placehold.co/40x40.png" alt={isClient ? t('userDropdown.myAccount') : 'User Avatar'} data-ai-hint="user avatar" />
-            <AvatarFallback>{isClient ? (t('userDropdown.myAccount').charAt(0) || 'U') : 'U'}</AvatarFallback>
+            <AvatarImage src="https://placehold.co/40x40.png" alt={t('userDropdown.myAccount', { default: 'User Avatar' })} data-ai-hint="user avatar" />
+            <AvatarFallback>{isClient ? (t('userDropdown.myAccount', { default: 'My Account' }).charAt(0) || 'U') : 'U'}</AvatarFallback>
           </Avatar>
-          <span className="hidden lg:inline text-sm font-medium">{isClient ? t('userDropdown.myAccount') : 'My Account'}</span>
+          <span className="hidden lg:inline text-sm font-medium">{t('userDropdown.myAccount', { default: 'My Account' })}</span>
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent side="bottom" align="end" className="w-56">
-        <DropdownMenuLabel>{isClient ? t('userDropdown.myAccount') : 'My Account'}</DropdownMenuLabel>
+        <DropdownMenuLabel>{t('userDropdown.myAccount', { default: 'My Account' })}</DropdownMenuLabel>
         <DropdownMenuSeparator />
         <DropdownMenuItem asChild>
           <Link href="/settings">
             <Settings className="w-4 h-4 mr-2" />
-            <span>{isClient ? t('userDropdown.settings') : 'Settings'}</span>
+            <span>{t('userDropdown.settings', { default: 'Settings' })}</span>
           </Link>
         </DropdownMenuItem>
         <DropdownMenuSeparator />
         <DropdownMenuItem>
           <LogOut className="w-4 h-4 mr-2" />
-          <span>{isClient ? t('userDropdown.logout') : 'Log out'}</span>
+          <span>{t('userDropdown.logout', { default: 'Log out' })}</span>
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
   );
 
   const ThemeToggleButton = () => (
-    <Button variant="ghost" size="icon" aria-label={isClient ? t('header.toggleTheme') : 'Toggle theme'} onClick={() => setTheme(resolvedTheme === 'dark' ? 'light' : 'dark')}>
+    <Button variant="ghost" size="icon" aria-label={t('header.toggleTheme', { default: 'Toggle theme' })} onClick={() => setTheme(resolvedTheme === 'dark' ? 'light' : 'dark')}>
       <Sun className="h-[1.2rem] w-[1.2rem] rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
       <Moon className="absolute h-[1.2rem] w-[1.2rem] rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
-      <span className="sr-only">{isClient ? t('header.toggleTheme') : 'Toggle theme'}</span>
+      <span className="sr-only">{t('header.toggleTheme', { default: 'Toggle theme' })}</span>
     </Button>
   );
 
@@ -74,7 +73,7 @@ export default function AppLayout({ children }: { children: ReactNode }) {
       >
         <Link href={item.href} className="flex items-center">
           <item.icon className={mobile ? "mr-3 h-5 w-5" : "mr-1.5 h-4 w-4"} />
-          {isClient ? t(item.titleKey, { default: item.titleKey.split('.').pop() }) : item.titleKey.split('.').pop() || item.titleKey}
+          {t(item.titleKey, { default: item.titleKey.replace('nav.', '').replace(/([A-Z])/g, ' $1') })}
         </Link>
       </Button>
     ))
@@ -84,19 +83,18 @@ export default function AppLayout({ children }: { children: ReactNode }) {
     <div className="flex flex-col min-h-screen">
       <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
         <div className="container flex h-16 items-center justify-between px-4 md:px-6">
-          {/* Mobile Menu Trigger & Logo */}
           <div className="flex items-center md:hidden">
             <Sheet>
               <SheetTrigger asChild>
                 <Button variant="ghost" size="icon" className="mr-2">
                   <MenuIcon className="h-6 w-6" />
-                  <span className="sr-only">{isClient ? t('header.openMenu', {default: "Open menu"}) : "Open menu"}</span>
+                  <span className="sr-only">{t('header.openMenu', { default: 'Open menu' })}</span>
                 </Button>
               </SheetTrigger>
               <SheetContent side="left" className="w-[300px] sm:w-[340px] p-0 flex flex-col">
-                 <SheetTitle className="sr-only">{isClient ? t('header.mobileNavTitle', { default: 'Navigation Menu' }) : 'Navigation Menu'}</SheetTitle>
+                 <SheetTitle className="sr-only">{t('header.mobileNavTitle', { default: 'Navigation Menu' })}</SheetTitle>
                  <div className="p-6 border-b">
-                    <Link href="/" className="block group" aria-label={isClient ? t('nav.home', { default: "Home"}) : 'Home'}>
+                    <Link href="/" className="block group" aria-label={t('nav.home', { default: 'Home' })}>
                       <Logo />
                     </Link>
                   </div>
@@ -108,14 +106,13 @@ export default function AppLayout({ children }: { children: ReactNode }) {
                   </div>
               </SheetContent>
             </Sheet>
-             <Link href="/" className="block group md:hidden" aria-label={isClient ? t('nav.home', { default: "Home"}) : 'Home'}>
+             <Link href="/" className="block group md:hidden" aria-label={t('nav.home', { default: 'Home' })}>
                 <Logo />
             </Link>
           </div>
 
-          {/* Desktop Logo and Navigation */}
           <div className="hidden md:flex items-center gap-6">
-            <Link href="/" className="block group" aria-label={isClient ? t('nav.home', { default: "Home"}) : 'Home'}>
+            <Link href="/" className="block group" aria-label={t('nav.home', { default: 'Home' })}>
               <Logo />
             </Link>
             <nav className="flex items-center gap-1">
@@ -123,7 +120,6 @@ export default function AppLayout({ children }: { children: ReactNode }) {
             </nav>
           </div>
 
-          {/* Right side actions (Theme toggle, User Profile) */}
           <div className="flex items-center gap-1 sm:gap-2">
             <ThemeToggleButton />
             <Button variant="ghost" size="icon" onClick={() => router.push('/settings')}>
