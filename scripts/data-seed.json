@@ -1,0 +1,34 @@
+{
+  "users": [
+    { "id": "demoUser123", "name": "Demo User", "email": "demo@example.com", "createdAt": "2025-10-01T00:00:00Z" }
+  ],
+  "workouts": [
+    { "id": "w_full_body", "userId": "demoUser123", "name": "Full Body Blast", "duration": "60m", "updatedAt": "2025-10-25T10:00:00Z" },
+    { "id": "w_upper_power", "userId": "demoUser123", "name": "Upper Body Power", "duration": "50m", "updatedAt": "2025-10-26T09:30:00Z" }
+  ],
+  "workout_sessions": [
+    { "id": "s_2025_10_20", "userId": "demoUser123", "workoutId": "w_full_body", "planName": "Full Body Blast", "completionDate": "2025-10-20", "duration": "58m" },
+    { "id": "s_2025_10_23", "userId": "demoUser123", "workoutId": "w_upper_power", "planName": "Upper Body Power", "completionDate": "2025-10-23", "duration": "49m" }
+  ],
+  "schedules": [
+    {
+      "id": "sch_demoUser123",
+      "userId": "demoUser123",
+      "currentWeight": 70.5,
+      "upcoming": [
+        { "id": "u_2025_10_29_w_full_body", "planId": "w_full_body", "planName": "Full Body Blast", "dateISO": "2025-10-29" },
+        { "id": "u_2025_10_31_w_upper_power", "planId": "w_upper_power", "planName": "Upper Body Power", "dateISO": "2025-10-31" }
+      ]
+    }
+  ],
+  "progress_tracking": [
+    { "id": "p_2025_10_15", "userId": "demoUser123", "name": "Weight", "value": 70.2, "unit": "kg", "date": "2025-10-15" },
+    { "id": "p_2025_10_25", "userId": "demoUser123", "name": "Weight", "value": 70.5, "unit": "kg", "date": "2025-10-25" }
+  ],
+  "diet_plans": [
+    { "id": "dp_low_carb", "userId": "demoUser123", "name": "Low Carb Week Plan", "createdAt": "2025-10-22T08:00:00Z" }
+  ],
+  "ai_recommendations": [
+    { "id": "ai_2025_10_21", "userId": "demoUser123", "createdAt": "2025-10-21T14:10:00Z", "summary": "Increase upper body sessions to 2/week; maintain hydration 2.5L/day" }
+  ]
+}
