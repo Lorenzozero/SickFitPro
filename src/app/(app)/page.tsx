@@ -1,10 +1,9 @@
-
 'use client';
 
 import { PageHeader } from '@/components/shared/page-header';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { TrendingUp, Weight, PlayCircle, Users, Activity, Clock, type LucideIcon, ChevronDown, ChevronUp } from 'lucide-react';
+import { TrendingUp, Weight, PlayCircle, Users, Activity, Clock, type LucideIcon, ChevronDown, ChevronUp, Calendar } from 'lucide-react';
 import Link from 'next/link';
 import { useLanguage } from '@/context/language-context';
 import { useEffect, useState, useMemo } from 'react';
@@ -13,10 +12,9 @@ import { Separator } from '@/components/ui/separator';
 import { useWeeklySchedule, dayKeys, type WorkoutPlanOption } from '@/context/weekly-schedule-context';
 import { addDays, format as formatDateFn } from 'date-fns';
 import { it as dateFnsIt, es as dateFnsEs, fr as dateFnsFr, enUS as dateFnsEnUs } from 'date-fns/locale';
-import type { CompletedWorkout } from '@/app/(app)/workouts/[planId]/active/page'; // Import CompletedWorkout
+import type { WorkoutSession } from '@/lib/types';
 
 const WORKOUT_HISTORY_STORAGE_KEY = 'sickfit-pro-workoutHistory';
-
 
 interface UpcomingWorkoutDisplayItem {
   id: string;
@@ -30,9 +28,9 @@ interface UpcomingWorkoutDisplayItem {
 interface StatItem {
   titleKey: string;
   value: string;
-  icon: LucideIcon; // Specific type for Lucide icons
+  icon: LucideIcon;
   color: string;
-  href?: string; // Optional link for the card
+  href?: string;
 }
 
 const getDateFnsLocale = (lang: string) => {
@@ -51,7 +49,7 @@ export default function DashboardPage() {
   const [currentWeight, setCurrentWeight] = useState<string>('N/A');
   const [upcomingWorkouts, setUpcomingWorkouts] = useState<UpcomingWorkoutDisplayItem[]>([]);
   const [showAllUpcoming, setShowAllUpcoming] = useState(false);
-  const [actualWorkoutHistory, setActualWorkoutHistory] = useState<CompletedWorkout[]>([]);
+  const [actualWorkoutHistory, setActualWorkoutHistory] = useState<WorkoutSession[]>([]);
 
   useEffect(() => {
     setIsMounted(true);
@@ -139,37 +137,33 @@ export default function DashboardPage() {
           const todaySimple = new Date(todayDate.getFullYear(), todayDate.getMonth(), todayDate.getDate());
           const workoutDateSimple = new Date(workoutDate.getFullYear(), workoutDate.getMonth(), workoutDate.getDate());
           return workoutDateSimple > todaySimple;
-      })); // Rimosso .slice(0, 5) per caricare tutti gli allenamenti futuri
+      }));
     };
 
     calculateUpcomingWorkouts();
   }, [isMounted, scheduleIsClient, languageContextIsClient, weeklySchedule, availableWorkoutPlans, language, t, todaysWorkoutsDetails]);
-
 
   const totalScheduledWorkoutsThisWeek = useMemo(() => {
     if (!scheduleIsClient) return 0;
     return dayKeys.reduce((sum, dayKey) => sum + (weeklySchedule[dayKey]?.length || 0), 0);
   }, [scheduleIsClient, weeklySchedule]);
   
-  // Placeholder for completed workouts. In a real app, this would come from tracked data.
   const completedWorkoutsThisWeek = actualWorkoutHistory.filter(h => {
     const completionDate = new Date(h.completionDate + 'T00:00:00');
     const todayDate = new Date();
-    const startOfWeek = new Date(todayDate.setDate(todayDate.getDate() - todayDate.getDay() + (todayDate.getDay() === 0 ? -6 : 1))); // Monday as start of week
+    const startOfWeek = new Date(todayDate.setDate(todayDate.getDate() - todayDate.getDay() + (todayDate.getDay() === 0 ? -6 : 1)));
     const endOfWeek = new Date(todayDate.setDate(todayDate.getDate() - todayDate.getDay() + 7));
     return completionDate >= startOfWeek && completionDate <= endOfWeek;
   }).length;
 
-
   const stats: StatItem[] = useMemo(() => [
     { titleKey: 'dashboard.workoutsThisWeek', value: `${completedWorkoutsThisWeek}/${totalScheduledWorkoutsThisWeek}`, icon: Users, color: 'text-accent', href: '/calendar' },
-    { titleKey: 'dashboard.weightLifted', value: '0 kg', icon: TrendingUp, color: 'text-green-500', href: '/progress' }, // Placeholder, added href
+    { titleKey: 'dashboard.weightLifted', value: '0 kg', icon: TrendingUp, color: 'text-green-500', href: '/progress' },
     { titleKey: 'dashboard.currentWeight', value: currentWeight, icon: Weight, color: 'text-orange-500', href: '/diet' },
   ], [completedWorkoutsThisWeek, totalScheduledWorkoutsThisWeek, currentWeight]);
 
   const formatDateHistory = (dateString: string) => {
     if (!isMounted || !languageContextIsClient) return dateString;
-    // Ensure the date string is treated as local time, not UTC, if it's just a date
     const date = new Date(dateString.includes('T') ? dateString : dateString + 'T00:00:00');
     return date.toLocaleDateString(language, {
       year: 'numeric',
@@ -182,7 +176,7 @@ export default function DashboardPage() {
     <>
       <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
         <CardTitle className="flex-grow text-center text-sm font-medium text-muted-foreground">
-          {isMounted && languageContextIsClient ? t(stat.titleKey) : stat.titleKey.split('.').pop()}
+          {t(stat.titleKey, { default: stat.titleKey.replace('dashboard.', '').replace(/([A-Z])/g, ' $1') })}
         </CardTitle>
         <stat.icon className={`w-5 h-5 ${stat.color}`} />
       </CardHeader>
@@ -197,12 +191,11 @@ export default function DashboardPage() {
   return (
     <>
       <PageHeader
-        title={languageContextIsClient ? t('dashboard.welcomeTitle') : "Welcome to SickFit Pro!"}
+        title={t('dashboard.welcomeTitle', { default: 'Welcome to SickFit Pro!' })}
         description=""
       />
       <div className={"grid grid-cols-3 gap-4 md:gap-6 lg:gap-8 mt-4 mb-8"}>
         {stats.map((stat, idx) => {
-          // Definisci tre colori di sfondo diversi, ben contrastati per light/dark
           const cardBgVariants = [
             "bg-gradient-to-br from-blue-600/80 to-indigo-700/80 dark:from-blue-900/80 dark:to-indigo-950/80",
             "bg-gradient-to-br from-green-500/80 to-emerald-700/80 dark:from-green-900/80 dark:to-emerald-950/80",
@@ -225,11 +218,10 @@ export default function DashboardPage() {
       </div>
 
       <div className="mt-6 grid gap-4 md:grid-cols-1 lg:grid-cols-2">
-        {/* Card "Today's Focus" - resa relativa per posizionare il pulsante mobile */}
         <Card className="shadow-xl relative bg-gradient-to-br from-blue-600/80 to-indigo-700/80 dark:from-blue-900/80 dark:to-indigo-950/80 text-primary-foreground">
-          <CardHeader className="relative text-center"> {/* Rimosso flex, aggiunto text-center e relative */}
-            <CardTitle> {/* Il testo qui sarà centrato grazie a text-center sul genitore */}
-              {isMounted && languageContextIsClient ? t('dashboard.todaysFocus') : "Today's Focus"}
+          <CardHeader className="relative text-center">
+            <CardTitle>
+              {t('dashboard.todaysFocus', { default: "Today's Focus" })}
             </CardTitle>
           </CardHeader>
 
@@ -241,7 +233,7 @@ export default function DashboardPage() {
                     {todaysWorkoutsDetails.map(workout => (
                       <div key={workout.id} className="mb-2">
                         <p className="text-xl font-semibold text-white">{workout.planName}</p>
-                        {workout.duration && ( // text-muted-foreground è già bianco globalmente, erediterà da text-primary-foreground
+                        {workout.duration && (
                           <div className="flex items-center justify-center text-sm text-muted-foreground mt-1">
                             <Clock className="w-3.5 h-3.5 mr-1.5" />
                             <span>{workout.duration}</span>
@@ -252,14 +244,14 @@ export default function DashboardPage() {
                   </>
                 ) : (
                   <>
-                    <Activity className="w-12 h-12 mx-auto mb-2 text-muted-foreground" /> {/* text-muted-foreground è già bianco */}
-                    <p className="font-semibold">{t('dashboard.todayIsRestDay')}</p>
+                    <Activity className="w-12 h-12 mx-auto mb-2 text-muted-foreground" />
+                    <p className="font-semibold">{t('dashboard.todayIsRestDay', { default: "Today is a rest day! Enjoy it! 😊" })}</p>
                   </>
                 )
               ) : (
                  <>
-                  <Activity className="w-12 h-12 mx-auto mb-2 text-muted-foreground" /> {/* text-muted-foreground è già bianco */}
-                  <p className="font-semibold">{t('dashboard.viewCalendarToSeeWorkout')}</p>
+                  <Activity className="w-12 h-12 mx-auto mb-2 text-muted-foreground" />
+                  <p className="font-semibold">{t('dashboard.viewCalendarToSeeWorkout', { default: "Your scheduled workout will appear here." })}</p>
                  </>
               )}
             </div>
@@ -288,7 +280,7 @@ export default function DashboardPage() {
                       <div className="text-center">
                         <p className="font-semibold text-white uppercase tracking-wider">{workout.dayOfWeek}</p>
                         <p className="text-lg font-bold text-primary-foreground">{workout.dayOfMonth}</p>
-                        <p className="text-muted-foreground uppercase">{workout.month}</p> {/* text-muted-foreground è già bianco */}
+                        <p className="text-muted-foreground uppercase">{workout.month}</p>
                       </div>
                       <Separator className="my-1.5 bg-primary-foreground/30" />
                       <p className="mt-1 font-medium text-center truncate" title={workout.planName}>
@@ -300,17 +292,22 @@ export default function DashboardPage() {
               </>
             )}
 
-            <Link href="/calendar" className="absolute bottom-3 right-3 text-white hover:text-accent transition-colors" aria-label={t('dashboard.viewFullSchedule', { default: "View Full Schedule"})}>
-              
+            <Link 
+              href="/calendar" 
+              className="absolute bottom-3 right-3 text-white hover:text-accent transition-colors focus:outline-none focus:ring-2 focus:ring-accent focus:ring-offset-2 focus:ring-offset-background rounded-sm p-1" 
+              aria-label={t('dashboard.viewFullSchedule', { default: "View Full Schedule" })}
+            >
+              <Calendar className="w-5 h-5" />
+              <span className="sr-only">{t('dashboard.viewFullSchedule', { default: "View Full Schedule" })}</span>
             </Link>
           </CardContent>
-          {/* Pulsante Mobile Flottante: visibile solo sotto md */}
+          
           <Link
             href="/start-workout"
             className="md:hidden absolute z-10 bottom-0 left-1/2 -translate-x-1/2 translate-y-1/2
                        bg-primary text-primary-foreground hover:bg-primary/90
                        rounded-full w-14 h-14 flex items-center justify-center shadow-xl focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
-            aria-label={isMounted && languageContextIsClient ? t('dashboard.logNewWorkout', { default: 'Start Workout' }) : 'Start Workout'}
+            aria-label={t('dashboard.logNewWorkout', { default: 'Start Workout' })}
             data-ai-hint="start-workout-fab"
           >
             <PlayCircle className="w-7 h-7 text-black" />
@@ -319,7 +316,7 @@ export default function DashboardPage() {
 
         <Card className="shadow-xl mt-6 lg:mt-0 bg-gradient-to-br from-teal-500/80 to-cyan-600/80 dark:from-teal-900/80 dark:to-cyan-950/80 text-primary-foreground">
           <CardHeader>
-            <CardTitle>{isMounted && languageContextIsClient ? t('dashboard.activityAndHistoryTitle') : "Activity & History"}</CardTitle>
+            <CardTitle>{t('dashboard.activityAndHistoryTitle', { default: "Activity & History" })}</CardTitle>
           </CardHeader>
           <CardContent className="text-primary-foreground">
             {actualWorkoutHistory.length > 0 ? (
@@ -332,9 +329,9 @@ export default function DashboardPage() {
                           <p className="font-semibold text-primary-foreground">
                             {item.planName}
                           </p>
-                          <p className="text-xs text-muted-foreground">{formatDateHistory(item.completionDate)}</p> {/* text-muted-foreground è già bianco */}
+                          <p className="text-xs text-muted-foreground">{formatDateHistory(item.completionDate)}</p>
                         </div>
-                        <div className="flex items-center text-sm text-muted-foreground shrink-0"> {/* text-muted-foreground è già bianco */}
+                        <div className="flex items-center text-sm text-muted-foreground shrink-0">
                           <Clock className="w-3.5 h-3.5 mr-1.5" />
                           <span>{item.duration}</span>
                         </div>
