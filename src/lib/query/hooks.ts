@@ -1,23 +1,29 @@
 import { useQuery } from '@tanstack/react-query';
-import { dataProvider } from '../data/provider';
-import type { DashboardData, Workout } from '../types';
+import { dataProvider } from '../data/factory';
+import * as Sentry from '@sentry/nextjs';
 
-// Dashboard data query with 5min stale time and background refetch
 export const useDashboardQuery = (uid: string = 'mock') => {
   return useQuery({
     queryKey: ['dashboard', uid],
     queryFn: () => dataProvider.getDashboard(uid),
-    staleTime: 5 * 60 * 1000, // 5 minutes
+    staleTime: 5 * 60 * 1000,
     refetchOnWindowFocus: true,
+    retry: 1,
+    onError: (err) => {
+      Sentry.captureException(err);
+    },
   });
 };
 
-// Workouts list query with 10min stale time
 export const useWorkoutsQuery = (uid: string = 'mock') => {
   return useQuery({
     queryKey: ['workouts', uid],
     queryFn: () => dataProvider.listWorkouts(uid),
-    staleTime: 10 * 60 * 1000, // 10 minutes
+    staleTime: 10 * 60 * 1000,
     refetchOnWindowFocus: false,
+    retry: 1,
+    onError: (err) => {
+      Sentry.captureException(err);
+    },
   });
 };
