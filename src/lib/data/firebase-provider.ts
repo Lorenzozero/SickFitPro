@@ -1,10 +1,10 @@
 import type { DataProvider } from './provider';
 import type { DashboardData, Workout, WorkoutSession } from '../types';
 import { fetchDashboardRT, fetchWorkoutsRT } from '../rtdb/queries';
-import { auth, rtdb } from '../firebase';
+import { rtdb } from '../firebase';
 import { ref, push, set } from 'firebase/database';
 import * as Sentry from '@sentry/nextjs';
-import { User } from 'firebase/auth';
+import type { User } from 'firebase/auth';
 
 const ENABLE_WRITES = (process.env.NEXT_PUBLIC_ENABLE_WRITES || 'false') === 'true';
 
@@ -24,11 +24,12 @@ function validateSession(s: Partial<WorkoutSession>) {
 export class FirebaseProvider implements DataProvider {
   async getDashboard(user: User): Promise<DashboardData> {
     if (!user) throw new Error('Not authenticated');
-    return fetchDashboardRT(user.uid);
+    // Pass entire user object as required by RTDB queries
+    return fetchDashboardRT(user);
   }
   async listWorkouts(user: User): Promise<Workout[]> {
     if (!user) throw new Error('Not authenticated');
-    return fetchWorkoutsRT(user.uid);
+    return fetchWorkoutsRT(user);
   }
   async saveSession(session: WorkoutSession, user: User): Promise<void> {
     if (!ENABLE_WRITES) throw new Error('Read-only mode: writes disabled');
