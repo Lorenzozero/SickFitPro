@@ -1,21 +1,36 @@
-'use client';
+"use client";
 
+import { useMemo } from 'react';
+import dynamic from 'next/dynamic';
 import { PageHeader } from '@/components/shared/page-header';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { TrendingUp, Weight, PlayCircle, Users, Activity, Clock, type LucideIcon, ChevronDown, ChevronUp, Calendar } from 'lucide-react';
+import { TrendingUp, Weight, PlayCircle, Users, Activity, Clock, Calendar, ChevronDown, ChevronUp } from 'lucide-react';
 import Link from 'next/link';
 import { useLanguage } from '@/context/language-context';
-import { useEffect, useState, useMemo } from 'react';
+import { useEffect, useState } from 'react';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Separator } from '@/components/ui/separator';
-import { useWeeklySchedule, dayKeys, type WorkoutPlanOption } from '@/context/weekly-schedule-context';
+import { useWeeklySchedule, dayKeys } from '@/context/weekly-schedule-context';
 import { addDays, format as formatDateFn } from 'date-fns';
 import { it as dateFnsIt, es as dateFnsEs, fr as dateFnsFr, enUS as dateFnsEnUs } from 'date-fns/locale';
 import type { WorkoutSession, DashboardData } from '@/lib/types';
-import { useAuth } from '@/context/auth-context';
+import { useAuth } from '@/lib/auth/auth-context';
 import { FirebaseProvider } from '@/lib/data/firebase-provider';
 import { toast } from 'sonner';
+import { ErrorBoundary } from '@/components/error-boundary';
+
+// Lazy load AI components if they exist
+const AIRecommendations = dynamic(
+  () => import('@/components/ai/recommendations').catch(() => ({ default: () => null })),
+  { ssr: false }
+);
+
+// Lazy load chart components if they exist
+const ProgressChart = dynamic(
+  () => import('@/components/charts/progress-chart').catch(() => ({ default: () => null })),
+  { ssr: false, loading: () => <div className="h-32 bg-muted/50 rounded animate-pulse" /> }
+);
 
 const WORKOUT_HISTORY_STORAGE_KEY = 'sickfit-pro-workoutHistory';
 
@@ -28,14 +43,6 @@ interface UpcomingWorkoutDisplayItem {
   planName: string;
 }
 
-interface StatItem {
-  titleKey: string;
-  value: string;
-  icon: LucideIcon;
-  color: string;
-  href?: string;
-}
-
 const getDateFnsLocale = (lang: string) => {
   switch (lang) {
     case 'it': return dateFnsIt;
@@ -44,6 +51,48 @@ const getDateFnsLocale = (lang: string) => {
     default: return dateFnsEnUs;
   }
 };
+
+function DashboardStats({ stats }: { stats: any[] }) {
+  const renderStatCardContent = (stat: any) => (
+    <>
+      <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
+        <CardTitle className="flex-grow text-center text-sm font-medium text-muted-foreground">
+          {stat.title}
+        </CardTitle>
+        <stat.icon className={`w-5 h-5 ${stat.color}`} />
+      </CardHeader>
+      <CardContent>
+        <div className="text-center text-3xl font-bold text-foreground">{stat.value}</div>
+      </CardContent>
+    </>
+  );
+
+  return (
+    <div className="grid grid-cols-3 gap-4 md:gap-6 lg:gap-8 mt-4 mb-8">
+      {stats.map((stat, idx) => {
+        const cardBgVariants = [
+          "bg-gradient-to-br from-blue-600/80 to-indigo-700/80 dark:from-blue-900/80 dark:to-indigo-950/80",
+          "bg-gradient-to-br from-green-500/80 to-emerald-700/80 dark:from-green-900/80 dark:to-emerald-950/80",
+          "bg-gradient-to-br from-orange-400/80 to-pink-500/80 dark:from-orange-900/80 dark:to-pink-950/80"
+        ];
+        const cardBg = cardBgVariants[idx % 3];
+        const cardClass = `min-h-[160px] h-[160px] max-h-[160px] w-full rounded-xl shadow-xl border-none flex flex-col justify-between hover:scale-[1.03] transition-transform ${cardBg}`;
+        
+        return stat.href ? (
+          <Link href={stat.href} key={stat.titleKey} className="block hover:no-underline">
+            <Card className={cardClass}>
+              {renderStatCardContent(stat)}
+            </Card>
+          </Link>
+        ) : (
+          <Card key={stat.titleKey} className={cardClass}>
+            {renderStatCardContent(stat)}
+          </Card>
+        );
+      })}
+    </div>
+  );
+}
 
 export default function DashboardPage() {
   const { t, language, isClient: languageContextIsClient } = useLanguage();
@@ -61,19 +110,19 @@ export default function DashboardPage() {
   useEffect(() => {
     setIsMounted(true);
     if (typeof window !== 'undefined') {
-        const storedWeight = localStorage.getItem('app-user-current-weight');
-        if (storedWeight) {
-            setCurrentWeight(`${storedWeight} kg`);
+      const storedWeight = localStorage.getItem('app-user-current-weight');
+      if (storedWeight) {
+        setCurrentWeight(`${storedWeight} kg`);
+      }
+      const storedHistory = localStorage.getItem(WORKOUT_HISTORY_STORAGE_KEY);
+      if (storedHistory) {
+        try {
+          setActualWorkoutHistory(JSON.parse(storedHistory));
+        } catch (e) {
+          console.error('Error parsing workout history from localStorage', e);
+          setActualWorkoutHistory([]);
         }
-        const storedHistory = localStorage.getItem(WORKOUT_HISTORY_STORAGE_KEY);
-        if (storedHistory) {
-            try {
-                setActualWorkoutHistory(JSON.parse(storedHistory));
-            } catch (e) {
-                console.error("Error parsing workout history from localStorage", e);
-                setActualWorkoutHistory([]);
-            }
-        }
+      }
     }
   }, []);
 
@@ -94,10 +143,8 @@ export default function DashboardPage() {
         if (data.currentWeight) {
           setCurrentWeight(`${data.currentWeight} kg`);
         }
-        // Note: upcomingWorkouts is still calculated based on weeklySchedule, not directly from dashboard data
-        // If upcomingWorkouts should come from RTDB, this logic needs to be adjusted.
       } catch (err) {
-        console.error("Error fetching dashboard data:", err);
+        console.error('Error fetching dashboard data:', err);
         setDashboardError('Failed to load dashboard data.');
         toast.error('Failed to load dashboard data.', { description: (err as Error).message });
       } finally {
@@ -111,9 +158,9 @@ export default function DashboardPage() {
   const today = useMemo(() => {
     if (!isMounted) return null;
     const date = new Date();
-    let dayIndex = date.getDay() - 1; 
-    if (dayIndex === -1) { 
-        dayIndex = 6;
+    let dayIndex = date.getDay() - 1;
+    if (dayIndex === -1) {
+      dayIndex = 6;
     }
     return dayKeys[dayIndex];
   }, [isMounted]);
@@ -123,12 +170,12 @@ export default function DashboardPage() {
       return [];
     }
     return weeklySchedule[today].map(scheduledWorkout => {
-        const planDetails = availableWorkoutPlans.find(p => p.id === scheduledWorkout.planId);
-        return {
-            ...scheduledWorkout,
-            planName: planDetails ? t(planDetails.nameKey, {default: planDetails.defaultName}) : scheduledWorkout.planName,
-            duration: planDetails?.duration,
-        };
+      const planDetails = availableWorkoutPlans.find(p => p.id === scheduledWorkout.planId);
+      return {
+        ...scheduledWorkout,
+        planName: planDetails ? t(planDetails.nameKey, { default: planDetails.defaultName }) : scheduledWorkout.planName,
+        duration: planDetails?.duration,
+      };
     });
   }, [isMounted, today, scheduleIsClient, weeklySchedule, availableWorkoutPlans, t]);
 
@@ -141,14 +188,14 @@ export default function DashboardPage() {
     const calculateUpcomingWorkouts = () => {
       const locale = getDateFnsLocale(language);
       const todayDate = new Date();
-      const nextDaysLimit = 7; 
+      const nextDaysLimit = 7;
       const workouts: UpcomingWorkoutDisplayItem[] = [];
 
       for (let i = 0; i < nextDaysLimit; i++) {
         const currentDate = addDays(todayDate, i);
         const dateFnsDayIndex = currentDate.getDay();
         const appDayKey = dayKeys[dateFnsDayIndex === 0 ? 6 : dateFnsDayIndex - 1];
-        
+
         const scheduledForDay = weeklySchedule[appDayKey];
 
         if (scheduledForDay && scheduledForDay.length > 0) {
@@ -162,8 +209,8 @@ export default function DashboardPage() {
                 id: `${formatDateFn(currentDate, 'yyyy-MM-dd')}-${scheduledWorkout.id}`,
                 date: currentDate,
                 dayOfWeek: formatDateFn(currentDate, 'EEEE', { locale }),
-                dayOfMonth: formatDateFn(currentDate, 'd', { locale }),   
-                month: formatDateFn(currentDate, 'MMM', { locale }),      
+                dayOfMonth: formatDateFn(currentDate, 'd', { locale }),
+                month: formatDateFn(currentDate, 'MMM', { locale }),
                 planName: t(planDetails.nameKey, { default: planDetails.defaultName }),
               });
             }
@@ -171,10 +218,10 @@ export default function DashboardPage() {
         }
       }
       setUpcomingWorkouts(workouts.filter(w => {
-          const workoutDate = new Date(w.date);
-          const todaySimple = new Date(todayDate.getFullYear(), todayDate.getMonth(), todayDate.getDate());
-          const workoutDateSimple = new Date(workoutDate.getFullYear(), workoutDate.getMonth(), workoutDate.getDate());
-          return workoutDateSimple > todaySimple;
+        const workoutDate = new Date(w.date);
+        const todaySimple = new Date(todayDate.getFullYear(), todayDate.getMonth(), todayDate.getDate());
+        const workoutDateSimple = new Date(workoutDate.getFullYear(), workoutDate.getMonth(), workoutDate.getDate());
+        return workoutDateSimple > todaySimple;
       }));
     };
 
@@ -185,7 +232,7 @@ export default function DashboardPage() {
     if (!scheduleIsClient) return 0;
     return dayKeys.reduce((sum, dayKey) => sum + (weeklySchedule[dayKey]?.length || 0), 0);
   }, [scheduleIsClient, weeklySchedule]);
-  
+
   const completedWorkoutsThisWeek = actualWorkoutHistory.filter(h => {
     const completionDate = new Date(h.completionDate + 'T00:00:00');
     const todayDate = new Date();
@@ -194,11 +241,32 @@ export default function DashboardPage() {
     return completionDate >= startOfWeek && completionDate <= endOfWeek;
   }).length;
 
-  const stats: StatItem[] = useMemo(() => [
-    { titleKey: 'dashboard.workoutsThisWeek', value: `${completedWorkoutsThisWeek}/${totalScheduledWorkoutsThisWeek}`, icon: Users, color: 'text-accent', href: '/calendar' },
-    { titleKey: 'dashboard.weightLifted', value: '0 kg', icon: TrendingUp, color: 'text-green-500', href: '/progress' },
-    { titleKey: 'dashboard.currentWeight', value: currentWeight, icon: Weight, color: 'text-orange-500', href: '/diet' },
-  ], [completedWorkoutsThisWeek, totalScheduledWorkoutsThisWeek, currentWeight]);
+  const stats = useMemo(() => [
+    {
+      titleKey: 'dashboard.workoutsThisWeek',
+      title: t('dashboard.workoutsThisWeek', { default: 'Workouts This Week' }),
+      value: `${completedWorkoutsThisWeek}/${totalScheduledWorkoutsThisWeek}`,
+      icon: Users,
+      color: 'text-accent',
+      href: '/calendar'
+    },
+    {
+      titleKey: 'dashboard.weightLifted',
+      title: t('dashboard.weightLifted', { default: 'Weight Lifted' }),
+      value: '0 kg',
+      icon: TrendingUp,
+      color: 'text-green-500',
+      href: '/progress'
+    },
+    {
+      titleKey: 'dashboard.currentWeight',
+      title: t('dashboard.currentWeight', { default: 'Current Weight' }),
+      value: currentWeight,
+      icon: Weight,
+      color: 'text-orange-500',
+      href: '/diet'
+    },
+  ], [completedWorkoutsThisWeek, totalScheduledWorkoutsThisWeek, currentWeight, t]);
 
   const formatDateHistory = (dateString: string) => {
     if (!isMounted || !languageContextIsClient) return dateString;
@@ -209,20 +277,6 @@ export default function DashboardPage() {
       day: 'numeric',
     });
   };
-
-  const renderStatCardContent = (stat: StatItem) => (
-    <>
-      <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
-        <CardTitle className="flex-grow text-center text-sm font-medium text-muted-foreground">
-          {t(stat.titleKey, { default: stat.titleKey.replace('dashboard.', '').replace(/([A-Z])/g, ' $1') })}
-        </CardTitle>
-        <stat.icon className={`w-5 h-5 ${stat.color}`} />
-      </CardHeader>
-      <CardContent>
-        <div className="text-center text-3xl font-bold text-foreground">{stat.value}</div>
-      </CardContent>
-    </>
-  );
 
   const displayedUpcomingWorkouts = showAllUpcoming ? upcomingWorkouts : upcomingWorkouts.slice(0, 2);
 
@@ -243,33 +297,13 @@ export default function DashboardPage() {
   }
 
   return (
-    <>
+    <ErrorBoundary>
       <PageHeader
         title={t('dashboard.welcomeTitle', { default: 'Welcome to SickFit Pro!' })}
         description=""
       />
-      <div className={"grid grid-cols-3 gap-4 md:gap-6 lg:gap-8 mt-4 mb-8"}>
-        {stats.map((stat, idx) => {
-          const cardBgVariants = [
-            "bg-gradient-to-br from-blue-600/80 to-indigo-700/80 dark:from-blue-900/80 dark:to-indigo-950/80",
-            "bg-gradient-to-br from-green-500/80 to-emerald-700/80 dark:from-green-900/80 dark:to-emerald-950/80",
-            "bg-gradient-to-br from-orange-400/80 to-pink-500/80 dark:from-orange-900/80 dark:to-pink-950/80"
-          ];
-          const cardBg = cardBgVariants[idx % 3];
-          const cardClass = `min-h-[160px] h-[160px] max-h-[160px] w-full rounded-xl shadow-xl border-none flex flex-col justify-between hover:scale-[1.03] transition-transform ${cardBg}`;
-          return stat.href ? (
-            <Link href={stat.href} key={stat.titleKey} className="block hover:no-underline">
-              <Card className={cardClass}>
-                {renderStatCardContent(stat)}
-              </Card>
-            </Link>
-          ) : (
-            <Card key={stat.titleKey} className={cardClass}>
-              {renderStatCardContent(stat)}
-            </Card>
-          );
-        })}
-      </div>
+      
+      <DashboardStats stats={stats} />
 
       <div className="mt-6 grid gap-4 md:grid-cols-1 lg:grid-cols-2">
         <Card className="shadow-xl relative bg-gradient-to-br from-blue-600/80 to-indigo-700/80 dark:from-blue-900/80 dark:to-indigo-950/80 text-primary-foreground">
@@ -303,13 +337,13 @@ export default function DashboardPage() {
                   </>
                 )
               ) : (
-                 <>
+                <>
                   <Activity className="w-12 h-12 mx-auto mb-2 text-muted-foreground" />
                   <p className="font-semibold">{t('dashboard.viewCalendarToSeeWorkout', { default: "Your scheduled workout will appear here." })}</p>
-                 </>
+                </>
               )}
             </div>
-            
+
             {isMounted && languageContextIsClient && upcomingWorkouts.length > 0 && (
               <>
                 <Separator className="my-4 bg-primary-foreground/30" />
@@ -318,9 +352,9 @@ export default function DashboardPage() {
                     {t('dashboard.upcomingWorkoutsTitle', { default: 'Upcoming Workouts' })}
                   </h4>
                   {upcomingWorkouts.length > 2 && (
-                    <Button 
-                      variant="ghost" 
-                      size="icon" 
+                    <Button
+                      variant="ghost"
+                      size="icon"
                       onClick={() => setShowAllUpcoming(!showAllUpcoming)}
                       className="text-primary-foreground hover:bg-white/20 hover:text-primary-foreground"
                     >
@@ -346,16 +380,16 @@ export default function DashboardPage() {
               </>
             )}
 
-            <Link 
-              href="/calendar" 
-              className="absolute bottom-3 right-3 text-white hover:text-accent transition-colors focus:outline-none focus:ring-2 focus:ring-accent focus:ring-offset-2 focus:ring-offset-background rounded-sm p-1" 
+            <Link
+              href="/calendar"
+              className="absolute bottom-3 right-3 text-white hover:text-accent transition-colors focus:outline-none focus:ring-2 focus:ring-accent focus:ring-offset-2 focus:ring-offset-background rounded-sm p-1"
               aria-label={t('dashboard.viewFullSchedule', { default: "View Full Schedule" })}
             >
               <Calendar className="w-5 h-5" />
               <span className="sr-only">{t('dashboard.viewFullSchedule', { default: "View Full Schedule" })}</span>
             </Link>
           </CardContent>
-          
+
           <Link
             href="/start-workout"
             className="md:hidden absolute z-10 bottom-0 left-1/2 -translate-x-1/2 translate-y-1/2
@@ -404,6 +438,15 @@ export default function DashboardPage() {
           </CardContent>
         </Card>
       </div>
-    </>
+      
+      {/* Lazy loaded components */}
+      <ErrorBoundary fallback={<div className="text-muted-foreground text-sm">Charts unavailable</div>}>
+        <ProgressChart />
+      </ErrorBoundary>
+      
+      <ErrorBoundary fallback={<div className="text-muted-foreground text-sm">AI recommendations unavailable</div>}>
+        <AIRecommendations />
+      </ErrorBoundary>
+    </ErrorBoundary>
   );
 }
