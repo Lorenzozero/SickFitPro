@@ -1,9 +1,9 @@
-'use client';
+"use client";
 
 import { useMemo } from 'react';
 import dynamic from 'next/dynamic';
 import { PageHeader } from '@/components/shared/page-header';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { TrendingUp, Weight, PlayCircle, Users, Activity, Clock, Calendar, ChevronDown, ChevronUp } from 'lucide-react';
 import Link from 'next/link';
@@ -19,13 +19,14 @@ import { useAuth } from '@/lib/auth/auth-context';
 import { FirebaseProvider } from '@/lib/data/firebase-provider';
 import { toast } from 'sonner';
 import { ErrorBoundary } from '@/components/error-boundary';
-import { ProgressPanel } from '@/components/progress';
 
+// Lazy load AI components if they exist
 const AIRecommendations = dynamic(
   () => import('@/components/ai/recommendations').catch(() => ({ default: () => null })),
   { ssr: false }
 );
 
+// Lazy load chart components if they exist
 const ProgressChart = dynamic(
   () => import('@/components/charts/progress-chart').catch(() => ({ default: () => null })),
   { ssr: false, loading: () => <div className="h-32 bg-muted/50 rounded animate-pulse" /> }
@@ -241,40 +242,15 @@ export default function DashboardPage() {
   }).length;
 
   const stats = useMemo(() => [
-    {
-      titleKey: 'dashboard.workoutsThisWeek',
-      title: t('dashboard.workoutsThisWeek', { default: 'Workouts This Week' }),
-      value: `${completedWorkoutsThisWeek}/${totalScheduledWorkoutsThisWeek}`,
-      icon: Users,
-      color: 'text-accent',
-      href: '/calendar'
-    },
-    {
-      titleKey: 'dashboard.weightLifted',
-      title: t('dashboard.weightLifted', { default: 'Weight Lifted' }),
-      value: '0 kg',
-      icon: TrendingUp,
-      color: 'text-green-500',
-      href: '/progress'
-    },
-    {
-      titleKey: 'dashboard.currentWeight',
-      title: t('dashboard.currentWeight', { default: 'Current Weight' }),
-      value: currentWeight,
-      icon: Weight,
-      color: 'text-orange-500',
-      href: '/diet'
-    },
+    { titleKey: 'dashboard.workoutsThisWeek', title: t('dashboard.workoutsThisWeek', { default: 'Workouts This Week' }), value: `${completedWorkoutsThisWeek}/${totalScheduledWorkoutsThisWeek}`, icon: Users, color: 'text-accent', href: '/calendar' },
+    { titleKey: 'dashboard.weightLifted', title: t('dashboard.weightLifted', { default: 'Weight Lifted' }), value: '0 kg', icon: TrendingUp, color: 'text-green-500', href: '/progress' },
+    { titleKey: 'dashboard.currentWeight', title: t('dashboard.currentWeight', { default: 'Current Weight' }), value: currentWeight, icon: Weight, color: 'text-orange-500', href: '/diet' },
   ], [completedWorkoutsThisWeek, totalScheduledWorkoutsThisWeek, currentWeight, t]);
 
   const formatDateHistory = (dateString: string) => {
     if (!isMounted || !languageContextIsClient) return dateString;
-    const date = new Date(dateString includes('T') ? dateString : dateString + 'T00:00:00');
-    return date.toLocaleDateString(language, {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric',
-    });
+    const date = new Date(dateString.includes('T') ? dateString : dateString + 'T00:00:00');
+    return date.toLocaleDateString(language, { year: 'numeric', month: 'short', day: 'numeric' });
   };
 
   const displayedUpcomingWorkouts = showAllUpcoming ? upcomingWorkouts : upcomingWorkouts.slice(0, 2);
@@ -297,11 +273,7 @@ export default function DashboardPage() {
 
   return (
     <ErrorBoundary>
-      <PageHeader
-        title={t('dashboard.welcomeTitle', { default: 'Welcome to SickFit Pro!' })}
-        description=""
-      />
-      
+      <PageHeader title={t('dashboard.welcomeTitle', { default: 'Welcome to SickFit Pro!' })} description="" />
       <DashboardStats stats={stats} />
 
       <div className="mt-6 grid gap-4 md:grid-cols-1 lg:grid-cols-2">
@@ -311,13 +283,38 @@ export default function DashboardPage() {
               {t('dashboard.todaysFocus', { default: "Today's Focus" })}
             </CardTitle>
           </CardHeader>
-
           <CardContent className="relative">
             <div className="text-center border-2 border-dashed rounded-lg border-primary-foreground/50 min-h-[120px] flex flex-col justify-center p-4" data-ai-hint="workout routine">
-              {/* ...omitted for brevity... */}
+              {/* ... workout details ... */}
             </div>
 
-            {/* ...omitted for brevity... */}
+            {isMounted && languageContextIsClient && upcomingWorkouts.length > 0 && (
+              <>
+                <Separator className="my-4 bg-primary-foreground/30" />
+                <div className="flex justify-between items-center mb-3">
+                  <h4 className="text-md font-semibold text-center flex-grow">
+                    {t('dashboard.upcomingWorkoutsTitle', { default: 'Upcoming Workouts' })}
+                  </h4>
+                  {upcomingWorkouts.length > 2 && (
+                    <Button variant="ghost" size="icon" aria-label={showAllUpcoming ? 'Collapse upcoming workouts' : 'Expand upcoming workouts'} onClick={() => setShowAllUpcoming(!showAllUpcoming)} className="text-primary-foreground hover:bg-white/20 hover:text-primary-foreground">
+                      {showAllUpcoming ? <ChevronUp className="w-5 h-5" /> : <ChevronDown className="w-5 h-5" />}
+                    </Button>
+                  )}
+                </div>
+                <div className="grid gap-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-2 xl:grid-cols-3">
+                  {displayedUpcomingWorkouts.map(workout => (
+                    <Card key={workout.id} className="p-2.5 bg-black/10 dark:bg-white/10 hover:shadow-md transition-shadow text-xs text-primary-foreground">
+                      {/* ... upcoming workout card ... */}
+                    </Card>
+                  ))}
+                </div>
+              </>
+            )}
+
+            <Link href="/calendar" className="absolute bottom-3 right-3 text-white hover:text-accent transition-colors focus:outline-none focus:ring-2 focus:ring-accent focus:ring-offset-2 focus:ring-offset-background rounded-sm p-1" aria-label={t('dashboard.viewFullSchedule', { default: "View Full Schedule" })}>
+              <Calendar className="w-5 h-5" />
+              <span className="sr-only">{t('dashboard.viewFullSchedule', { default: "View Full Schedule" })}</span>
+            </Link>
           </CardContent>
 
           <Link href="/start-workout" className="md:hidden absolute z-10 bottom-0 left-1/2 -translate-x-1/2 translate-y-1/2 bg-primary text-primary-foreground hover:bg-primary/90 rounded-full w-14 h-14 flex items-center justify-center shadow-xl focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background" aria-label={t('dashboard.logNewWorkout', { default: 'Start Workout' })} data-ai-hint="start-workout-fab">
@@ -330,24 +327,18 @@ export default function DashboardPage() {
             <CardTitle>{t('dashboard.activityAndHistoryTitle', { default: "Activity & History" })}</CardTitle>
           </CardHeader>
           <CardContent className="text-primary-foreground">
-            {/* ...omitted for brevity... */}
+            {/* ... activity & history list ... */}
           </CardContent>
         </Card>
       </div>
       
+      {/* Lazy loaded components */}
       <ErrorBoundary fallback={<div className="text-muted-foreground text-sm">Charts unavailable</div>}>
         <ProgressChart />
       </ErrorBoundary>
       
       <ErrorBoundary fallback={<div className="text-muted-foreground text-sm">AI recommendations unavailable</div>}>
         <AIRecommendations />
-      </ErrorBoundary>
-
-      {/* Integrated ProgressPanel in dashboard below the fold for quick access */}
-      <ErrorBoundary fallback={<div className="text-muted-foreground text-sm">Progress unavailable</div>}>
-        <div className="mt-8">
-          <ProgressPanel />
-        </div>
       </ErrorBoundary>
     </ErrorBoundary>
   );
