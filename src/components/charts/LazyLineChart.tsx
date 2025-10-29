@@ -3,11 +3,11 @@ import React from 'react';
 
 // Utility to create safe dynamic imports for Recharts components
 // This prevents TypeScript errors with defaultProps type incompatibilities
-function createSafeDynamic<T = any>(componentName: string) {
+function createSafeDynamic(componentName: string) {
   return dynamic(async () => {
     const recharts = await import('recharts');
     const Component = (recharts as any)[componentName];
-    const WrappedComponent = (props: T) => React.createElement(Component, props);
+    const WrappedComponent = (props: React.ComponentProps<any>) => React.createElement(Component, props);
     return WrappedComponent;
   }, { ssr: false });
 }
