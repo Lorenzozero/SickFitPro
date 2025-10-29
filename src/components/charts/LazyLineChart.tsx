@@ -4,11 +4,17 @@ import React from 'react';
 // Lazy load heavy Recharts components only on client
 const ResponsiveContainer = dynamic(() => import('recharts').then(m => m.ResponsiveContainer), { ssr: false });
 const LineChart = dynamic(() => import('recharts').then(m => m.LineChart), { ssr: false });
-const Line = dynamic(() => import('recharts').then(m => m.Line), { ssr: false });
 const XAxis = dynamic(() => import('recharts').then(m => m.XAxis), { ssr: false });
 const YAxis = dynamic(() => import('recharts').then(m => m.YAxis), { ssr: false });
 const Tooltip = dynamic(() => import('recharts').then(m => m.Tooltip), { ssr: false });
 const CartesianGrid = dynamic(() => import('recharts').then(m => m.CartesianGrid), { ssr: false });
+
+// Wrap Line to avoid TS type incompatibility on dynamic import
+const Line = dynamic(async () => {
+  const recharts = await import('recharts');
+  const LineWrapped = (props: any) => <recharts.Line {...props} />;
+  return LineWrapped;
+}, { ssr: false });
 
 export interface LazyLineChartProps {
   data: Array<Record<string, number | string>>;
