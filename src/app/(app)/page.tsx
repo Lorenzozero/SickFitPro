@@ -20,13 +20,11 @@ import { FirebaseProvider } from '@/lib/data/firebase-provider';
 import { toast } from 'sonner';
 import { ErrorBoundary } from '@/components/error-boundary';
 
-// Lazy load AI components if they exist
 const AIRecommendations = dynamic(
   () => import('@/components/ai/recommendations').catch(() => ({ default: () => null })),
   { ssr: false }
 );
 
-// Lazy load chart components if they exist
 const ProgressChart = dynamic(
   () => import('@/components/charts/progress-chart').catch(() => ({ default: () => null })),
   { ssr: false, loading: () => <div className="h-32 bg-muted/50 rounded animate-pulse" /> }
@@ -355,6 +353,7 @@ export default function DashboardPage() {
                     <Button
                       variant="ghost"
                       size="icon"
+                      aria-label={showAllUpcoming ? 'Collapse upcoming workouts' : 'Expand upcoming workouts'}
                       onClick={() => setShowAllUpcoming(!showAllUpcoming)}
                       className="text-primary-foreground hover:bg-white/20 hover:text-primary-foreground"
                     >
@@ -412,7 +411,7 @@ export default function DashboardPage() {
                 <ul className="space-y-2 pr-3">
                   {actualWorkoutHistory.map((item, index) => (
                     <li key={item.id}>
-                      <div className="flex items-center justify-between p-2 rounded-md bg-black/10 dark:bg-white/10 hover:bg-black/20 dark:hover:bg-white/20 transition-colors">
+                      <div className="flex items-center justify-between p-2 rounded-md bg-black/10 dark:bg白/10 hover:bg-black/20 dark:hover:bg-white/20 transition-colors">
                         <div className="flex-grow">
                           <p className="font-semibold text-primary-foreground">
                             {item.planName}
