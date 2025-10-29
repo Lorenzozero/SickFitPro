@@ -1,10 +1,13 @@
-// Minimal shared types to support data layer and dashboard migration
-export interface Workout { id: string; userId: string; name: string; duration?: string }
-export interface WorkoutSession { id: string; userId: string; workoutId: string; planName: string; completionDate: string; duration: string }
-export interface ScheduledWorkout { id: string; planId: string; planName: string; dateISO?: string }
-export interface DashboardData {
-  sessions: WorkoutSession[];
-  upcomingWorkouts: ScheduledWorkout[];
-  currentWeight?: number;
-  weeklyStats: { completedWorkouts: number; totalScheduled: number };
-}
+// Centralized types inferred from Zod schemas
+import { z } from 'zod';
+import { 
+  WorkoutSchema, 
+  WorkoutSessionSchema, 
+  ScheduledWorkoutSchema, 
+  DashboardDataSchema 
+} from './validation/schemas';
+
+export type Workout = z.infer<typeof WorkoutSchema>;
+export type WorkoutSession = z.infer<typeof WorkoutSessionSchema>;
+export type ScheduledWorkout = z.infer<typeof ScheduledWorkoutSchema>;
+export type DashboardData = z.infer<typeof DashboardDataSchema>;
