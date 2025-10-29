@@ -1,27 +1,21 @@
-
 'use client';
 
+import { Suspense } from 'react';
 import { PageHeader } from '@/components/shared/page-header';
-import WaterIntakeCard from '@/components/dashboard/water-intake-card';
-import MacroTrackingCard from '@/components/dashboard/macro-tracking-card';
-import AiHealthAdvisorForm from '@/components/forms/nutritional-analysis-form';
+import { ErrorBoundary } from '@/components/error-boundary';
+import { DietPanel } from '@/components/diet';
 import { useLanguage } from '@/context/language-context';
-import SupplementTrackerCard from '@/components/diet/supplement-tracker-card'; // Importa il nuovo componente
 
 export default function DietPage() {
   const { t } = useLanguage();
-
   return (
     <>
-      <PageHeader
-        title={t('dietPage.title')}
-      />
-      <div className="space-y-6">
-        <WaterIntakeCard />
-        <MacroTrackingCard />
-        <SupplementTrackerCard /> {/* Aggiungi il nuovo componente qui */}
-        <AiHealthAdvisorForm />
-      </div>
+      <PageHeader title={t('dietPage.title', { default: 'Diet' })} description={t('dietPage.subtitle', { default: 'Set your daily macro targets and track meals' })} />
+      <ErrorBoundary fallback={<div className="text-sm text-muted-foreground">Diet unavailable</div>}>
+        <Suspense fallback={<div className="h-48 rounded bg-muted/40 animate-pulse" />}> 
+          <DietPanel />
+        </Suspense>
+      </ErrorBoundary>
     </>
   );
 }
