@@ -9,7 +9,7 @@ const ThemeProvider = dynamic(() => import('@/components/theme-provider').then(m
 const LanguageProvider = dynamic(() => import('@/context/language-context').then(mod => ({ default: mod.LanguageProvider })), { ssr: false });
 const ActiveWorkoutProvider = dynamic(() => import('@/context/active-workout-context').then(mod => ({ default: mod.ActiveWorkoutProvider })), { ssr: false });
 const WeeklyScheduleProvider = dynamic(() => import('@/context/weekly-schedule-context').then(mod => ({ default: mod.WeeklyScheduleProvider })), { ssr: false });
-const AuthProvider = dynamic(() => import('@/lib/auth/auth-context').then(mod => ({ default: mod.AuthProvider })), { ssr: false });
+import { AuthProvider } from '@/lib/auth/auth-context';
 
 // Create QueryClient outside component to prevent recreation
 let queryClient: QueryClient | null = null;

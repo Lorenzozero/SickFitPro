@@ -63,10 +63,10 @@ export default function DietPanel() {
         <CardContent>
           <div className="grid grid-cols-1 sm:grid-cols-5 gap-3 mb-3">
             <Input placeholder={t('diet.mealName', { default: 'Meal name' })} value={newMeal.name || ''} onChange={e => setNewMeal(v => ({ ...v, name: e.target.value }))} />
-            <Input placeholder={t('diet.cal', { default: 'kcal' })} type="number" value={newMeal.calories as any || ''} onChange={e => setNewMeal(v => ({ ...v, calories: e.target.value }))} />
-            <Input placeholder="P" type="number" value={newMeal.protein as any || ''} onChange={e => setNewMeal(v => ({ ...v, protein: e.target.value }))} />
-            <Input placeholder="C" type="number" value={newMeal.carbs as any || ''} onChange={e => setNewMeal(v => ({ ...v, carbs: e.target.value }))} />
-            <Input placeholder="F" type="number" value={newMeal.fats as any || ''} onChange={e => setNewMeal(v => ({ ...v, fats: e.target.value }))} />
+            <Input placeholder={t('diet.cal', { default: 'kcal' })} type="number" value={newMeal.calories || ''} onChange={e => setNewMeal(v => ({ ...v, calories: Number(e.target.value) }))} />
+            <Input placeholder="P" type="number" value={newMeal.protein || ''} onChange={e => setNewMeal(v => ({ ...v, protein: Number(e.target.value) }))} />
+            <Input placeholder="C" type="number" value={newMeal.carbs || ''} onChange={e => setNewMeal(v => ({ ...v, carbs: Number(e.target.value) }))} />
+            <Input placeholder="F" type="number" value={newMeal.fats || ''} onChange={e => setNewMeal(v => ({ ...v, fats: Number(e.target.value) }))} />
           </div>
           <Button onClick={onAddMeal}>{t('diet.addMeal', { default: 'Add Meal' })}</Button>
 
