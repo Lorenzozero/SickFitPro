@@ -1,20 +1,25 @@
 import dynamic from 'next/dynamic';
 import React from 'react';
 
-// Lazy load heavy Recharts components only on client
-const ResponsiveContainer = dynamic(() => import('recharts').then(m => m.ResponsiveContainer), { ssr: false });
-const LineChart = dynamic(() => import('recharts').then(m => m.LineChart), { ssr: false });
-const XAxis = dynamic(() => import('recharts').then(m => m.XAxis), { ssr: false });
-const YAxis = dynamic(() => import('recharts').then(m => m.YAxis), { ssr: false });
-const Tooltip = dynamic(() => import('recharts').then(m => m.Tooltip), { ssr: false });
-const CartesianGrid = dynamic(() => import('recharts').then(m => m.CartesianGrid), { ssr: false });
+// Utility to create safe dynamic imports for Recharts components
+// This prevents TypeScript errors with defaultProps type incompatibilities
+function createSafeDynamic<T = any>(componentName: string) {
+  return dynamic(async () => {
+    const recharts = await import('recharts');
+    const Component = (recharts as any)[componentName];
+    const WrappedComponent = (props: T) => React.createElement(Component, props);
+    return WrappedComponent;
+  }, { ssr: false });
+}
 
-// Wrap Line to avoid TS type incompatibility on dynamic import
-const Line = dynamic(async () => {
-  const recharts = await import('recharts');
-  const LineWrapped = (props: any) => <recharts.Line {...props} />;
-  return LineWrapped;
-}, { ssr: false });
+// Lazy load heavy Recharts components only on client with safe wrappers
+const ResponsiveContainer = createSafeDynamic('ResponsiveContainer');
+const LineChart = createSafeDynamic('LineChart');
+const XAxis = createSafeDynamic('XAxis');
+const YAxis = createSafeDynamic('YAxis');
+const Tooltip = createSafeDynamic('Tooltip');
+const CartesianGrid = createSafeDynamic('CartesianGrid');
+const Line = createSafeDynamic('Line');
 
 export interface LazyLineChartProps {
   data: Array<Record<string, number | string>>;
