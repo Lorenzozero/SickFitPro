@@ -17,7 +17,8 @@
     "security:audit": "npm audit --audit-level moderate",
     "docker:build": "docker build -t sickfit-pro .",
     "docker:run": "docker-compose up -d",
-    "docker:stop": "docker-compose down"
+    "docker:stop": "docker-compose down",
+    "rtdb:rules:deploy": "firebase deploy --only database --project=$FIREBASE_PROJECT"
   },
   "dependencies": {
     "@fontsource/exo": "^5.2.5",
@@ -87,5 +88,8 @@
     "tsx": "^4.20.5",
     "typescript": "^5",
     "vitest": "^3.2.4"
+  },
+  "overrides": {
+    "@types/node": "^22.12.0"
   }
 }
