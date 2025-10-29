@@ -5,40 +5,32 @@ import { useAuth } from '@/lib/auth/auth-context';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { z } from 'zod';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
 
-function mapFirebaseError(code?: string) {
-  switch (code) {
-    case 'auth/invalid-email':
-      return 'Email non valida';
-    case 'auth/user-disabled':
-      return 'Account disabilitato';
-    case 'auth/user-not-found':
-      return 'Utente non trovato';
-    case 'auth/wrong-password':
-      return 'Password errata';
-    case 'auth/too-many-requests':
-      return 'Troppi tentativi, riprova più tardi';
-    default:
-      return 'Accesso non riuscito, riprova';
-  }
-}
+const LoginSchema = z.object({
+  email: z.string().email('Please enter a valid email address'),
+  password: z.string().min(6, 'Password must be at least 6 characters'),
+});
+
+type LoginForm = z.infer<typeof LoginSchema>;
 
 export default function LoginPage() {
-  const { signIn, loading } = useAuth();
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [error, setError] = useState<string | null>(null);
+  const { signIn, loading, error: authError } = useAuth();
+  const {
+    register,
+    handleSubmit,
+    formState: { errors, isSubmitting },
+  } = useForm<LoginForm>({
+    resolver: zodResolver(LoginSchema),
+  });
 
-  const onSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setError(null);
-    try {
-      await signIn(email, password);
-    } catch (err: any) {
-      const code = err?.code as string | undefined;
-      setError(mapFirebaseError(code));
-    }
+  const onSubmit = async (data: LoginForm) => {
+    await signIn(data);
   };
+
+  const isLoading = loading || isSubmitting;
 
   return (
     <div className="min-h-[70vh] flex items-center justify-center p-4">
@@ -47,17 +39,51 @@ export default function LoginPage() {
           <CardTitle>Sign in</CardTitle>
         </CardHeader>
         <CardContent>
-          <form onSubmit={onSubmit} className="space-y-3" aria-live="polite">
+          <form onSubmit={handleSubmit(onSubmit)} className="space-y-4" noValidate>
             <div>
-              <label className="block text-sm mb-1" htmlFor="email">Email</label>
-              <Input id="email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} required disabled={loading} />
+              <label className="block text-sm font-medium mb-1" htmlFor="email">
+                Email
+              </label>
+              <Input
+                id="email"
+                type="email"
+                {...register('email')}
+                disabled={isLoading}
+                aria-invalid={!!errors.email}
+                aria-describedby={errors.email ? 'email-error' : undefined}
+              />
+              {errors.email && (
+                <p id="email-error" className="text-sm text-red-500 mt-1" role="alert">
+                  {errors.email.message}
+                </p>
+              )}
             </div>
             <div>
-              <label className="block text-sm mb-1" htmlFor="password">Password</label>
-              <Input id="password" type="password" value={password} onChange={(e) => setPassword(e.target.value)} required disabled={loading} />
+              <label className="block text-sm font-medium mb-1" htmlFor="password">
+                Password
+              </label>
+              <Input
+                id="password"
+                type="password"
+                {...register('password')}
+                disabled={isLoading}
+                aria-invalid={!!errors.password}
+                aria-describedby={errors.password ? 'password-error' : undefined}
+              />
+              {errors.password && (
+                <p id="password-error" className="text-sm text-red-500 mt-1" role="alert">
+                  {errors.password.message}
+                </p>
+              )}
             </div>
-            {error && <p className="text-sm text-red-500" role="alert">{error}</p>}
-            <Button type="submit" disabled={loading} className="w-full">{loading ? 'Signing in…' : 'Sign in'}</Button>
+            {authError && (
+              <p className="text-sm text-red-500" role="alert">
+                {authError.message}
+              </p>
+            )}
+            <Button type="submit" disabled={isLoading} className="w-full">
+              {isLoading ? 'Signing in…' : 'Sign in'}
+            </Button>
           </form>
         </CardContent>
       </Card>
