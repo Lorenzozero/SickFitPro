@@ -4,17 +4,18 @@ import { Geist, Geist_Mono } from 'next/font/google';
 import './globals.css';
 import { ErrorBoundary } from '@/components/error-boundary';
 import { Providers } from '@/components/providers';
+import ReadonlyBanner from '@/components/shared/readonly-banner';
 
 const geistSans = Geist({ 
   variable: '--font-geist-sans', 
   subsets: ['latin'],
-  display: 'swap' // Optimize font loading
+  display: 'swap'
 });
 
 const geistMono = Geist_Mono({ 
   variable: '--font-geist-mono', 
   subsets: ['latin'],
-  display: 'swap' // Optimize font loading
+  display: 'swap'
 });
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
@@ -24,6 +25,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <a href="#main-content" className="sr-only focus:not-sr-only focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 focus:ring-offset-background px-3 py-2">
           Skip to content
         </a>
+        <ReadonlyBanner />
         <ErrorBoundary>
           <Providers>
             {children}
