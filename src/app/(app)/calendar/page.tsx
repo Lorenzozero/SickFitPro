@@ -27,6 +27,9 @@ import { useLanguage } from '@/context/language-context';
 import { useToast } from '@/hooks/use-toast';
 import { useWeeklySchedule, type ScheduledWorkout, type WorkoutPlanOption, dayKeys } from '@/context/weekly-schedule-context';
 import { Skeleton } from '@/components/ui/skeleton';
+import { useAuth } from '@/context/auth-context';
+import { FirebaseProvider } from '@/lib/data/firebase-provider';
+import { toast } from 'sonner';
 
 
 interface DayScheduleContentProps {
@@ -272,3 +275,5 @@ export default function CalendarPage() {
     </>
   );
 }
+
+

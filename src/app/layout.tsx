@@ -1,3 +1,4 @@
+"use client";
 import type { Metadata } from 'next';
 import { Geist, Geist_Mono } from 'next/font/google';
 import './globals.css';
@@ -8,15 +9,12 @@ import { ActiveWorkoutProvider } from '@/context/active-workout-context';
 import { WeeklyScheduleProvider } from '@/context/weekly-schedule-context';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { useState } from 'react';
-import { AuthProvider } from '@/lib/auth';
+import { AuthProvider } from '@/lib/auth/auth-context';
+
+import { metadata } from './metadata';
 
 const geistSans = Geist({ variable: '--font-geist-sans', subsets: ['latin'] });
 const geistMono = Geist_Mono({ variable: '--font-geist-mono', subsets: ['latin'] });
-
-export const metadata: Metadata = {
-  title: 'SickFit Pro',
-  description: 'Il tuo compagno di fitness definitivo per allenamenti personalizzati e monitoraggio dei progressi.',
-};
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   const [queryClient] = useState(() => new QueryClient());

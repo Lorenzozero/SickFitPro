@@ -3,7 +3,10 @@ import { ref, get, query, orderByChild, equalTo, limitToLast } from 'firebase/da
 import type { DashboardData, Workout, WorkoutSession, ScheduledWorkout } from '../types';
 import * as Sentry from '@sentry/nextjs';
 
-export async function fetchWorkoutsRT(uid: string): Promise<Workout[]> {
+import type { User } from 'firebase/auth';
+
+export async function fetchWorkoutsRT(user: User): Promise<Workout[]> {
+  const uid = user.uid;
   try {
     const q = query(ref(rtdb, 'workouts'), orderByChild('userId'), equalTo(uid), limitToLast(100));
     const snap = await get(q);
@@ -16,7 +19,8 @@ export async function fetchWorkoutsRT(uid: string): Promise<Workout[]> {
   }
 }
 
-export async function fetchDashboardRT(uid: string): Promise<DashboardData> {
+export async function fetchDashboardRT(user: User): Promise<DashboardData> {
+  const uid = user.uid;
   try {
     const sessionsQ = query(ref(rtdb, 'workout_sessions'), orderByChild('userId'), equalTo(uid), limitToLast(20));
     const sessionsSnap = await get(sessionsQ);

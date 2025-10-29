@@ -12,7 +12,10 @@ import { Separator } from '@/components/ui/separator';
 import { useWeeklySchedule, dayKeys, type WorkoutPlanOption } from '@/context/weekly-schedule-context';
 import { addDays, format as formatDateFn } from 'date-fns';
 import { it as dateFnsIt, es as dateFnsEs, fr as dateFnsFr, enUS as dateFnsEnUs } from 'date-fns/locale';
-import type { WorkoutSession } from '@/lib/types';
+import type { WorkoutSession, DashboardData } from '@/lib/types';
+import { useAuth } from '@/context/auth-context';
+import { FirebaseProvider } from '@/lib/data/firebase-provider';
+import { toast } from 'sonner';
 
 const WORKOUT_HISTORY_STORAGE_KEY = 'sickfit-pro-workoutHistory';
 
@@ -50,6 +53,10 @@ export default function DashboardPage() {
   const [upcomingWorkouts, setUpcomingWorkouts] = useState<UpcomingWorkoutDisplayItem[]>([]);
   const [showAllUpcoming, setShowAllUpcoming] = useState(false);
   const [actualWorkoutHistory, setActualWorkoutHistory] = useState<WorkoutSession[]>([]);
+  const [isLoadingDashboard, setIsLoadingDashboard] = useState(true);
+  const [dashboardError, setDashboardError] = useState<string | null>(null);
+
+  const { user } = useAuth();
 
   useEffect(() => {
     setIsMounted(true);
@@ -69,6 +76,37 @@ export default function DashboardPage() {
         }
     }
   }, []);
+
+  useEffect(() => {
+    if (!user) {
+      setIsLoadingDashboard(false);
+      setDashboardError('User not authenticated');
+      return;
+    }
+
+    const fetchDashboardData = async () => {
+      setIsLoadingDashboard(true);
+      setDashboardError(null);
+      try {
+        const provider = new FirebaseProvider();
+        const data: DashboardData = await provider.getDashboard(user);
+        setActualWorkoutHistory(data.sessions);
+        if (data.currentWeight) {
+          setCurrentWeight(`${data.currentWeight} kg`);
+        }
+        // Note: upcomingWorkouts is still calculated based on weeklySchedule, not directly from dashboard data
+        // If upcomingWorkouts should come from RTDB, this logic needs to be adjusted.
+      } catch (err) {
+        console.error("Error fetching dashboard data:", err);
+        setDashboardError('Failed to load dashboard data.');
+        toast.error('Failed to load dashboard data.', { description: (err as Error).message });
+      } finally {
+        setIsLoadingDashboard(false);
+      }
+    };
+
+    fetchDashboardData();
+  }, [user]);
 
   const today = useMemo(() => {
     if (!isMounted) return null;
@@ -187,6 +225,22 @@ export default function DashboardPage() {
   );
 
   const displayedUpcomingWorkouts = showAllUpcoming ? upcomingWorkouts : upcomingWorkouts.slice(0, 2);
+
+  if (isLoadingDashboard) {
+    return (
+      <div className="flex justify-center items-center h-screen">
+        <p>Loading dashboard...</p>
+      </div>
+    );
+  }
+
+  if (dashboardError) {
+    return (
+      <div className="flex justify-center items-center h-screen text-red-500">
+        <p>{dashboardError}</p>
+      </div>
+    );
+  }
 
   return (
     <>
@@ -341,7 +395,12 @@ export default function DashboardPage() {
                   ))}
                 </ul>
               </ScrollArea>
-            ) : null}
+            ) : (
+              <div className="flex flex-col items-center justify-center h-full text-center text-muted-foreground">
+                <Activity className="w-12 h-12 mb-2" />
+                <p>{t('dashboard.noWorkoutHistory', { default: 'No workout history yet. Start a workout to see your progress!' })}</p>
+              </div>
+            )}
           </CardContent>
         </Card>
       </div>

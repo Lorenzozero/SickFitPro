@@ -14,6 +14,7 @@ import { useLanguage } from '@/context/language-context';
 import { useEffect, useState, useMemo } from 'react';
 import Image from 'next/image';
 import { useToast } from '@/hooks/use-toast';
+import { useSaveSession } from '@/hooks/use-save-session';
 import { cn } from '@/lib/utils';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useActiveWorkout } from '@/context/active-workout-context';
@@ -286,6 +287,7 @@ export default function ActiveWorkoutPage() {
   const router = useRouter();
   const { t, isClient: languageContextIsClient } = useLanguage();
   const { toast } = useToast();
+const { saveSession, isLoading: isSaving, error: saveError } = useSaveSession();
   const {
     activePlanId: contextActivePlanId,
     activePlanName: contextActivePlanName,
@@ -431,7 +433,7 @@ export default function ActiveWorkoutPage() {
     toast({ title: t('activeWorkoutPage.toastSetDeletedTitle'), variant: 'destructive', duration: 1000 });
   };
 
-  const handleFinishWorkout = () => {
+  const handleFinishWorkout = async () => {
     if (!languageContextIsClient || !plan) return;
 
     const completedExercisesData: CompletedExerciseDetail[] = activeWorkout
@@ -444,13 +446,11 @@ export default function ActiveWorkoutPage() {
         }))
       : [];
 
-    const completedWorkoutData: CompletedWorkout = {
-      id: String(Date.now()),
-      planId: plan.id,
-      planName: contextActivePlanName || plan.name, // Use contextActivePlanName if available
-      completionDate: new Date().toISOString().split('T')[0],
-      duration: elapsedTime,
-      exercises: completedExercisesData,
+    const completedSession: CompletedWorkout = {
+      ...session,
+      userId: user.uid,
+      workoutId: planId,
+      completionDate: new Date().toISOString().split('T')[0]
     };
 
     if (typeof window !== 'undefined') {
@@ -466,6 +466,19 @@ export default function ActiveWorkoutPage() {
       }
       history.unshift(completedWorkoutData); // Add to the beginning
       localStorage.setItem(WORKOUT_HISTORY_STORAGE_KEY, JSON.stringify(history.slice(0, 20))); // Keep last 20
+
+      try {
+        // Salva su Firebase
+        await saveSession(completedWorkoutData);
+      } catch (e) {
+        console.error("Error saving workout session to Firebase", e);
+        toast({
+          title: t('activeWorkoutPage.toastSaveErrorTitle'),
+          description: t('activeWorkoutPage.toastSaveErrorDescription'),
+          variant: 'destructive',
+        });
+        return; // Stop further processing if save to Firebase fails
+      }
     }
 
     // Perform comparison for summary
@@ -753,7 +766,7 @@ export default function ActiveWorkoutPage() {
                 >
                   {t('calendarPage.cancelButton')}
                 </AlertDialogCancel>
-                <AlertDialogAction onClick={handleFinishWorkout} className="text-black dark:text-black">{t('activeWorkoutPage.confirmFinishButton')}</AlertDialogAction>
+                <AlertDialogAction onClick={handleFinishWorkout} disabled={isSaving} className="text-black dark:text-black">{t('activeWorkoutPage.confirmFinishButton')}</AlertDialogAction>
               </AlertDialogFooter>
             </AlertDialogContent>
           </AlertDialog>
@@ -761,4 +774,4 @@ export default function ActiveWorkoutPage() {
       )}
     </>
   );
-}
+}
