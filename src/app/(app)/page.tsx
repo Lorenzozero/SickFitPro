@@ -179,6 +179,10 @@ export default function DashboardPage() {
     });
   }, [isMounted, today, scheduleIsClient, weeklySchedule, availableWorkoutPlans, t]);
 
+  const displayedUpcomingWorkouts = useMemo(() => (
+    showAllUpcoming ? upcomingWorkouts : upcomingWorkouts.slice(0, 2)
+  ), [showAllUpcoming, upcomingWorkouts]);
+
   useEffect(() => {
     if (!isMounted || !scheduleIsClient || !languageContextIsClient) {
       setUpcomingWorkouts([]);
@@ -233,13 +237,15 @@ export default function DashboardPage() {
     return dayKeys.reduce((sum, dayKey) => sum + (weeklySchedule[dayKey]?.length || 0), 0);
   }, [scheduleIsClient, weeklySchedule]);
 
-  const completedWorkoutsThisWeek = actualWorkoutHistory.filter(h => {
-    const completionDate = new Date(h.completionDate + 'T00:00:00');
-    const todayDate = new Date();
-    const startOfWeek = new Date(todayDate.setDate(todayDate.getDate() - todayDate.getDay() + (todayDate.getDay() === 0 ? -6 : 1)));
-    const endOfWeek = new Date(todayDate.setDate(todayDate.getDate() - todayDate.getDay() + 7));
-    return completionDate >= startOfWeek && completionDate <= endOfWeek;
-  }).length;
+  const completedWorkoutsThisWeek = useMemo(() => (
+    actualWorkoutHistory.filter(h => {
+      const completionDate = new Date(h.completionDate + 'T00:00:00');
+      const todayDate = new Date();
+      const startOfWeek = new Date(todayDate.getFullYear(), todayDate.getMonth(), todayDate.getDate() - todayDate.getDay() + (todayDate.getDay() === 0 ? -6 : 1));
+      const endOfWeek = new Date(todayDate.getFullYear(), todayDate.getMonth(), todayDate.getDate() - todayDate.getDay() + 7);
+      return completionDate >= startOfWeek && completionDate <= endOfWeek;
+    }).length
+  ), [actualWorkoutHistory]);
 
   const stats = useMemo(() => [
     { titleKey: 'dashboard.workoutsThisWeek', title: t('dashboard.workoutsThisWeek', { default: 'Workouts This Week' }), value: `${completedWorkoutsThisWeek}/${totalScheduledWorkoutsThisWeek}`, icon: Users, color: 'text-accent', href: '/calendar' },
@@ -252,8 +258,6 @@ export default function DashboardPage() {
     const date = new Date(dateString.includes('T') ? dateString : dateString + 'T00:00:00');
     return date.toLocaleDateString(language, { year: 'numeric', month: 'short', day: 'numeric' });
   };
-
-  const displayedUpcomingWorkouts = showAllUpcoming ? upcomingWorkouts : upcomingWorkouts.slice(0, 2);
 
   if (isLoadingDashboard) {
     return (
@@ -277,6 +281,7 @@ export default function DashboardPage() {
       <DashboardStats stats={stats} />
 
       <div className="mt-6 grid gap-4 md:grid-cols-1 lg:grid-cols-2">
+        {/* Today's Focus */}
         <Card className="shadow-xl relative bg-gradient-to-br from-blue-600/80 to-indigo-700/80 dark:from-blue-900/80 dark:to-indigo-950/80 text-primary-foreground">
           <CardHeader className="relative text-center">
             <CardTitle>
@@ -285,7 +290,33 @@ export default function DashboardPage() {
           </CardHeader>
           <CardContent className="relative">
             <div className="text-center border-2 border-dashed rounded-lg border-primary-foreground/50 min-h-[120px] flex flex-col justify-center p-4" data-ai-hint="workout routine">
-              {/* ... workout details ... */}
+              {isMounted && scheduleIsClient && languageContextIsClient ? (
+                todaysWorkoutsDetails.length > 0 ? (
+                  <>
+                    {todaysWorkoutsDetails.map(workout => (
+                      <div key={workout.id} className="mb-2">
+                        <p className="text-xl font-semibold text-white">{workout.planName}</p>
+                        {workout.duration && (
+                          <div className="flex items-center justify-center text-sm text-muted-foreground mt-1">
+                            <Clock className="w-3.5 h-3.5 mr-1.5" />
+                            <span>{workout.duration}</span>
+                          </div>
+                        )}
+                      </div>
+                    ))}
+                  </>
+                ) : (
+                  <>
+                    <Activity className="w-12 h-12 mx-auto mb-2 text-muted-foreground" />
+                    <p className="font-semibold">{t('dashboard.todayIsRestDay', { default: "Today is a rest day! Enjoy it! 😊" })}</p>
+                  </>
+                )
+              ) : (
+                <>
+                  <Activity className="w-12 h-12 mx-auto mb-2 text-muted-foreground" />
+                  <p className="font-semibold">{t('dashboard.viewCalendarToSeeWorkout', { default: "Your scheduled workout will appear here." })}</p>
+                </>
+              )}
             </div>
 
             {isMounted && languageContextIsClient && upcomingWorkouts.length > 0 && (
@@ -304,7 +335,15 @@ export default function DashboardPage() {
                 <div className="grid gap-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-2 xl:grid-cols-3">
                   {displayedUpcomingWorkouts.map(workout => (
                     <Card key={workout.id} className="p-2.5 bg-black/10 dark:bg-white/10 hover:shadow-md transition-shadow text-xs text-primary-foreground">
-                      {/* ... upcoming workout card ... */}
+                      <div className="text-center">
+                        <p className="font-semibold text-white uppercase tracking-wider">{workout.dayOfWeek}</p>
+                        <p className="text-lg font-bold text-primary-foreground">{workout.dayOfMonth}</p>
+                        <p className="text-muted-foreground uppercase">{workout.month}</p>
+                      </div>
+                      <Separator className="my-1.5 bg-primary-foreground/30" />
+                      <p className="mt-1 font-medium text-center truncate" title={workout.planName}>
+                        {workout.planName}
+                      </p>
                     </Card>
                   ))}
                 </div>
@@ -322,12 +361,43 @@ export default function DashboardPage() {
           </Link>
         </Card>
 
+        {/* Activity & History */}
         <Card className="shadow-xl mt-6 lg:mt-0 bg-gradient-to-br from-teal-500/80 to-cyan-600/80 dark:from-teal-900/80 dark:to-cyan-950/80 text-primary-foreground">
           <CardHeader>
             <CardTitle>{t('dashboard.activityAndHistoryTitle', { default: "Activity & History" })}</CardTitle>
+            <CardDescription className="text-primary-foreground/80">
+              {t('dashboard.activityAndHistorySubtitle', { default: 'Your recent workout history' })}
+            </CardDescription>
           </CardHeader>
           <CardContent className="text-primary-foreground">
-            {/* ... activity & history list ... */}
+            {actualWorkoutHistory.length > 0 ? (
+              <ScrollArea className="h-64">
+                <ul className="space-y-2 pr-3">
+                  {actualWorkoutHistory.map((item, index) => (
+                    <li key={item.id}>
+                      <div className="flex items-center justify-between p-2 rounded-md bg-black/10 dark:bg-white/10 hover:bg-black/20 dark:hover:bg-white/20 transition-colors">
+                        <div className="flex-grow">
+                          <p className="font-semibold text-primary-foreground">
+                            {item.planName}
+                          </p>
+                          <p className="text-xs text-muted-foreground">{formatDateHistory(item.completionDate)}</p>
+                        </div>
+                        <div className="flex items-center text-sm text-muted-foreground shrink-0">
+                          <Clock className="w-3.5 h-3.5 mr-1.5" />
+                          <span>{item.duration}</span>
+                        </div>
+                      </div>
+                      {index < actualWorkoutHistory.length - 1 && <Separator className="my-2 bg-primary-foreground/30" />}
+                    </li>
+                  ))}
+                </ul>
+              </ScrollArea>
+            ) : (
+              <div className="flex flex-col items-center justify-center h-full text-center text-muted-foreground">
+                <Activity className="w-12 h-12 mb-2" />
+                <p>{t('dashboard.noWorkoutHistory', { default: 'No workout history yet. Start a workout to see your progress!' })}</p>
+              </div>
+            )}
           </CardContent>
         </Card>
       </div>
