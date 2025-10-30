@@ -363,7 +363,7 @@ export default function DashboardPage() {
             </Link>
           </CardContent>
 
-          <Link href="/start-workout" className="md:hidden absolute z-10 bottom-0 left-1/2 -translate-x-1/2 translate-y-1/2 bg-primary text-primary-foreground hover:bg-primary/90 rounded-full w-14 h-14 flex items-center justify-center shadow-xl focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background" aria-label={t('dashboard.logNewWorkout', { default: 'Start Workout' })} data-ai-hint="start-workout-fab">
+          <Link href="/start-workout" className="absolute z-10 bottom-0 left-1/2 -translate-x-1/2 translate-y-1/2 bg-primary text-primary-foreground hover:bg-primary/90 rounded-full w-14 h-14 flex items-center justify-center shadow-xl focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background" aria-label={t('dashboard.logNewWorkout', { default: 'Start Workout' })} data-ai-hint="start-workout-fab">
             <PlayCircle className="w-7 h-7 text-black" />
           </Link>
         </Card>

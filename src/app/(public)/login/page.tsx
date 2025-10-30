@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useAuth } from '@/lib/auth/auth-context';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -8,6 +8,8 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { z } from 'zod';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 
 const LoginSchema = z.object({
   email: z.string().email('Please enter a valid email address'),
@@ -16,10 +18,11 @@ const LoginSchema = z.object({
 
 type LoginForm = z.infer<typeof LoginSchema>;
 
-import { AuthProvider } from '@/context/auth-context';
+import { AuthProvider } from '@/lib/auth/auth-context';
 
 export default function LoginPage() {
-  const { signIn, loading, error: authError } = useAuth();
+  const { signIn, loading, error: authError, user } = useAuth();
+  const router = useRouter();
   const {
     register,
     handleSubmit,
@@ -27,6 +30,12 @@ export default function LoginPage() {
   } = useForm<LoginForm>({
     resolver: zodResolver(LoginSchema),
   });
+
+  useEffect(() => {
+    if (!loading && user) {
+      router.push('/');
+    }
+  }, [loading, user, router]);
 
   const onSubmit = async (data: LoginForm) => {
     await signIn(data);
@@ -86,6 +95,9 @@ export default function LoginPage() {
               )}
               <Button type="submit" disabled={isLoading} className="w-full">
                 {isLoading ? 'Signing in…' : 'Sign in'}
+              </Button>
+              <Button variant="outline" className="w-full" asChild>
+                <Link href="/signup">Register</Link>
               </Button>
             </form>
           </CardContent>

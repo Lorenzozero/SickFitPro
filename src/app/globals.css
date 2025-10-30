@@ -43,8 +43,8 @@
     /* Sidebar specific theme */
     --sidebar-background: 180 30% 97%; 
     --sidebar-foreground: 0 0% 3.9%; /* Testo nero */
-    --sidebar-primary: 180 100% 25.1%; /* Dark Teal for active/selected items */
-    --sidebar-primary-foreground: 0 0% 3.9%; /* Testo nero su primario sidebar */
+    --sidebar-primary: 180 100% 15%; /* Teal più scuro per miglior contrasto */
+    --sidebar-primary-foreground: 0 0% 98%; /* Testo bianco su primario sidebar */
     --sidebar-accent: 180 50% 90%; 
     --sidebar-accent-foreground: 0 0% 3.9%; /* Testo nero su accent sidebar */
     --sidebar-border: 180 30% 88%; /* Subtle teal border */
@@ -62,7 +62,7 @@
     --popover-foreground: 0 0% 98%;
 
     --primary: 0 0% 100%; /* Bianco */
-    --primary-foreground: 0 0% 98%; /* Testo bianco */
+    --primary-foreground: 0 0% 3.9%; /* Testo nero */
 
     --secondary: 240 3.7% 15.9%;
     --secondary-foreground: 0 0% 98%;
@@ -89,8 +89,8 @@
     /* Sidebar specific theme for dark mode */
     --sidebar-background: 180 80% 10%; 
     --sidebar-foreground: 0 0% 98%; /* Testo bianco */
-    --sidebar-primary: 182 100% 74.3%; /* Electric blue for active/selected items */
-    --sidebar-primary-foreground: 0 0% 98%; /* Testo bianco */
+    --sidebar-primary: 182 100% 65%; /* Electric blue più scuro per miglior contrasto */
+    --sidebar-primary-foreground: 0 0% 5%; /* Testo nero su primario sidebar */
     --sidebar-accent: 180 70% 15%; 
     --sidebar-accent-foreground: 0 0% 98%; /* Testo bianco */
     --sidebar-border: 180 60% 20%; /* Dark teal border */

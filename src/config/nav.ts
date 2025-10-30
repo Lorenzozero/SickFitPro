@@ -11,6 +11,8 @@ export interface NavItem {
   external?: boolean;
 }
 
+export const APP_NAME = "SickFitPro";
+
 export const navItems: NavItem[] = [
   // Voce Home rimossa
   {

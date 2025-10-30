@@ -17,6 +17,7 @@ function mapRtdbError(err: unknown, fallback: string) {
 
 export async function fetchWorkoutsRT(user: User): Promise<Workout[]> {
   const uid = user.uid;
+  console.log('fetchDashboardRT: User UID:', uid);
   try {
     const q = query(ref(rtdb, 'workouts'), orderByChild('userId'), equalTo(uid), limitToLast(100));
     const snap = await get(q);
@@ -45,21 +46,21 @@ export async function fetchWorkoutsRT(user: User): Promise<Workout[]> {
 
 export async function fetchDashboardRT(user: User): Promise<DashboardData> {
   const uid = user.uid;
-  try {
-    const sessionsQ = query(ref(rtdb, 'workout_sessions'), orderByChild('userId'), equalTo(uid), limitToLast(50));
-    const sessionsSnap = await get(sessionsQ);
-    const sessionsObj: Record<string, Omit<WorkoutSession, 'id'>> = sessionsSnap.val() || {};
-    const sessionsRaw = Object.entries(sessionsObj).map(([id, data]) => ({ id, ...(data as Omit<WorkoutSession, 'id'>) }));
+    try {
+      const sessionsQ = query(ref(rtdb, 'workout_sessions'), orderByChild('userId'), equalTo(uid), limitToLast(50));
+      const sessionsSnap = await get(sessionsQ);
+      const sessionsObj: Record<string, Omit<WorkoutSession, 'id'>> = sessionsSnap.val() || {};
+      const sessionsRaw = Object.entries(sessionsObj).map(([id, data]) => ({ id, ...(data as Omit<WorkoutSession, 'id'>) }));
 
-    const sessions: WorkoutSession[] = sessionsRaw
-      .map((s) => WorkoutSessionSchema.safeParse(s))
-      .filter((r): r is z.SafeParseSuccess<WorkoutSession> => r.success)
-      .map((r) => r.data)
-      .sort((a, b) => (b.completionDate || '').localeCompare(a.completionDate || ''));
+      const sessions: WorkoutSession[] = sessionsRaw
+        .map((s) => WorkoutSessionSchema.safeParse(s))
+        .filter((r): r is z.SafeParseSuccess<WorkoutSession> => r.success)
+        .map((r) => r.data)
+        .sort((a, b) => (b.completionDate || '').localeCompare(a.completionDate || ''));
 
-    const schedQ = query(ref(rtdb, 'schedules'), orderByChild('userId'), equalTo(uid), limitToLast(1));
-    const schedSnap = await get(schedQ);
-    const schedObj: Record<string, any> = schedSnap.val() || {};
+      const schedQ = query(ref(rtdb, 'schedules'), orderByChild('userId'), equalTo(uid), limitToLast(1));
+      const schedSnap = await get(schedQ);
+      const schedObj: Record<string, any> = schedSnap.val() || {};
     const first = Object.values(schedObj)[0] as { upcoming?: unknown[]; currentWeight?: number } | undefined;
 
     const upcomingRaw: unknown[] = Array.isArray(first?.upcoming) ? first!.upcoming!.slice(0, 10) : [];

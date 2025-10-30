@@ -1,5 +1,7 @@
+"use client";
+
 import { createContext, useContext, useEffect, useState, type ReactNode } from 'react';
-import { onAuthStateChanged, signInWithEmailAndPassword, signOut, type User } from 'firebase/auth';
+import { onAuthStateChanged, signInWithEmailAndPassword, signOut, createUserWithEmailAndPassword, type User } from 'firebase/auth';
 import { auth } from '../firebase';
 import * as Sentry from '@sentry/nextjs';
 import { toast } from 'sonner';
@@ -10,7 +12,17 @@ const SignInSchema = z.object({
   password: z.string().min(6, 'Password should be at least 6 characters long.'),
 });
 
+const SignUpSchema = z.object({
+  email: z.string().email('Please enter a valid email address.'),
+  password: z.string().min(6, 'Password should be at least 6 characters long.'),
+  confirmPassword: z.string().min(6, 'Password should be at least 6 characters long.'),
+}).refine((data) => data.password === data.confirmPassword, {
+  message: "Passwords don't match",
+  path: ["confirmPassword"],
+});
+
 type SignInInput = z.infer<typeof SignInSchema>;
+type SignUpInput = z.infer<typeof SignUpSchema>;
 
 interface AuthError {
   code: string;
@@ -22,6 +34,7 @@ interface AuthContextProps {
   loading: boolean;
   error: AuthError | null;
   signIn: (input: SignInInput) => Promise<void>;
+  signUp: (input: SignUpInput) => Promise<void>;
   signOutUser: () => Promise<void>;
   clearError: () => void;
 }
@@ -42,6 +55,10 @@ const getErrorMessage = (errorCode: string): string => {
       return 'Too many failed attempts. Please try again later.';
     case 'auth/network-request-failed':
       return 'Network error. Please check your connection and try again.';
+    case 'auth/email-already-in-use':
+      return 'The email address is already in use by another account.';
+    case 'auth/weak-password':
+      return 'The password is too weak.';
     default:
       return 'An unexpected error occurred. Please try again.';
   }
@@ -97,6 +114,30 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
+  const signUp = async (input: SignUpInput) => {
+    try {
+      const parsed = SignUpSchema.safeParse(input);
+      if (!parsed.success) {
+        const msg = parsed.error.issues[0]?.message || 'Invalid input.';
+        setError({ code: 'auth/invalid-input', message: msg });
+        toast.error(msg);
+        return;
+      }
+      setLoading(true);
+      setError(null);
+      await createUserWithEmailAndPassword(auth, parsed.data.email, parsed.data.password);
+      toast.success('Account created successfully');
+    } catch (err: any) {
+      const code = err?.code || 'auth/unknown';
+      const message = getErrorMessage(code);
+      setError({ code, message });
+      toast.error(message);
+      Sentry.captureException(err, { tags: { area: 'auth', op: 'sign_up' }, extra: { email: input.email } });
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const signOutUser = async () => {
     try {
       setLoading(true);
@@ -117,7 +158,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const clearError = () => setError(null);
 
   return (
-    <AuthContext.Provider value={{ user, loading, error, signIn, signOutUser, clearError }}>
+    <AuthContext.Provider value={{ user, loading, error, signIn, signUp, signOutUser, clearError }}>
       {children}
     </AuthContext.Provider>
   );
