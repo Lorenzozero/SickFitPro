@@ -1,3 +1,4 @@
+'use client';
 import { Suspense } from 'react';
 import { PageHeader } from '@/components/shared/page-header';
 import { ErrorBoundary } from '@/components/error-boundary';

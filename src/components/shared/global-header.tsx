@@ -40,7 +40,7 @@ export function GlobalHeader() {
             {user ? (
               <>
                 <DropdownMenuItem className="cursor-pointer" asChild>
-                  <Link href="/profile">Profile</Link>
+                  <Link href="/settings">Profile</Link>
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem className="cursor-pointer" onClick={signOut}>
