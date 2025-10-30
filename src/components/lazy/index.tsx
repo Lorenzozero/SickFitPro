@@ -2,9 +2,8 @@ import dynamic from 'next/dynamic';
 import React, { Suspense } from 'react';
 
 // Dynamically import heavy sections to reduce TTI
-// ... existing code ...
-
-export const DietPage = dynamic(() => import('../diet').then(m => m.default), {
+// Diet: import panel directly to avoid nested dynamic chains
+export const DietPage = dynamic(() => import('../diet/panel'), {
   ssr: false,
   loading: () => <div style={{height: 240}} aria-busy>Loading diet…</div>,
 });
