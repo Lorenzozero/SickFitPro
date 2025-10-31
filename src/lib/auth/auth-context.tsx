@@ -1,6 +1,7 @@
 "use client";
 
 import { createContext, useContext, useEffect, useState, type ReactNode } from 'react';
+import { FirebaseError } from 'firebase/app';
 import { onAuthStateChanged, signInWithEmailAndPassword, signOut, createUserWithEmailAndPassword, type User } from 'firebase/auth';
 import { auth } from '../firebase';
 import * as Sentry from '@sentry/nextjs';
@@ -78,7 +79,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         setError(null);
         Sentry.setUser(u ? { id: u.uid, email: u.email || undefined } : null);
       },
-      (authError) => {
+      (authError: any) => {
         setLoading(false);
         const code = authError?.code || 'auth/unknown';
         const message = getErrorMessage(code);
