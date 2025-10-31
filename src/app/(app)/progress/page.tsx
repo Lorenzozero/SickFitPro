@@ -1,4 +1,3 @@
-
 'use client';
 
 import { useState, type ChangeEvent, useEffect, useMemo, useRef } from 'react';
@@ -22,8 +21,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { format, parseISO, getISOWeek, getMonth, getYear, subWeeks, subMonths, subYears } from 'date-fns';
 import { it as dateFnsIt, es as dateFnsEs, fr as dateFnsFr, enUS as dateFnsEnUs } from 'date-fns/locale';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
-import prisma from '@/lib/database';
 
+// prisma import removed
 
 const BODY_MEASUREMENTS_STORAGE_KEY = 'sickfit-pro-userBodyMeasurements';
 const PROGRESS_PHOTOS_STORAGE_KEY = 'sickfit-pro-progressPhotos';
@@ -436,70 +435,6 @@ export default function ProgressPage() {
         </Card>
       </div>
 
-      <Card className="mt-6 shadow-lg rounded-xl border bg-gradient-to-r from-yellow-400/80 to-pink-500/80 dark:from-orange-800/80 dark:to-pink-900/80 text-primary-foreground">
-        <CardHeader className="flex flex-row items-center justify-between">
-            <div className="flex items-center">
-                <BarChart className="w-5 h-5 mr-2 text-primary-foreground" />
-                <CardTitle className="text-primary-foreground">{t('progressPage.bodyMeasurementsCardTitle')}</CardTitle>
-            </div>
-            <div className="flex items-center gap-2">
-                        {/* Tooltip rimosso per semplificare e risolvere potenziale conflitto di overlay */}
-                        <Select value={reminderFrequency} onValueChange={(value) => setReminderFrequency(value as ReminderFrequency)}>
-                                <SelectTrigger asChild aria-label={t('progressPage.measurementReminderSettingsAriaLabel', {default: "Measurement Reminder Settings"})} >
-                                    <Button variant="ghost" size="icon" className="text-primary-foreground hover:bg-white/20 [&_svg]:text-primary-foreground">
-                                       <Bell className="w-4 h-4" />
-                                    </Button>
-                                </SelectTrigger>
-                                <SelectContent sideOffset={5}> {/* Aggiunto sideOffset per un migliore posizionamento */}
-                                    <SelectItem value="off">{t('progressPage.reminderOff')}</SelectItem>
-                                    <SelectItem value="weekly">{t('progressPage.reminderWeekly')}</SelectItem>
-                                    <SelectItem value="bi-weekly">{t('progressPage.reminderBiWeekly')}</SelectItem>
-                                    <SelectItem value="monthly">{t('progressPage.reminderMonthly')}</SelectItem>
-                                </SelectContent>
-                            </Select>
-                <Button onClick={() => openMeasurementDialog()} className="bg-white hover:bg-slate-100 text-black rounded-full">
-                    <PlusCircle className="w-4 h-4 md:mr-2" /> 
-                    <span className="hidden md:inline">{t('progressPage.addMeasurementButton')}</span>
-                </Button>
-            </div>
-        </CardHeader>
-        <CardContent>
-            {bodyMeasurements.length > 0 ? (
-                <div className="w-full overflow-x-auto">
-                  <Table>
-                      <TableHeader >
-                          <TableRow className="border-primary-foreground/30">
-                              <TableHead className="min-w-[120px] text-primary-foreground">{t('progressPage.tableHeaderDate')}</TableHead>
-                              <TableHead className="min-w-[150px] text-primary-foreground">{t('progressPage.tableHeaderMeasurementName')}</TableHead>
-                              <TableHead className="min-w-[180px] text-primary-foreground">{t('progressPage.tableHeaderValue')}</TableHead>
-                              <TableHead className="text-right min-w-[100px] text-primary-foreground">{t('exercisesPage.tableHeaderActions')}</TableHead> 
-                            </TableRow>
-                      </TableHeader>
-                      <TableBody>
-                          {bodyMeasurements.sort((a,b) => new Date(b.date).getTime() - new Date(a.date).getTime()).map(m => (
-                              <TableRow key={m.id} className="border-primary-foreground/20 hover:bg-white/10">
-                                  <TableCell className="text-primary-foreground">{new Date(m.date + 'T00:00:00').toLocaleDateString(languageContextIsClient ? language : 'en-US', { year: 'numeric', month: 'short', day: 'numeric' })}</TableCell>
-                                  <TableCell className="text-primary-foreground">{t(`progressPage.measurementName${m.measurementName.charAt(0).toUpperCase() + m.measurementName.slice(1)}`, { default: m.measurementName })}</TableCell>
-                                  <TableCell className="text-primary-foreground">{m.value} {m.unit}{m.notes ? ` (${m.notes})` : ''}</TableCell>
-                                  <TableCell className="text-right space-x-1 sm:space-x-2"> {/* text-black applied to edit button */}
-                                      <Button variant="ghost" size="icon" onClick={() => openMeasurementDialog(m)} className="text-primary-foreground hover:bg-white/20">
-                                          <Edit2 className="w-4 h-4" />
-                                      </Button>
-                                      <Button variant="ghost" size="icon" onClick={() => handleDeleteMeasurement(m.id)}>
-                                          <Trash2 className="w-4 h-4 text-destructive" />
-                                      </Button>
-                                  </TableCell>
-                              </TableRow>
-                          ))}
-                      </TableBody>
-                  </Table>
-                </div>
-            ) : (
-                <p className="text-sm text-center text-primary-foreground/80 py-4">{t('progressPage.noMeasurementsYet')}</p>
-            )}
-        </CardContent>
-      </Card>
-
       <Card className="mt-6 shadow-lg rounded-xl border bg-gradient-to-r from-orange-500/20 via-orange-500/80 to-orange-500/20 dark:from-orange-700/20 dark:via-orange-700/80 dark:to-orange-700/20 text-primary-foreground">
         <CardHeader className="flex flex-row items-center justify-between">
           <CardTitle>{t('progressPage.photoComparisonCardTitle')}</CardTitle>
@@ -568,35 +503,5 @@ export default function ProgressPage() {
     </>
   ); // End of ProgressPage component return
 
-  // Moved useEffects for DB interaction (see important note below)
-  useEffect(() => {
-    if (!isClient) return; // Ensure prisma calls are attempted only client-side (still problematic)
-    const fetchBodyMeasurements = async () => {
-        // IMPORTANT: Direct Prisma calls in 'use client' components are generally not recommended.
-        // This will likely fail as Prisma is meant for server-side execution.
-        // Consider moving this logic to a Server Action or an API route.
-        // const bodyMeasurementsFromDB = await prisma.bodyMeasurement.findMany();
-        // setBodyMeasurements(bodyMeasurementsFromDB);
-        console.warn("Attempting to fetch body measurements with Prisma on client-side. This should be refactored.");
-    };
-    fetchBodyMeasurements();
-  }, [isClient]);
-
-  useEffect(() => {
-    if (!isClient || bodyMeasurements.length === 0) return; // Avoid running if no data or not client
-    const saveBodyMeasurementsToDB = async () => {
-        // IMPORTANT: Similar to fetching, saving directly with Prisma here is problematic.
-        // Also, createMany will attempt to re-insert all items on every change.
-        // await prisma.bodyMeasurement.createMany({ data: bodyMeasurements });
-        console.warn("Attempting to save body measurements with Prisma on client-side. This should be refactored.");
-    };
-    // saveBodyMeasurementsToDB(); // Temporarily commented out to prevent errors after fixing hook call
-  }, [bodyMeasurements, isClient]);
-
-  useEffect(() => {
-    if (!isClient) return;
-    // Similar warnings apply for fetching and saving progress photos with Prisma on the client.
-    console.warn("Attempting to fetch/save progress photos with Prisma on client-side. This should be refactored.");
-  }, [isClient, progressPhotos]);
-
-} // End of ProgressPage component function
+  // Removed prisma client usage/hooks; client-side direct Prisma calls are invalid. Keep localStorage-only behavior.
+}
