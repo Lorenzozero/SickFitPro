@@ -9,4 +9,3 @@ const Panel = () => {
 };
 
 export default Panel;
-ò+
